@@ -1,5 +1,6 @@
 import os
 import random
+import uuid
 
 from django.contrib.auth import get_user_model
 from django.core.validators import FileExtensionValidator
@@ -15,13 +16,12 @@ def upload_publication_image_to(instance, filename):
 
 
 class Publication(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
     views = models.PositiveBigIntegerField(default=0)
     title = models.CharField(max_length=255, null=True, blank=True)
     content = models.TextField()
     writer = models.ForeignKey(
-        get_user_model(),
-        on_delete=models.CASCADE,
-        related_name='publications'
+        get_user_model(), on_delete=models.CASCADE, related_name="publications"
     )
 
     is_published = models.BooleanField(default=False, editable=False)
@@ -39,9 +39,7 @@ class Publication(models.Model):
 class Hashtags(models.Model):
     tag = models.CharField(max_length=64)
     publication = models.ForeignKey(
-        "Publication",
-        related_name="hashtags",
-        on_delete=models.CASCADE
+        "Publication", related_name="hashtags", on_delete=models.CASCADE
     )
 
 
@@ -51,9 +49,7 @@ class PublicationImage(models.Model):
         validators=[FileExtensionValidator(ALLOWED_IMAGES_EXTENSIONS)],
     )
     publication = models.ForeignKey(
-        "Publication",
-        related_name="images",
-        on_delete=models.CASCADE
+        "Publication", related_name="images", on_delete=models.CASCADE
     )
     timestamp = models.DateTimeField(auto_now=True)
 
@@ -68,9 +64,7 @@ class PublicationImage(models.Model):
 class PublicationImageUrl(models.Model):
     image_url = models.URLField()
     publication = models.ForeignKey(
-        "Publication",
-        related_name="image_urls",
-        on_delete=models.CASCADE
+        "Publication", related_name="image_urls", on_delete=models.CASCADE
     )
     timestamp = models.DateTimeField(auto_now=True)
 
@@ -82,14 +76,10 @@ class Bookmark(models.Model):
     is_bookmarked = models.BooleanField(default=True)
 
     publication = models.ForeignKey(
-        "Publication",
-        related_name="bookmarks",
-        on_delete=models.CASCADE
+        "Publication", related_name="bookmarks", on_delete=models.CASCADE
     )
     writer = models.ForeignKey(
-        get_user_model(),
-        on_delete=models.CASCADE,
-        related_name='bookmarks'
+        get_user_model(), on_delete=models.CASCADE, related_name="bookmarks"
     )
     timestamp = models.DateTimeField(auto_now=True)
 
@@ -101,14 +91,10 @@ class UpVote(models.Model):
     up_vote = models.BooleanField(default=True)
 
     publication = models.ForeignKey(
-        "Publication",
-        related_name="up_votes",
-        on_delete=models.CASCADE
+        "Publication", related_name="up_votes", on_delete=models.CASCADE
     )
     writer = models.ForeignKey(
-        get_user_model(),
-        on_delete=models.CASCADE,
-        related_name='up_voted_publications'
+        get_user_model(), on_delete=models.CASCADE, related_name="up_voted_publications"
     )
     timestamp = models.DateTimeField(auto_now=True)
 
@@ -120,14 +106,12 @@ class DownVotes(models.Model):
     down_vote = models.BooleanField(default=True)
 
     publication = models.ForeignKey(
-        "Publication",
-        related_name="down_votes",
-        on_delete=models.CASCADE
+        "Publication", related_name="down_votes", on_delete=models.CASCADE
     )
     writer = models.ForeignKey(
         get_user_model(),
         on_delete=models.CASCADE,
-        related_name='down_voted_publications'
+        related_name="down_voted_publications",
     )
     timestamp = models.DateTimeField(auto_now=True)
 
@@ -139,13 +123,9 @@ class ReportPublication(models.Model):
     reason = models.TextField()
 
     publication = models.ForeignKey(
-        "Publication",
-        on_delete=models.CASCADE,
-        related_name="reports"
+        "Publication", on_delete=models.CASCADE, related_name="reports"
     )
     writer = models.ForeignKey(
-        get_user_model(),
-        on_delete=models.CASCADE,
-        related_name="reported_publications"
+        get_user_model(), on_delete=models.CASCADE, related_name="reported_publications"
     )
     timestamp = models.DateTimeField(auto_now=True)
