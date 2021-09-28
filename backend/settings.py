@@ -41,14 +41,19 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+
+    # external apps
     "rest_framework",
+    "phonenumber_field",
     "django_filters",
     "corsheaders",
 
+    # internal apps
+    "account",
     "community",
     "publication",
     "comment",
-    "notification"
+    "notification",
 ]
 
 MIDDLEWARE = [
@@ -185,3 +190,5 @@ EMAIL_HOST_USER = "foo@bar.com"
 
 ALLOWED_IMAGES_EXTENSIONS = ["png", "jpg", "jpeg", "gif", "bmp", "tiff", "JPG"]
 MAX_UPLOAD_IMAGE_SIZE = 70000
+
+DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
