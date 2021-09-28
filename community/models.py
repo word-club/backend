@@ -1,5 +1,6 @@
 import os
 import random
+import uuid
 
 from django.contrib.auth import get_user_model
 from django.core.validators import FileExtensionValidator
@@ -20,6 +21,7 @@ def upload_cover_to(instance, filename):
 
 
 class Community(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
     name = models.CharField(max_length=64)
     description = models.CharField(max_length=512)
     email = models.EmailField()
@@ -36,9 +38,7 @@ class CommunityAvatar(models.Model):
         validators=[FileExtensionValidator(ALLOWED_IMAGES_EXTENSIONS)],
     )
     community = models.ForeignKey(
-        "Community",
-        on_delete=models.CASCADE,
-        related_name="avatars"
+        "Community", on_delete=models.CASCADE, related_name="avatars"
     )
     timestamp = models.DateTimeField(auto_now=True)
 
@@ -49,9 +49,7 @@ class CommunityCover(models.Model):
         validators=[FileExtensionValidator(ALLOWED_IMAGES_EXTENSIONS)],
     )
     community = models.ForeignKey(
-        "Community",
-        on_delete=models.CASCADE,
-        related_name="covers"
+        "Community", on_delete=models.CASCADE, related_name="covers"
     )
     timestamp = models.DateTimeField(auto_now=True)
 
@@ -59,9 +57,7 @@ class CommunityCover(models.Model):
 class CommunityRule(models.Model):
     rule = models.CharField(max_length=512)
     community = models.ForeignKey(
-        "Community",
-        on_delete=models.CASCADE,
-        related_name="rules"
+        "Community", on_delete=models.CASCADE, related_name="rules"
     )
     timestamp = models.DateTimeField(auto_now=True)
 
@@ -71,12 +67,10 @@ class SubscribeCommunity(models.Model):
     subscriber = models.ForeignKey(
         get_user_model(),
         on_delete=models.CASCADE,
-        related_name="subscribed_communities"
+        related_name="subscribed_communities",
     )
     community = models.ForeignKey(
-        "Community",
-        on_delete=models.CASCADE,
-        related_name="subscribers"
+        "Community", on_delete=models.CASCADE, related_name="subscribers"
     )
     timestamp = models.DateTimeField(auto_now=True)
 
@@ -84,14 +78,10 @@ class SubscribeCommunity(models.Model):
 class ReportCommunity(models.Model):
     reason = models.TextField()
     writer = models.ForeignKey(
-        get_user_model(),
-        on_delete=models.CASCADE,
-        related_name="reported_communities"
+        get_user_model(), on_delete=models.CASCADE, related_name="reported_communities"
     )
     community = models.ForeignKey(
-        "Community",
-        on_delete=models.CASCADE,
-        related_name="reports"
+        "Community", on_delete=models.CASCADE, related_name="reports"
     )
     timestamp = models.DateTimeField(auto_now=True)
 
@@ -101,12 +91,9 @@ class DisableNotifications(models.Model):
     writer = models.ForeignKey(
         get_user_model(),
         on_delete=models.CASCADE,
-        related_name="notifications_disabled_communities"
+        related_name="notifications_disabled_communities",
     )
     community = models.ForeignKey(
-        "Community",
-        on_delete=models.CASCADE,
-        related_name="notifications_disabled_by"
+        "Community", on_delete=models.CASCADE, related_name="notifications_disabled_by"
     )
     timestamp = models.DateTimeField(auto_now=True)
-
