@@ -26,9 +26,7 @@ def upload_cover_image_to(instance, filename):
 class Profile(models.Model):
     code = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
     user = models.OneToOneField(
-        get_user_model(),
-        on_delete=models.CASCADE,
-        editable=False
+        get_user_model(), on_delete=models.CASCADE, editable=False
     )
     bio = models.TextField(null=True, blank=True)
     birth_date = models.DateField(null=True, blank=True)
@@ -59,9 +57,7 @@ class ProfileAvatar(models.Model):
         validators=[FileExtensionValidator(ALLOWED_IMAGES_EXTENSIONS)],
     )
     profile = models.ForeignKey(
-        Profile,
-        on_delete=models.CASCADE,
-        related_name="images"
+        Profile, on_delete=models.CASCADE, related_name="images"
     )
     timestamp = models.DateTimeField(auto_now=True)
 
@@ -78,9 +74,7 @@ class ProfileCover(models.Model):
         validators=[FileExtensionValidator(ALLOWED_IMAGES_EXTENSIONS)],
     )
     profile = models.ForeignKey(
-        Profile,
-        on_delete=models.CASCADE,
-        related_name="covers"
+        Profile, on_delete=models.CASCADE, related_name="covers"
     )
     timestamp = models.DateTimeField(auto_now=True)
 
@@ -90,8 +84,6 @@ class ProfileCover(models.Model):
 
 class ResetPasswordCode(models.Model):
     user = models.ForeignKey(
-        get_user_model(),
-        on_delete=models.CASCADE,
-        related_name="reset_password_codes"
+        get_user_model(), on_delete=models.CASCADE, related_name="reset_password_codes"
     )
     code = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)

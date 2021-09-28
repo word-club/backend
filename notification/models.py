@@ -51,8 +51,9 @@ class Notification(models.Model):
     comment_involved = models.ForeignKey(
         Comment,
         on_delete=models.CASCADE,
-        null=True, blank=True,
-        related_name="involvements"
+        null=True,
+        blank=True,
+        related_name="involvements",
     )
 
     timestamp = models.DateTimeField(auto_now=True)

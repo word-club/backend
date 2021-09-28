@@ -41,13 +41,11 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-
     # external apps
     "rest_framework",
     "phonenumber_field",
     "django_filters",
     "corsheaders",
-
     # internal apps
     "account",
     "community",
