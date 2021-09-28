@@ -1,0 +1,5 @@
+# IDE Caches
+# -------------
+venv/
+.idea/
+*/__pycache__/
