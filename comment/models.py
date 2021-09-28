@@ -1,5 +1,6 @@
 import os
 import random
+import uuid
 
 from django.contrib.auth import get_user_model
 from django.core.validators import FileExtensionValidator
@@ -16,23 +17,16 @@ def upload_comment_image_to(instance, filename):
 
 
 class Comment(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
     comment = models.TextField()
     publication = models.ForeignKey(
-        Publication,
-        related_name="comments",
-        on_delete=models.CASCADE
+        Publication, related_name="comments", on_delete=models.CASCADE
     )
     writer = models.ForeignKey(
-        get_user_model(),
-        on_delete=models.CASCADE,
-        related_name='comments'
+        get_user_model(), on_delete=models.CASCADE, related_name="comments"
     )
     reply_to = models.ForeignKey(
-        "self",
-        null=True,
-        blank=True,
-        on_delete=models.CASCADE,
-        related_name="replies"
+        "self", null=True, blank=True, on_delete=models.CASCADE, related_name="replies"
     )
     timestamp = models.DateTimeField(auto_now=True)
 
@@ -46,9 +40,7 @@ class CommentImage(models.Model):
         validators=[FileExtensionValidator(ALLOWED_IMAGES_EXTENSIONS)],
     )
     comment = models.ForeignKey(
-        "Comment",
-        related_name="images",
-        on_delete=models.CASCADE
+        "Comment", related_name="images", on_delete=models.CASCADE
     )
     timestamp = models.DateTimeField(auto_now=True)
 
@@ -63,9 +55,7 @@ class CommentImage(models.Model):
 class CommentImageUrl(models.Model):
     url = models.URLField()
     publication = models.ForeignKey(
-        "Comment",
-        related_name="image_urls",
-        on_delete=models.CASCADE
+        "Comment", related_name="image_urls", on_delete=models.CASCADE
     )
     timestamp = models.DateTimeField(auto_now=True)
 
@@ -76,9 +66,7 @@ class CommentImageUrl(models.Model):
 class CommentVideoUrl(models.Model):
     url = models.URLField()
     publication = models.ForeignKey(
-        "Comment",
-        related_name="video_urls",
-        on_delete=models.CASCADE
+        "Comment", related_name="video_urls", on_delete=models.CASCADE
     )
     timestamp = models.DateTimeField(auto_now=True)
 
@@ -90,14 +78,10 @@ class UpVote(models.Model):
     up_vote = models.BooleanField(default=True)
 
     publication = models.ForeignKey(
-        "Comment",
-        related_name="up_votes",
-        on_delete=models.CASCADE
+        "Comment", related_name="up_votes", on_delete=models.CASCADE
     )
     writer = models.ForeignKey(
-        get_user_model(),
-        on_delete=models.CASCADE,
-        related_name='up_voted_comments'
+        get_user_model(), on_delete=models.CASCADE, related_name="up_voted_comments"
     )
     timestamp = models.DateTimeField(auto_now=True)
 
@@ -109,14 +93,10 @@ class DownVotes(models.Model):
     down_vote = models.BooleanField(default=True)
 
     publication = models.ForeignKey(
-        "Comment",
-        related_name="down_votes",
-        on_delete=models.CASCADE
+        "Comment", related_name="down_votes", on_delete=models.CASCADE
     )
     writer = models.ForeignKey(
-        get_user_model(),
-        on_delete=models.CASCADE,
-        related_name='down_voted_comments'
+        get_user_model(), on_delete=models.CASCADE, related_name="down_voted_comments"
     )
     timestamp = models.DateTimeField(auto_now=True)
 
@@ -127,14 +107,10 @@ class DownVotes(models.Model):
 class ReportComment(models.Model):
     reason = models.TextField()
     comment = models.ForeignKey(
-        "Comment",
-        on_delete=models.CASCADE,
-        related_name="reports"
+        "Comment", on_delete=models.CASCADE, related_name="reports"
     )
     writer = models.ForeignKey(
-        get_user_model(),
-        on_delete=models.CASCADE,
-        related_name="reported_comments"
+        get_user_model(), on_delete=models.CASCADE, related_name="reported_comments"
     )
     timestamp = models.DateTimeField(auto_now=True)
 
