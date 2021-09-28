@@ -44,6 +44,11 @@ INSTALLED_APPS = [
     "rest_framework",
     "django_filters",
     "corsheaders",
+
+    "community",
+    "publication",
+    "comment",
+    "notification"
 ]
 
 MIDDLEWARE = [
@@ -177,3 +182,6 @@ EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = "127.0.0.1"
 EMAIL_PORT = 1025
 EMAIL_HOST_USER = "foo@bar.com"
+
+ALLOWED_IMAGES_EXTENSIONS = ["png", "jpg", "jpeg", "gif", "bmp", "tiff", "JPG"]
+MAX_UPLOAD_IMAGE_SIZE = 70000
