@@ -198,3 +198,23 @@ class CommunityAdmin(models.Model):
 
     class Meta:
         ordering = ["-timestamp"]
+
+
+class CommunityAuthorizationCode(models.Model):
+    code = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
+    community = models.ForeignKey(
+        "Community",
+        editable=False,
+        on_delete=models.CASCADE,
+        related_name="authorization_codes"
+    )
+    created_by = models.ForeignKey(
+        get_user_model(),
+        on_delete=models.CASCADE,
+        related_name="requested_community_authorization_codes",
+        editable=False
+    )
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-timestamp"]

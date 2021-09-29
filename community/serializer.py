@@ -92,6 +92,7 @@ class CommunityAdminSerializer(serializers.ModelSerializer):
 
 class CommunitySerializer(serializers.ModelSerializer):
     hashtags = CommunityHashtagSerializer(many=True, read_only=True)
+    admins = CommunityAdminSerializer(many=True, read_only=True)
     rules = CommunityRuleSerializer(many=True, read_only=True)
     avatars = CommunityAvatarSerializer(many=True, read_only=True)
     covers = CommunityCoverSerializer(many=True, read_only=True)

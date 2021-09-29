@@ -70,4 +70,14 @@ urlpatterns += [
         "community-admin/<str:pk>/admin",
         RemoveCommunityAdmin.as_view(),
     ),
+    path(
+        "authorize-community/<str:pk>",
+        RequestCommunityAuthorization.as_view(),
+        name="authorize-community"
+    ),
+    path(
+        "authorize-community/<str:pk>",
+        ConfirmCommunityAuthorization.as_view,
+        name="confirm-authorize-community"
+    )
 ]

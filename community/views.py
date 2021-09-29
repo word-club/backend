@@ -1,3 +1,8 @@
+from django.conf import settings
+from django.contrib.sites.shortcuts import get_current_site
+from django.core.mail import send_mail
+from django.template.loader import render_to_string
+from django.utils import timezone
 from rest_framework import viewsets, status
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.generics import get_object_or_404
@@ -105,7 +110,7 @@ class ReportACommunity(APIView):
     def post(self, request, pk):
         community = get_object_or_404(Community, pk=pk)
         self.check_object_permissions(request, community)
-        context = {"community": community, "request": request}
+        context = { "community": community, "request": request }
         serializer = ReportCommunitySerializer(data=request.data, context=context)
         if serializer.is_valid():
             serializer.save()
@@ -120,7 +125,7 @@ class SubscribeToACommunity(APIView):
     def post(self, request, pk):
         community = get_object_or_404(Community, pk=pk)
         self.check_object_permissions(request, community)
-        context = {"community": community, "request": request}
+        context = { "community": community, "request": request }
         serializer = SubscribeCommunitySerializer(data=request.data, context=context)
         if serializer.is_valid():
             serializer.save()
@@ -135,7 +140,7 @@ class DisableNotificationsForACommunity(APIView):
     def post(self, request, pk):
         community = get_object_or_404(Community, pk=pk)
         self.check_object_permissions(request, community)
-        context = {"community": community, "request": request}
+        context = { "community": community, "request": request }
         serializer = DisableNotificationSerializer(data=request.data, context=context)
         if serializer.is_valid():
             serializer.save()
@@ -150,7 +155,7 @@ class AddCommunityAvatar(APIView):
     def post(self, request, pk):
         community = get_object_or_404(Community, pk=pk)
         self.check_object_permissions(request, community)
-        context = {"community": community, "request": request}
+        context = { "community": community, "request": request }
         serializer = CommunityAvatarSerializer(data=request.data, context=context)
         if serializer.is_valid():
             serializer.save()
@@ -165,7 +170,7 @@ class AddCommunityCover(APIView):
     def post(self, request, pk):
         community = get_object_or_404(Community, pk=pk)
         self.check_object_permissions(request, community)
-        context = {"community": community, "request": request}
+        context = { "community": community, "request": request }
         serializer = CommunityCoverSerializer(data=request.data, context=context)
         if serializer.is_valid():
             serializer.save()
@@ -216,7 +221,7 @@ class AddCommunityHashtag(APIView):
     def post(self, request, pk):
         community = get_object_or_404(Community, pk=pk)
         self.check_object_permissions(request, community)
-        context = {"community": community, "request": request}
+        context = { "community": community, "request": request }
         serializer = CommunityHashtagSerializer(request.data, context=context)
         if serializer.is_valid():
             serializer.save()
@@ -242,7 +247,7 @@ class AddCommunityAdmin(APIView):
     def post(self, request, pk):
         community = get_object_or_404(Community, pk=pk)
         self.check_object_permissions(request, community)
-        context = {"community": community, "request": request}
+        context = { "community": community, "request": request }
         serializer = CommunityAdminSerializer(request.data, context=context)
         if serializer.is_valid():
             serializer.save()
@@ -258,4 +263,53 @@ class RemoveCommunityAdmin(APIView):
         community_admin = get_object_or_404(CommunityAdmin, pk=pk)
         self.check_object_permissions(request, community_admin.community)
         community_admin.delete()
+        return Response(status=status.HTTP_200_OK)
+
+
+class RequestCommunityAuthorization(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsCommunityAdministrator]
+
+    def post(self, request, pk):
+        community = get_object_or_404(Community, pk=pk)
+        self.check_object_permissions(request, community)
+        if community.email:
+            return Response(status=status.HTTP_400_BAD_REQUEST,
+                data={ "details": "Community does not have email set." })
+        if community.is_authorized:
+            return Response(status=status.HTTP_204_NO_CONTENT, data={ "details": "Community is already authorized." })
+        codes = CommunityAuthorizationCode.objects.filter(community=community)
+        [code.delete() for code in codes]  # delete every pre-existing codes
+        code = CommunityAuthorizationCode.objects.create(community=community)
+        mail_subject = "Authorize Community"
+        message = render_to_string(
+            "authorize_community.html",
+            {
+                "user"  : request.user.username,
+                "domain": get_current_site(request).domain,
+                "code"  : code.code,
+            },
+        )
+        send_mail(
+            mail_subject,
+            message="AuthorizeCommunity",
+            from_email=settings.EMAIL_HOST_USER,
+            recipient_list=[community.email],
+            html_message=message,
+        )
+        return Response(status=status.HTTP_200_OK)
+
+
+class ConfirmCommunityAuthorization(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsCommunityAdministrator]
+
+    def post(self, request, pk):
+        community_authorize_code = get_object_or_404(CommunityAuthorizationCode, pk=pk)
+        self.check_object_permissions(request, community_authorize_code.community)
+        community_to_authorize = community_authorize_code.community
+        community_to_authorize.is_authorized = True
+        community_to_authorize.authorized_at = timezone.now()
+        community_to_authorize.save()
+        community_authorize_code.delete()
         return Response(status=status.HTTP_200_OK)

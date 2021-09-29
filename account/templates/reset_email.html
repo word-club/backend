@@ -46,7 +46,7 @@
 			<!-- Text -->
 			<p class="card-text">
 				<a class="action-text"
-					href="{% if request.is_secure %}https{% else %}http{% endif %}://localhost:8000{% url 'accounts:reset-password-confirm' code=code %}">
+					href="{% if request.is_secure %}https{% else %}http{% endif %}://localhost:8000{% url 'account:reset-password-confirm' code=code %}">
 					<h5 class="waves-effect waves-light">Click here to proceed.<i class="fas fa-lock-open ml-2"></i></h5>
 				</a>
 			</p>

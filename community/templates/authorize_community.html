@@ -1,0 +1,16 @@
+<html>
+    <head>
+        <title>Authorize Community | Word Club</title>
+    </head>
+    <body>
+        <div>
+            Community Admin: {{ user }}
+            Domain: {{ domain }}
+            Authorization Code: {{ code }}
+            <a class="action-text"
+               href="{% if request.is_secure %}https{% else %}http{% endif %}://localhost:8000{% url 'community:authorize-community-confirm' code=code %}">
+                <h5 class="waves-effect waves-light">Click here to proceed.<i class="fas fa-lock-open ml-2"></i></h5>
+            </a>
+        </div>
+    </body>
+</html>
