@@ -23,35 +23,51 @@ urlpatterns += [
         AddCommunityCover.as_view(),
     ),
     path(
-        "disable-notifications/<int:pk>",
+        "community/<str:pk>/hashtag",
+        AddCommunityHashtag.as_view(),
+    ),
+    path(
+        "community/<str:pk>/admin",
+        AddCommunityAdmin.as_view(),
+    ),
+    path(
+        "disable-notifications/<str:pk>",
         RemoveCommunityDisableNotification.as_view(),
     ),
     path(
-        "community-rule/<int:pk>",
+        "community-rule/<str:pk>",
         DeleteCommunityRule.as_view(),
     ),
     path(
-        "community-cover/<int:pk>",
+        "community-cover/<str:pk>",
         DeleteCommunityCover.as_view(),
     ),
     path(
-        "community-avatar/<int:pk>",
+        "community-avatar/<str:pk>",
         DeleteCommunityAvatar.as_view(),
     ),
     path(
-        "community-report/<int:pk>",
+        "community-report/<str:pk>",
         DeleteCommunityReport.as_view(),
     ),
     path(
-        "community-unsubscribe/<int:pk>",
+        "community-unsubscribe/<str:pk>",
         RemoveCommunityDisableNotification.as_view(),
     ),
     path(
-        "community-avatar/<int:pk>/set-active",
+        "community-hashtag/<str:pk>",
+        RemoveCommunityHashtag.as_view(),
+    ),
+    path(
+        "community-avatar/<str:pk>/set-active",
         SetActiveCommunityAvatar.as_view(),
     ),
     path(
-        "community-cover/<int:pk>/set-active",
+        "community-cover/<str:pk>/set-active",
         SetActiveCommunityCover.as_view(),
+    ),
+    path(
+        "community-admin/<str:pk>/admin",
+        RemoveCommunityAdmin.as_view(),
     ),
 ]

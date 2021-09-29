@@ -10,7 +10,7 @@ class CommunityAvatarSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         validated_data["created_by"] = self.context["request"].user
-        validated_data["community"] = self.context["community"].id
+        validated_data["community"] = self.context["community"]
         return super().create(validated_data)
 
 
@@ -21,7 +21,7 @@ class CommunityCoverSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         validated_data["created_by"] = self.context["request"].user
-        validated_data["community"] = self.context["community"].id
+        validated_data["community"] = self.context["community"]
         return super().create(validated_data)
 
 
@@ -32,7 +32,7 @@ class CommunityRuleSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         validated_data["created_by"] = self.context["request"].user
-        validated_data["community"] = self.context["community"].id
+        validated_data["community"] = self.context["community"]
         return super().create(**validated_data)
 
 
@@ -43,7 +43,7 @@ class ReportCommunitySerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         validated_data["created_by"] = self.context["request"].user
-        validated_data["community"] = self.context["community"].id
+        validated_data["community"] = self.context["community"]
         return super().create(validated_data)
 
 
@@ -54,7 +54,7 @@ class SubscribeCommunitySerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         validated_data["created_by"] = self.context["request"].user
-        validated_data["community"] = self.context["community"].id
+        validated_data["community"] = self.context["community"]
         return super().create(**validated_data)
 
 
@@ -65,11 +65,33 @@ class DisableNotificationSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         validated_data["created_by"] = self.context["request"].user
-        validated_data["community"] = self.context["community"].id
+        validated_data["community"] = self.context["community"]
         return super().create(**validated_data)
 
 
+class CommunityHashtagSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CommunityHashtag
+        fields = "__all__"
+
+    def create(self, validated_data):
+        validated_data["community"] = self.context["community"]
+        return super().create(validated_data)
+
+
+class CommunityAdminSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CommunityAdmin
+        fields = "__all__"
+
+    def create(self, validated_data):
+        validated_data["created_by"] = self.context["request"].user
+        validated_data["community"] = self.context["community"]
+        return super().create(validated_data)
+
+
 class CommunitySerializer(serializers.ModelSerializer):
+    hashtags = CommunityHashtagSerializer(many=True, read_only=True)
     rules = CommunityRuleSerializer(many=True, read_only=True)
     avatars = CommunityAvatarSerializer(many=True, read_only=True)
     covers = CommunityCoverSerializer(many=True, read_only=True)
