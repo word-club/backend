@@ -9,7 +9,5 @@ def set_creator_as_community_admin(sender, instance, created, **kwargs):
     if created:
         community_writer = instance.created_by
         CommunityAdmin.objects.create(
-            user=community_writer,
-            created_by=community_writer,
-            community=instance
+            user=community_writer, created_by=community_writer, community=instance
         )

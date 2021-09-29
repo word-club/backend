@@ -6,7 +6,11 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from account.permissions import IsOwner
-from community.permissions import IsCommunityAdministrator, IsSubscriber, IsNotASubscriber
+from community.permissions import (
+    IsCommunityAdministrator,
+    IsSubscriber,
+    IsNotASubscriber,
+)
 from community.serializer import *
 
 

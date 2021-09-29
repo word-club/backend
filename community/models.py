@@ -49,6 +49,7 @@ class Community(models.Model):
 
 
 class CommunityAvatar(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
     is_active = models.BooleanField(default=False, editable=False)
     image = models.ImageField(
         upload_to=upload_avatar_to,
@@ -70,6 +71,7 @@ class CommunityAvatar(models.Model):
 
 
 class CommunityCover(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
     is_active = models.BooleanField(default=False)
     image = models.ImageField(
         upload_to=upload_cover_to,
@@ -91,6 +93,7 @@ class CommunityCover(models.Model):
 
 
 class CommunityRule(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
     rule = models.TextField()
     community = models.ForeignKey(
         "Community", on_delete=models.CASCADE, related_name="rules", editable=False
@@ -108,6 +111,7 @@ class CommunityRule(models.Model):
 
 
 class CommunitySubscription(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
     subscriber = models.ForeignKey(
         get_user_model(),
         on_delete=models.CASCADE,
@@ -128,6 +132,7 @@ class CommunitySubscription(models.Model):
 
 
 class CommunityReport(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
     reason = models.TextField()
     created_by = models.ForeignKey(
         get_user_model(),
@@ -145,6 +150,7 @@ class CommunityReport(models.Model):
 
 
 class CommunityDisableNotifications(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
     created_by = models.ForeignKey(
         get_user_model(),
         on_delete=models.CASCADE,
@@ -165,35 +171,28 @@ class CommunityDisableNotifications(models.Model):
 
 
 class CommunityHashtag(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
     tag = models.ForeignKey(
-        HashTag,
-        related_name="communities",
-        on_delete=models.CASCADE
+        HashTag, related_name="communities", on_delete=models.CASCADE
     )
     publication = models.ForeignKey(
-        "Community",
-        related_name="hashtags",
-        on_delete=models.CASCADE,
-        editable=False
+        "Community", related_name="hashtags", on_delete=models.CASCADE, editable=False
     )
 
 
 class CommunityAdmin(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
     community = models.ForeignKey(
-        "Community",
-        on_delete=models.CASCADE,
-        related_name="admins"
+        "Community", on_delete=models.CASCADE, related_name="admins"
     )
     user = models.ForeignKey(
-        get_user_model(),
-        on_delete=models.CASCADE,
-        related_name="managed_communities"
+        get_user_model(), on_delete=models.CASCADE, related_name="managed_communities"
     )
     created_by = models.ForeignKey(
         get_user_model(),
         on_delete=models.CASCADE,
         related_name="created_community_admins",
-        editable=False
+        editable=False,
     )
     timestamp = models.DateTimeField(auto_now_add=True)
 

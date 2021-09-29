@@ -27,7 +27,9 @@ class IsSubscriber(permissions.BasePermission):
         community = obj
         if not check_models(user, community):
             return False
-        community_subscribers = CommunitySubscription.objects.filter(community=community)
+        community_subscribers = CommunitySubscription.objects.filter(
+            community=community
+        )
         return True if user in community_subscribers else False
 
 
@@ -37,5 +39,7 @@ class IsNotASubscriber(permissions.BasePermission):
         community = obj
         if not check_models(user, community):
             return False
-        community_subscribers = CommunitySubscription.objects.filter(community=community)
+        community_subscribers = CommunitySubscription.objects.filter(
+            community=community
+        )
         return True if user not in community_subscribers else False

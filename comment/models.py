@@ -35,6 +35,7 @@ class Comment(models.Model):
 
 
 class CommentImage(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
     image = models.ImageField(
         upload_to=upload_comment_image_to,
         validators=[FileExtensionValidator(ALLOWED_IMAGES_EXTENSIONS)],
@@ -53,6 +54,7 @@ class CommentImage(models.Model):
 
 
 class CommentImageUrl(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
     url = models.URLField()
     publication = models.ForeignKey(
         "Comment", related_name="image_urls", on_delete=models.CASCADE
@@ -64,6 +66,7 @@ class CommentImageUrl(models.Model):
 
 
 class CommentVideoUrl(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
     url = models.URLField()
     publication = models.ForeignKey(
         "Comment", related_name="video_urls", on_delete=models.CASCADE
@@ -75,6 +78,7 @@ class CommentVideoUrl(models.Model):
 
 
 class UpVote(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
     up_vote = models.BooleanField(default=True)
 
     publication = models.ForeignKey(
@@ -90,6 +94,7 @@ class UpVote(models.Model):
 
 
 class DownVotes(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
     down_vote = models.BooleanField(default=True)
 
     publication = models.ForeignKey(
@@ -105,6 +110,7 @@ class DownVotes(models.Model):
 
 
 class ReportComment(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
     reason = models.TextField()
     comment = models.ForeignKey(
         "Comment", on_delete=models.CASCADE, related_name="reports"

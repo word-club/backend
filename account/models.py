@@ -39,6 +39,7 @@ class Profile(models.Model):
 
 
 class ProfileAvatar(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
     is_active = models.BooleanField(default=False, editable=False)
     image = models.ImageField(
         upload_to=upload_profile_image_to,
@@ -59,6 +60,7 @@ class ProfileAvatar(models.Model):
 
 
 class ProfileCover(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
     is_active = models.BooleanField(default=False, editable=False)
     image = models.ImageField(
         upload_to=upload_cover_image_to,

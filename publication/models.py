@@ -38,13 +38,17 @@ class Publication(models.Model):
 
 
 class PublicationHashtag(models.Model):
-    tag = models.ForeignKey(HashTag, related_name="publications", on_delete=models.CASCADE)
+    id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
+    tag = models.ForeignKey(
+        HashTag, related_name="publications", on_delete=models.CASCADE
+    )
     publication = models.ForeignKey(
         "Publication", related_name="hashtags", on_delete=models.CASCADE, editable=False
     )
 
 
 class PublicationImage(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
     image = models.ImageField(
         upload_to=upload_publication_image_to,
         validators=[FileExtensionValidator(ALLOWED_IMAGES_EXTENSIONS)],
@@ -63,6 +67,7 @@ class PublicationImage(models.Model):
 
 
 class PublicationImageUrl(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
     image_url = models.URLField()
     publication = models.ForeignKey(
         "Publication", related_name="image_urls", on_delete=models.CASCADE
@@ -74,6 +79,7 @@ class PublicationImageUrl(models.Model):
 
 
 class Bookmark(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
     is_bookmarked = models.BooleanField(default=True)
 
     publication = models.ForeignKey(
@@ -89,6 +95,7 @@ class Bookmark(models.Model):
 
 
 class UpVote(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
     up_vote = models.BooleanField(default=True)
 
     publication = models.ForeignKey(
@@ -104,6 +111,7 @@ class UpVote(models.Model):
 
 
 class DownVotes(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
     down_vote = models.BooleanField(default=True)
 
     publication = models.ForeignKey(
@@ -121,6 +129,7 @@ class DownVotes(models.Model):
 
 
 class ReportPublication(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
     reason = models.TextField()
 
     publication = models.ForeignKey(
