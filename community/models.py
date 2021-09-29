@@ -6,6 +6,7 @@ from django.contrib.auth import get_user_model
 from django.core.validators import FileExtensionValidator
 from django.db import models
 from backend.settings import ALLOWED_IMAGES_EXTENSIONS
+from hashtag.models import HashTag
 
 
 def upload_avatar_to(instance, filename):
@@ -161,3 +162,40 @@ class CommunityDisableNotifications(models.Model):
     class Meta:
         ordering = ["-timestamp"]
         unique_together = [["created_by", "community"]]
+
+
+class CommunityHashtag(models.Model):
+    tag = models.ForeignKey(
+        HashTag,
+        related_name="communities",
+        on_delete=models.CASCADE
+    )
+    publication = models.ForeignKey(
+        "Community",
+        related_name="hashtags",
+        on_delete=models.CASCADE,
+        editable=False
+    )
+
+
+class CommunityAdmin(models.Model):
+    community = models.ForeignKey(
+        "Community",
+        on_delete=models.CASCADE,
+        related_name="admins"
+    )
+    user = models.ForeignKey(
+        get_user_model(),
+        on_delete=models.CASCADE,
+        related_name="managed_communities"
+    )
+    created_by = models.ForeignKey(
+        get_user_model(),
+        on_delete=models.CASCADE,
+        related_name="created_community_admins",
+        editable=False
+    )
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-timestamp"]
