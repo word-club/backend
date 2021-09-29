@@ -92,13 +92,13 @@ class FollowUser(models.Model):
         get_user_model(),
         on_delete=models.CASCADE,
         related_name="following",
-        editable=False
+        editable=False,
     )
     user = models.ForeignKey(
         get_user_model(),
         on_delete=models.CASCADE,
         related_name="followers",
-        editable=False
+        editable=False,
     )
     timestamp = models.DateTimeField(auto_now=True)
 

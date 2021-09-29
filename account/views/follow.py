@@ -12,9 +12,7 @@ from account.serializers.follow import FollowUserSerializer
 
 
 class FollowUserViewSet(
-    mixins.ListModelMixin,
-    mixins.DestroyModelMixin,
-    viewsets.GenericViewSet
+    mixins.ListModelMixin, mixins.DestroyModelMixin, viewsets.GenericViewSet
 ):
     queryset = FollowUser.objects.all()
     authentication_classes = [TokenAuthentication]
@@ -31,10 +29,7 @@ class FollowAUserView(APIView):
     @staticmethod
     def post(request, pk):
         to_follow = get_object_or_404(get_user_model(), pk=pk)
-        FollowUser.objects.create(
-            to_follow=to_follow,
-            user=request.user
-        )
+        FollowUser.objects.create(to_follow=to_follow, user=request.user)
         return Response(status=status.HTTP_201_CREATED)
 
 
