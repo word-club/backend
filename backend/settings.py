@@ -29,25 +29,26 @@ CSRF_TRUSTED_ORIGINS = [
     "localhost:8080",
 ]
 
-# CORS_ALLOW_ALL_ORIGINS = False
-
-
 # Application definition
 
-INSTALLED_APPS = [
+INTERNAL_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    # external apps
+]
+
+EXTERNAL_APPS = [
     "rest_framework",
     "rest_framework.authtoken",
     "phonenumber_field",
     "django_filters",
     "corsheaders",
-    # internal apps
+]
+
+LOCAL_APPS = [
     "account",
     "hashtag",
     "community",
@@ -55,6 +56,8 @@ INSTALLED_APPS = [
     "comment",
     "notification",
 ]
+
+INSTALLED_APPS = INTERNAL_APPS + EXTERNAL_APPS + LOCAL_APPS
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -99,6 +102,7 @@ DATABASES = {
 }
 
 # postgresql configuration
+# -------------------------------------------------------------
 
 # DATABASES = {
 #     'default': {
@@ -110,6 +114,7 @@ DATABASES = {
 #         'PORT'    : '',
 #     }
 # }
+# -------------------------------------------------------------
 
 
 # Password validation
@@ -182,11 +187,12 @@ EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 # EMAIL_PORT = 587
 # EMAIL_HOST_USER = os.getenv("HOST_EMAIL")
 # EMAIL_HOST_PASSWORD = os.getenv("HOST_PASSWORD")
-
+# -----------------------------------------------------
 # temporary configuration for mailhog local mail server
 EMAIL_HOST = "127.0.0.1"
 EMAIL_PORT = 1025
 EMAIL_HOST_USER = "foo@bar.com"
+# -----------------------------------------------------
 
 ALLOWED_IMAGES_EXTENSIONS = ["png", "jpg", "jpeg", "gif", "bmp", "tiff", "JPG"]
 MAX_UPLOAD_IMAGE_SIZE = 70000
