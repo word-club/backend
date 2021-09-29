@@ -7,6 +7,7 @@ from django.core.validators import FileExtensionValidator
 from django.db import models
 
 from backend.settings import ALLOWED_IMAGES_EXTENSIONS
+from hashtag.models import HashTag
 
 
 def upload_publication_image_to(instance, filename):
@@ -36,10 +37,10 @@ class Publication(models.Model):
         ordering = ["-timestamp"]
 
 
-class Hashtags(models.Model):
-    tag = models.CharField(max_length=64)
+class PublicationHashtag(models.Model):
+    tag = models.ForeignKey(HashTag, related_name="publications", on_delete=models.CASCADE)
     publication = models.ForeignKey(
-        "Publication", related_name="hashtags", on_delete=models.CASCADE
+        "Publication", related_name="hashtags", on_delete=models.CASCADE, editable=False
     )
 
 

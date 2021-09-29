@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     "corsheaders",
     # internal apps
     "account",
+    "hashtag",
     "community",
     "publication",
     "comment",
