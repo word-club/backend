@@ -1,0 +1,112 @@
+<html lang="en">
+<head>
+	<title>Reset Your Password | Word Club</title>
+	<meta charset="utf-8">
+	<meta content="width=device-width, initial-scale=1, shrink-to-fit=no" name="viewport">
+	<meta content="ie=edge" http-equiv="x-ua-compatible">
+	<link href="https://use.fontawesome.com/releases/v5.8.2/css/all.css" rel="stylesheet">
+	<!-- Font Awesome -->
+	<link href="https://use.fontawesome.com/releases/v5.8.2/css/all.css" rel="stylesheet">
+	<!-- Google Fonts -->
+	<link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet">
+	<!-- Bootstrap core CSS -->
+	<link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.0/css/bootstrap.min.css" rel="stylesheet">
+	<!-- Material Design Bootstrap -->
+	<link href="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.19.1/css/mdb.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="email-container">
+	{% autoescape off %}
+	<!--Navbar-->
+	<nav class="navbar navbar-expand-lg navbar-dark primary-color">
+		<!-- Navbar brand -->
+		<a class="navbar-brand" href="#"><i class="fas fa-dove mr-2"></i>Word Club</a>
+	</nav>
+	<div class="space"></div>
+	<div class="card card-cascade wider">
+		<!-- Card image -->
+		<div class="view view-cascade gradient-card-header peach-gradient">
+
+			<!-- Title -->
+			<h2 class="card-header-title white-text mb-3"><i class="fas fa-user-lock mr-2"></i>Reset Password</h2>
+			<hr/>
+			<!-- Text -->
+			<p id="greet" class="white-text">
+				Hi,&nbsp;
+				<span class="font-weight-bold white-text">{{ user }}</span>&nbsp;!</p>
+			<p id="question" class="white-text">
+				Are you sure you want to&nbsp;
+				<span class="font-weight-bold">reset your password</span>
+				?
+			</p>
+
+			<div class="space"></div>
+			<hr/>
+
+			<!-- Text -->
+			<p class="card-text">
+				<a class="action-text"
+					href="{% if request.is_secure %}https{% else %}http{% endif %}://localhost:8000{% url 'accounts:reset-password-confirm' code=code %}">
+					<h5 class="waves-effect waves-light">Click here to proceed.<i class="fas fa-lock-open ml-2"></i></h5>
+				</a>
+			</p>
+		</div>
+	</div>
+	<hr>
+	<p id="foot-note">
+		<i class="fas fa-exclamation-triangle"></i>
+		&nbsp;&nbsp;
+		<span>Ignore this message if its not you.</span>
+	</p>
+	{% endautoescape %}
+</div>
+
+<style>
+	.card {
+		max-width: 600px;
+		margin: 0 auto;
+	}
+	.view {
+		padding: 10px;
+	}
+
+	.space {
+		padding-top: 15px;
+		padding-bottom: 15px;
+	}
+
+	#question {
+		font-size: 18px;
+	}
+	#foot-note {
+		font-size: 14px;
+		color: #2e353d;
+	}
+
+	#greet span {
+		color: #519122
+	}
+
+	#greet {
+		font-size: 18px;
+	}
+
+	#foot-note i {
+		font-size: 12px;
+		padding-top: -1px;
+	}
+
+		.action-text {
+				color: black !important;
+		}
+</style>
+<script
+	crossorigin="anonymous"
+	integrity="sha256-4+XzXVhsDmqanXGHaHvgh1gMQKX40OUvDEBTu8JcmNs="
+	src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+
+<script type="text/javascript">
+	//
+</script>
+</body>
+</html>

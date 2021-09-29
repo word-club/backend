@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     # external apps
     "rest_framework",
+    "rest_framework.authtoken",
     "phonenumber_field",
     "django_filters",
     "corsheaders",

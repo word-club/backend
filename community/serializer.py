@@ -83,3 +83,16 @@ class CommunitySerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         validated_data["created_by"] = self.context["request"].user
         return super().create(**validated_data)
+
+
+class CommunityGlobalSerializer(serializers.ModelSerializer):
+    avatar = serializers.SerializerMethodField(allow_null=True)
+
+    @staticmethod
+    def get_avatar(obj):
+        avatar = CommunityAvatar.objects.filter(community=obj, is_active=True)
+        return avatar[0].image if len(avatar) > 0 else None
+
+    class Meta:
+        model = Community
+        fields = ["id", "name", "avatar"]

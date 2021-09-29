@@ -17,7 +17,7 @@ migrate:
 	$(PYTHON) manage.py migrate
 
 serve:
-	$(PYTHON) manage.py runserver
+	$(PYTHON) manage.py runserver $(BASE_URL)
 
 shell:
 	$(PYTHON) manage.py shell
