@@ -5,8 +5,6 @@ import uuid
 from django.contrib.auth import get_user_model
 from django.core.validators import FileExtensionValidator
 from django.db import models
-from django.db.models.signals import post_save
-from django.dispatch import receiver
 
 from backend.settings import ALLOWED_IMAGES_EXTENSIONS
 
@@ -31,21 +29,13 @@ class Profile(models.Model):
     bio = models.TextField(null=True, blank=True)
     birth_date = models.DateField(null=True, blank=True)
 
+    is_authorized = models.BooleanField(default=False, editable=False)
+    authorized_at = models.DateTimeField(null=True, blank=True, editable=False)
+
     timestamp = models.DateTimeField(auto_now=True)
 
     class Meta:
         ordering = ["-timestamp"]
-
-
-@receiver(post_save, sender=get_user_model())
-def create_user_profile(sender, instance, created, **kwargs):
-    if created:
-        Profile.objects.create(user=instance)
-
-
-@receiver(post_save, sender=get_user_model())
-def save_user_profile(sender, instance, **kwargs):
-    instance.profile.save()
 
 
 class ProfileAvatar(models.Model):
