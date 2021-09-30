@@ -7,6 +7,7 @@ from django.core.validators import FileExtensionValidator
 from django.db import models
 
 from backend.settings import ALLOWED_IMAGES_EXTENSIONS
+from community.models import Community
 from hashtag.models import HashTag
 
 
@@ -20,7 +21,7 @@ class Publication(models.Model):
     id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
     title = models.CharField(max_length=255, null=True, blank=True)
     content = models.TextField(null=True, blank=True)
-    writer = models.ForeignKey(
+    created_by = models.ForeignKey(
         get_user_model(),
         on_delete=models.CASCADE,
         related_name="publications",
@@ -36,6 +37,13 @@ class Publication(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
     timestamp = models.DateTimeField(auto_now=True)
+
+    community = models.ForeignKey(
+        Community,
+        null=True, blank=True,
+        on_delete=models.CASCADE,
+        related_name="publications"
+    )
 
     class Meta:
         ordering = ["-timestamp"]
@@ -88,21 +96,21 @@ class PublicationImageUrl(models.Model):
         ordering = ["-timestamp"]
 
 
-class Bookmark(models.Model):
+class PublicationBookmark(models.Model):
     id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
     is_bookmarked = models.BooleanField(default=True, editable=False)
 
     publication = models.ForeignKey(
         "Publication", related_name="bookmarks", on_delete=models.CASCADE, editable=False
     )
-    writer = models.ForeignKey(
+    created_by = models.ForeignKey(
         get_user_model(), on_delete=models.CASCADE, related_name="bookmarks", editable=False
     )
     timestamp = models.DateTimeField(auto_now=True)
 
     class Meta:
         ordering = ["-timestamp"]
-        unique_together = [["publication", "writer"]]
+        unique_together = [["publication", "created_by"]]
 
 
 class PublicationUpVote(models.Model):
@@ -111,14 +119,14 @@ class PublicationUpVote(models.Model):
     publication = models.ForeignKey(
         "Publication", related_name="up_votes", on_delete=models.CASCADE, editable=False
     )
-    writer = models.ForeignKey(
+    created_by = models.ForeignKey(
         get_user_model(), on_delete=models.CASCADE, related_name="up_voted_publications", editable=False
     )
     timestamp = models.DateTimeField(auto_now=True)
 
     class Meta:
         ordering = ["-timestamp"]
-        unique_together = [["publication", "writer"]]
+        unique_together = [["publication", "created_by"]]
 
 
 class PublicationDownVote(models.Model):
@@ -127,7 +135,7 @@ class PublicationDownVote(models.Model):
     publication = models.ForeignKey(
         "Publication", related_name="down_votes", on_delete=models.CASCADE, editable=False
     )
-    writer = models.ForeignKey(
+    created_by = models.ForeignKey(
         get_user_model(),
         on_delete=models.CASCADE,
         related_name="down_voted_publications",
@@ -137,7 +145,23 @@ class PublicationDownVote(models.Model):
 
     class Meta:
         ordering = ["-timestamp"]
-        unique_together = [["publication", "writer"]]
+        unique_together = [["publication", "created_by"]]
+
+
+class HidePublication(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
+
+    publication = models.ForeignKey(
+        "Publication", on_delete=models.CASCADE, related_name="hides", editable=False
+    )
+    created_by = models.ForeignKey(
+        get_user_model(), on_delete=models.CASCADE, related_name="hidden_publications", editable=False
+    )
+    timestamp = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["-timestamp"]
+        unique_together = [["publication", "created_by"]]
 
 
 class ReportPublication(models.Model):
@@ -147,11 +171,11 @@ class ReportPublication(models.Model):
     publication = models.ForeignKey(
         "Publication", on_delete=models.CASCADE, related_name="reports", editable=False
     )
-    writer = models.ForeignKey(
+    created_by = models.ForeignKey(
         get_user_model(), on_delete=models.CASCADE, related_name="reported_publications", editable=False
     )
     timestamp = models.DateTimeField(auto_now=True)
 
     class Meta:
         ordering = ["-timestamp"]
-        unique_together = [["publication", "writer"]]
+        unique_together = [["publication", "created_by"]]

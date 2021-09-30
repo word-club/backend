@@ -51,7 +51,7 @@ class DeleteCommunityRule(APIView):
 
     def delete(self, request, pk):
         rule = get_object_or_404(CommunityRule, pk=pk)
-        self.check_object_permissions(request, rule.community)
+        self.check_object_permissions(request, rule)
         rule.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
@@ -62,7 +62,7 @@ class DeleteCommunityCover(APIView):
 
     def delete(self, request, pk):
         cover = get_object_or_404(CommunityCover, pk=pk)
-        self.check_object_permissions(request, cover.community)
+        self.check_object_permissions(request, cover)
         cover.image.delete()
         cover.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
@@ -74,7 +74,7 @@ class DeleteCommunityAvatar(APIView):
 
     def delete(self, request, pk):
         avatar = get_object_or_404(CommunityAvatar, pk=pk)
-        self.check_object_permissions(request, avatar.community)
+        self.check_object_permissions(request, avatar)
         avatar.image.delete()
         avatar.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
@@ -86,7 +86,7 @@ class DeleteCommunityReport(APIView):
 
     def delete(self, request, pk):
         report = get_object_or_404(CommunityReport, pk=pk)
-        self.check_object_permissions(request, report.community)
+        self.check_object_permissions(request, report)
         report.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
@@ -184,7 +184,7 @@ class SetActiveCommunityAvatar(APIView):
 
     def post(self, request, pk):
         community_avatar = get_object_or_404(CommunityAvatar, pk=pk)
-        self.check_object_permissions(request, community_avatar.community)
+        self.check_object_permissions(request, community_avatar)
         all_avatars = CommunityAvatar.objects.filter(
             community=community_avatar.community, is_active=True
         )
@@ -202,7 +202,7 @@ class SetActiveCommunityCover(APIView):
 
     def post(self, request, pk):
         community_cover = get_object_or_404(CommunityAvatar, pk=pk)
-        self.check_object_permissions(request, community_cover.community)
+        self.check_object_permissions(request, community_cover)
         all_covers = CommunityCover.objects.filter(
             community=community_cover.community, is_active=True
         )
@@ -235,7 +235,7 @@ class RemoveCommunityHashtag(APIView):
 
     def delete(self, request, pk):
         community_hashtag = get_object_or_404(CommunityHashtag, pk=pk)
-        self.check_object_permissions(request, community_hashtag.community)
+        self.check_object_permissions(request, community_hashtag)
         community_hashtag.delete()
         return Response(status=status.HTTP_200_OK)
 
@@ -261,7 +261,7 @@ class RemoveCommunityAdmin(APIView):
 
     def delete(self, request, pk):
         community_admin = get_object_or_404(CommunityAdmin, pk=pk)
-        self.check_object_permissions(request, community_admin.community)
+        self.check_object_permissions(request, community_admin)
         community_admin.delete()
         return Response(status=status.HTTP_200_OK)
 
@@ -309,7 +309,7 @@ class ConfirmCommunityAuthorization(APIView):
 
     def post(self, request, pk):
         community_authorize_code = get_object_or_404(CommunityAuthorizationCode, pk=pk)
-        self.check_object_permissions(request, community_authorize_code.community)
+        self.check_object_permissions(request, community_authorize_code)
         community_to_authorize = community_authorize_code.community
         community_to_authorize.is_authorized = True
         community_to_authorize.authorized_at = timezone.now()

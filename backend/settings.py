@@ -198,3 +198,18 @@ ALLOWED_IMAGES_EXTENSIONS = ["png", "jpg", "jpeg", "gif", "bmp", "tiff", "JPG"]
 MAX_UPLOAD_IMAGE_SIZE = 70000
 
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
+
+
+# Channels Configuration
+# https://channels.readthedocs.io/en/stable/
+
+# CHANNEL_LAYERS = {
+#     "default": {
+#         "BACKEND": "channels_redis.core.RedisChannelLayer",
+#         "CONFIG": {
+#             "hosts": os.getenv("REDIS_URL"),
+#             "capacity": 1500,  # default 100
+#             "expiry": 10,  # default 60
+#         }
+#     }
+# }
