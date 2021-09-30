@@ -18,23 +18,30 @@ def upload_publication_image_to(instance, filename):
 
 class Publication(models.Model):
     id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
-    views = models.PositiveBigIntegerField(default=0)
     title = models.CharField(max_length=255, null=True, blank=True)
-    content = models.TextField()
+    content = models.TextField(null=True, blank=True)
     writer = models.ForeignKey(
-        get_user_model(), on_delete=models.CASCADE, related_name="publications"
+        get_user_model(),
+        on_delete=models.CASCADE,
+        related_name="publications",
+        editable=False
     )
 
     is_published = models.BooleanField(default=False, editable=False)
-    published_at = models.DateTimeField(null=True, blank=True)
+    published_at = models.DateTimeField(null=True, blank=True, editable=False)
 
     is_pinned = models.BooleanField(default=False, editable=False)
+
+    view_count = models.PositiveBigIntegerField(default=0, editable=False)
 
     created_at = models.DateTimeField(auto_now_add=True)
     timestamp = models.DateTimeField(auto_now=True)
 
     class Meta:
         ordering = ["-timestamp"]
+
+    def is_draft(self):
+        return not self.is_published
 
 
 class PublicationHashtag(models.Model):
@@ -46,6 +53,9 @@ class PublicationHashtag(models.Model):
         "Publication", related_name="hashtags", on_delete=models.CASCADE, editable=False
     )
 
+    class Meta:
+        unique_together = [["publication", "tag"]]
+
 
 class PublicationImage(models.Model):
     id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
@@ -54,7 +64,7 @@ class PublicationImage(models.Model):
         validators=[FileExtensionValidator(ALLOWED_IMAGES_EXTENSIONS)],
     )
     publication = models.ForeignKey(
-        "Publication", related_name="images", on_delete=models.CASCADE
+        "Publication", related_name="images", on_delete=models.CASCADE, editable=False
     )
     timestamp = models.DateTimeField(auto_now=True)
 
@@ -70,7 +80,7 @@ class PublicationImageUrl(models.Model):
     id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
     image_url = models.URLField()
     publication = models.ForeignKey(
-        "Publication", related_name="image_urls", on_delete=models.CASCADE
+        "Publication", related_name="image_urls", on_delete=models.CASCADE, editable=False
     )
     timestamp = models.DateTimeField(auto_now=True)
 
@@ -80,52 +90,54 @@ class PublicationImageUrl(models.Model):
 
 class Bookmark(models.Model):
     id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
-    is_bookmarked = models.BooleanField(default=True)
+    is_bookmarked = models.BooleanField(default=True, editable=False)
 
     publication = models.ForeignKey(
-        "Publication", related_name="bookmarks", on_delete=models.CASCADE
+        "Publication", related_name="bookmarks", on_delete=models.CASCADE, editable=False
     )
     writer = models.ForeignKey(
-        get_user_model(), on_delete=models.CASCADE, related_name="bookmarks"
+        get_user_model(), on_delete=models.CASCADE, related_name="bookmarks", editable=False
     )
     timestamp = models.DateTimeField(auto_now=True)
 
     class Meta:
         ordering = ["-timestamp"]
+        unique_together = [["publication", "writer"]]
 
 
-class UpVote(models.Model):
+class PublicationUpVote(models.Model):
     id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
-    up_vote = models.BooleanField(default=True)
 
     publication = models.ForeignKey(
-        "Publication", related_name="up_votes", on_delete=models.CASCADE
+        "Publication", related_name="up_votes", on_delete=models.CASCADE, editable=False
     )
     writer = models.ForeignKey(
-        get_user_model(), on_delete=models.CASCADE, related_name="up_voted_publications"
+        get_user_model(), on_delete=models.CASCADE, related_name="up_voted_publications", editable=False
     )
     timestamp = models.DateTimeField(auto_now=True)
 
     class Meta:
         ordering = ["-timestamp"]
+        unique_together = [["publication", "writer"]]
 
 
-class DownVotes(models.Model):
+class PublicationDownVote(models.Model):
     id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
-    down_vote = models.BooleanField(default=True)
 
     publication = models.ForeignKey(
-        "Publication", related_name="down_votes", on_delete=models.CASCADE
+        "Publication", related_name="down_votes", on_delete=models.CASCADE, editable=False
     )
     writer = models.ForeignKey(
         get_user_model(),
         on_delete=models.CASCADE,
         related_name="down_voted_publications",
+        editable=False
     )
     timestamp = models.DateTimeField(auto_now=True)
 
     class Meta:
         ordering = ["-timestamp"]
+        unique_together = [["publication", "writer"]]
 
 
 class ReportPublication(models.Model):
@@ -133,9 +145,13 @@ class ReportPublication(models.Model):
     reason = models.TextField()
 
     publication = models.ForeignKey(
-        "Publication", on_delete=models.CASCADE, related_name="reports"
+        "Publication", on_delete=models.CASCADE, related_name="reports", editable=False
     )
     writer = models.ForeignKey(
-        get_user_model(), on_delete=models.CASCADE, related_name="reported_publications"
+        get_user_model(), on_delete=models.CASCADE, related_name="reported_publications", editable=False
     )
     timestamp = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["-timestamp"]
+        unique_together = [["publication", "writer"]]
