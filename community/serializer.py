@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from community.models import *
+from publication.serializers import PublicationSerializer
 
 
 class CommunityAvatarSerializer(serializers.ModelSerializer):
@@ -98,6 +99,7 @@ class CommunitySerializer(serializers.ModelSerializer):
     covers = CommunityCoverSerializer(many=True, read_only=True)
     reports = ReportCommunitySerializer(many=True, read_only=True)
     subscribers = SubscribeCommunitySerializer(many=True, read_only=True)
+    publications = PublicationSerializer(many=True, read_only=True)
 
     class Meta:
         model = Community
