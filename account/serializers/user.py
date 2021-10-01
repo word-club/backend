@@ -16,10 +16,10 @@ class ProfilePostSerializer(serializers.ModelSerializer):
 class UserPostSerializer(serializers.ModelSerializer):
     profile = ProfilePostSerializer(write_only=True, default={})
 
-    # @staticmethod
-    # def validate_password(password):
-    #     validate_password(password)
-    #     return password
+    @staticmethod
+    def validate_password(password):
+        validate_password(password)
+        return password
 
     class Meta:
         model = get_user_model()
@@ -28,10 +28,9 @@ class UserPostSerializer(serializers.ModelSerializer):
         extra_kwargs = {"password": {"write_only": True}}
 
     def create(self, validated_data):
-        profile_data = validated_data.pop("profile")
+        profile_data = validated_data.get("profile")
         user = get_user_model().objects.create(**validated_data)
-        profile_data["user"] = user
-        Profile.objects.create(**profile_data)
+        Profile.objects.create(**profile_data, user=user)
         return user
 
     def update(self, instance, validated_data):
