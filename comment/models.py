@@ -13,7 +13,7 @@ from publication.models import Publication
 def upload_comment_image_to(instance, filename):
     _, file_extension = os.path.splitext(filename)
     filename = str(random.getrandbits(64)) + file_extension
-    return f"publications/{instance.comment.publication.pk}/comments/{instance.comment.pk}/{filename}"
+    return f"comments/{instance.comment.pk}/{filename}"
 
 
 class Comment(models.Model):
@@ -35,11 +35,30 @@ class Comment(models.Model):
         related_name="comments",
         editable=False,
     )
-    reply_to = models.ForeignKey(
-        "self", editable=False,
-        null=True, blank=True,
+    timestamp = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["-timestamp"]
+
+
+class CommentReply(models.Model):
+    id = models.UUIDField(
+        default=uuid.uuid4,
+        editable=False,
+        primary_key=True
+    )
+    reply = models.TextField()
+    created_by = models.ForeignKey(
+        get_user_model(),
         on_delete=models.CASCADE,
-        related_name="replies"
+        related_name="replied_comments",
+        editable=False,
+    )
+    comment = models.ForeignKey(
+        "Comment",
+        related_name="replies",
+        on_delete=models.CASCADE,
+        editable=False,
     )
     timestamp = models.DateTimeField(auto_now=True)
 
@@ -117,15 +136,13 @@ class CommentUpVote(models.Model):
         editable=False,
         primary_key=True
     )
-    up_vote = models.BooleanField(default=True)
-
     comment = models.ForeignKey(
         "Comment",
         related_name="up_votes",
         on_delete=models.CASCADE,
         editable=False,
     )
-    writer = models.ForeignKey(
+    created_by = models.ForeignKey(
         get_user_model(),
         on_delete=models.CASCADE,
         related_name="up_voted_comments",
@@ -135,6 +152,7 @@ class CommentUpVote(models.Model):
 
     class Meta:
         ordering = ["-timestamp"]
+        unique_together = [["created_by", "comment"]]
 
 
 class CommentDownVote(models.Model):
@@ -143,8 +161,6 @@ class CommentDownVote(models.Model):
         editable=False,
         primary_key=True
     )
-    down_vote = models.BooleanField(default=True)
-
     comment = models.ForeignKey(
         "Comment",
         related_name="down_votes",
@@ -161,6 +177,7 @@ class CommentDownVote(models.Model):
 
     class Meta:
         ordering = ["-timestamp"]
+        unique_together = [["created_by", "comment"]]
 
 
 class ReportComment(models.Model):
