@@ -10,50 +10,87 @@ from publication.models import Publication
 
 class Notification(models.Model):
     id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
-    is_read = models.BooleanField(default=False)
-    for_everyone = models.BooleanField(default=False)
+    seen = models.BooleanField(default=False)
+    is_global = models.BooleanField(default=False)
 
     subject = models.CharField(max_length=64)
     description = models.CharField(max_length=255)
+    timestamp = models.DateTimeField(auto_now_add=True)
 
-    target = models.ForeignKey(
+    class Meta:
+        ordering = ["-timestamp"]
+
+
+class NotificationTo(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
+    user = models.ForeignKey(
         get_user_model(),
         on_delete=models.CASCADE,
-        null=True,
-        blank=True,
-        related_name="notifications",
+        related_name="received_notifications",
     )
-
-    user_involved = models.ForeignKey(
-        get_user_model(),
+    notification = models.ForeignKey(
+        "Notification",
         on_delete=models.CASCADE,
-        null=True,
-        blank=True,
-        related_name="involvements",
+        related_name="receivers",
+        editable=False
     )
 
-    publication_involved = models.ForeignKey(
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-timestamp"]
+
+
+class PublicationNotification(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
+    publication = models.ForeignKey(
         Publication,
         on_delete=models.CASCADE,
-        null=True,
-        blank=True,
-        related_name="involvements",
+        related_name="notifications",
+    )
+    timestamp = models.DateTimeField(auto_now=True)
+    notification = models.ForeignKey(
+        "Notification",
+        on_delete=models.CASCADE,
+        related_name="publications",
+        editable=False
     )
 
-    community_involved = models.ForeignKey(
+    class Meta:
+        ordering = ["-timestamp"]
+
+
+class CommunityNotification(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
+    community = models.ForeignKey(
         Community,
         on_delete=models.CASCADE,
-        null=True,
-        blank=True,
-        related_name="involvements",
+        related_name="notifications",
+    )
+    timestamp = models.DateTimeField(auto_now=True)
+    notification = models.ForeignKey(
+        "Notification",
+        on_delete=models.CASCADE,
+        related_name="communities",
+        editable=False
     )
 
-    comment_involved = models.ForeignKey(
+    class Meta:
+        ordering = ["-timestamp"]
+
+
+class CommentNotification(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
+    comment = models.ForeignKey(
         Comment,
         on_delete=models.CASCADE,
-        null=True,
-        blank=True,
-        related_name="involvements",
+        related_name="notifications",
+    )
+    notification = models.ForeignKey(
+        "Notification",
+        on_delete=models.CASCADE,
+        related_name="comments",
+        editable=False
     )
 
     timestamp = models.DateTimeField(auto_now=True)
