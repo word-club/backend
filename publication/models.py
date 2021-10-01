@@ -8,7 +8,7 @@ from django.db import models
 
 from backend.settings import ALLOWED_IMAGES_EXTENSIONS
 from community.models import Community
-from hashtag.models import HashTag
+from hashtag.models import Hashtag
 
 
 def upload_publication_image_to(instance, filename):
@@ -55,7 +55,7 @@ class Publication(models.Model):
 class PublicationHashtag(models.Model):
     id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
     tag = models.ForeignKey(
-        HashTag, related_name="publications", on_delete=models.CASCADE
+        Hashtag, related_name="publications", on_delete=models.CASCADE
     )
     publication = models.ForeignKey(
         "Publication", related_name="hashtags", on_delete=models.CASCADE, editable=False

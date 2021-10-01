@@ -6,7 +6,7 @@ from django.contrib.auth import get_user_model
 from django.core.validators import FileExtensionValidator
 from django.db import models
 from backend.settings import ALLOWED_IMAGES_EXTENSIONS
-from hashtag.models import HashTag
+from hashtag.models import Hashtag
 
 
 def upload_avatar_to(instance, filename):
@@ -173,7 +173,7 @@ class CommunityDisableNotifications(models.Model):
 class CommunityHashtag(models.Model):
     id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
     tag = models.ForeignKey(
-        HashTag, related_name="communities", on_delete=models.CASCADE
+        Hashtag, related_name="communities", on_delete=models.CASCADE
     )
     publication = models.ForeignKey(
         "Community", related_name="hashtags", on_delete=models.CASCADE, editable=False
