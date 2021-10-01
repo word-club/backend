@@ -4,9 +4,9 @@ from django.contrib.auth import get_user_model
 from django.db import models
 
 
-class HashTag(models.Model):
+class Hashtag(models.Model):
     id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
-    tag = models.CharField(max_length=64)
+    tag = models.CharField(max_length=64, unique=True)
 
     created_by = models.ForeignKey(
         get_user_model(),
