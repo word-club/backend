@@ -20,23 +20,41 @@ class PublicationListRetrieveView(
     serializer_class = PublicationSerializer
     authentication_classes = []
     permission_classes = []
-    filterset_fields = ["writer", "is_published", "timestamp"]
+    filterset_fields = ["created_by", "is_published", "timestamp"]
     search_fields = ["title", "content"]
 
 
-class PublicationCreateUpdateDeleteView(
-    mixins.CreateModelMixin,
-    mixins.UpdateModelMixin,
-    mixins.DestroyModelMixin,
-    viewsets.GenericViewSet
-):
-    queryset = Publication.objects.all()
-    serializer_class = PublicationSerializer
+class AddPublicationView(APIView):
     authentication_classes = [TokenAuthentication]
 
-    def get_permissions(self):
-        if self.action == "create": return [IsAuthenticated]
-        else: return [IsOwner, IsCommunityAdministrator]
+    @staticmethod
+    def post(request):
+        context = {"request": request}
+        serializer = PublicationSerializer(data=request.data, context=context)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class UpdatePublicationView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsOwner, IsCommunityAdministrator]
+
+    def patch(self, request, pk):
+        publication = get_object_or_404(Publication, pk=pk)
+        self.check_object_permissions(request, publication)
+        serializer = PublicationSerializer(publication, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, pk):
+        publication = get_object_or_404(Publication, pk=pk)
+        self.check_object_permissions(request, publication)
+        publication.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class AddPublicationHashtag(APIView):
@@ -87,6 +105,7 @@ class RemovePublicationImageView(APIView):
     def delete(self, request, pk):
         publication_image = get_object_or_404(PublicationImage, pk=pk)
         self.check_object_permissions(request, publication_image.publication)
+        publication_image.image.delete()
         publication_image.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
@@ -173,7 +192,7 @@ class BookmarkAPublicationView(APIView):
     @staticmethod
     def post(request, pk):
         publication = get_object_or_404(Publication, pk=pk)
-        up_vote, created = PublicationBookmark.objects.get_or_create(
+        bookmark, created = PublicationBookmark.objects.get_or_create(
             created_by=request.user,
             publication=publication
         )
@@ -223,16 +242,8 @@ class ReportAPublicationView(APIView):
     @staticmethod
     def post(request, pk):
         publication = get_object_or_404(Publication, pk=pk)
-
-        reports = ReportPublication.objects.filter(created_by=request.user)
-
-        most_recent_report_found = False
-        diff = None
-        for report in reports:
-            diff = helper.get_time_diff_in_days(report.timestamp)
-            if diff < 15:
-                most_recent_report_found = True
-                break
+        reports = ReportPublication.objects.filter(created_by=request.user, publication=publication)
+        most_recent_report_found, diff = helper.is_recent_report_present(reports)
 
         if most_recent_report_found: return Response(
             data={"details": "recently reported", "remaining": 15 - diff},
@@ -252,8 +263,8 @@ class RemovePublicationReportView(APIView):
     permission_classes = [IsAdminUser]
 
     def delete(self, request, pk):
-        bookmark = get_object_or_404(PublicationDownVote, pk=pk)
-        self.check_object_permissions(request, bookmark)
-        bookmark.delete()
+        report = get_object_or_404(ReportPublication, pk=pk)
+        self.check_object_permissions(request, report)
+        report.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 

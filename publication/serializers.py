@@ -1,5 +1,6 @@
 from rest_framework import serializers
 
+from comment.serializers import CommentSerializer
 from publication.models import *
 
 
@@ -62,8 +63,12 @@ class PublicationSerializer(serializers.ModelSerializer):
     image_urls = PublicationImageUrlSerializer(read_only=True, many=True)
     up_votes = PublicationUpVoteSerializer(read_only=True, many=True)
     down_votes = PublicationDownVoteSerializer(read_only=True, many=True)
-    # comments = CommentSerializer(read_only=True, many=True)
+    comments = CommentSerializer(read_only=True, many=True)
 
     class Meta:
         model = Publication
         fields = "__all__"
+
+    def create(self, validated_data):
+        validated_data["created_by"] = self.context["request"].user
+        return super().create(validated_data)
