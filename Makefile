@@ -58,6 +58,7 @@ new-admin:
 fresh-migrations:
 	make clean-migrations
 	make make-migrations APP=account
+	make make-migrations APP=hashtag
 	make make-migrations APP=community
 	make migrate
 	make make-migrations APP=publication
