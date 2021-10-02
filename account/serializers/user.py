@@ -5,6 +5,8 @@ import helper
 from account.models import *
 from account.serializers.follow import FollowUserSerializer
 from community.serializer import CommunityGlobalSerializer
+from notification.serializers import NotificationReceiverSerializer
+from publication.serializers import PublicationSerializer, BookmarkedPublicationsSerializers
 
 
 class ProfilePostSerializer(serializers.ModelSerializer):
@@ -107,7 +109,9 @@ class UserInfoSerializer(serializers.ModelSerializer):
     followers = FollowUserSerializer(many=True, read_only=True)
     following = FollowUserSerializer(many=True, read_only=True)
     subscribed_communities = CommunityGlobalSerializer(many=True, read_only=True)
-    # created_publications
+    created_publications = PublicationSerializer(many=True, read_only=True)
+    received_notifications = NotificationReceiverSerializer(many=True, read_only=True)
+    bookmarks = BookmarkedPublicationsSerializers(many=True, read_only=True)
 
     class Meta:
         model = get_user_model()

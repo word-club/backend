@@ -72,3 +72,11 @@ class PublicationSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         validated_data["created_by"] = self.context["request"].user
         return super().create(validated_data)
+
+
+class BookmarkedPublicationsSerializers(serializers.ModelSerializer):
+    publication = PublicationSerializer(read_only=True)
+
+    class Meta:
+        model = PublicationBookmark
+        fields = "__all__"

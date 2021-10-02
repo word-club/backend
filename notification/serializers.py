@@ -3,34 +3,39 @@ from notification.models import *
 from publication.models import Publication
 
 
-class NotificationReceiverSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = NotificationTo
-
-
 class NotificationPublicationSerializer(serializers.ModelSerializer):
     class Meta:
         model = PublicationNotification
+        fields = "__all__"
 
 
 class NotificationCommunitySerializer(serializers.ModelSerializer):
     class Meta:
         model = CommunityNotification
+        fields = "__all__"
 
 
 class NotificationCommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = CommentNotification
+        fields = "__all__"
 
 
 class NotificationSerializer(serializers.ModelSerializer):
-    receivers = NotificationReceiverSerializer(many=True, read_only=True)
     publications = NotificationPublicationSerializer(many=True, read_only=True)
     communities = NotificationCommunitySerializer(many=True, read_only=True)
     comments = NotificationCommentSerializer(many=True, read_only=True)
 
     class Meta:
         model = Notification
+        fields = "__all__"
+
+
+class NotificationReceiverSerializer(serializers.ModelSerializer):
+    notification = NotificationSerializer(read_only=True)
+
+    class Meta:
+        model = NotificationTo
         fields = "__all__"
 
 
