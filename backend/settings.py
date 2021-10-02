@@ -41,6 +41,7 @@ INTERNAL_APPS = [
 ]
 
 EXTERNAL_APPS = [
+    "channels",
     "rest_framework",
     "rest_framework.authtoken",
     "phonenumber_field",
@@ -208,13 +209,13 @@ DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 # Channels Configuration
 # https://channels.readthedocs.io/en/stable/
 
-# CHANNEL_LAYERS = {
-#     "default": {
-#         "BACKEND": "channels_redis.core.RedisChannelLayer",
-#         "CONFIG": {
-#             "hosts": os.getenv("REDIS_URL"),
-#             "capacity": 1500,  # default 100
-#             "expiry": 10,  # default 60
-#         }
-#     }
-# }
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [(os.getenv("REDIS_URL", 6379))],
+            "capacity": 1500,  # default 100
+            "expiry": 10,  # default 60
+        }
+    }
+}
