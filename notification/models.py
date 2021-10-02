@@ -10,7 +10,6 @@ from publication.models import Publication
 
 class Notification(models.Model):
     id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
-    seen = models.BooleanField(default=False)
     is_global = models.BooleanField(default=False)
 
     subject = models.CharField(max_length=64)
@@ -23,6 +22,7 @@ class Notification(models.Model):
 
 class NotificationTo(models.Model):
     id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
+    seen = models.BooleanField(default=False, editable=False)
     user = models.ForeignKey(
         get_user_model(),
         on_delete=models.CASCADE,

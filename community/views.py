@@ -25,6 +25,18 @@ class CommunityViewSet(viewsets.ModelViewSet):
     serializer_class = CommunitySerializer
     search_fields = ["name"]
 
+    # def get_serializer_context(self):
+    #     context = super().get_serializer_context()
+    #     depth = 0
+    #     try:
+    #         depth = int(self.request.query_params.get('depth', 0))
+    #     except ValueError:
+    #         pass  # Ignore non-numeric parameters and keep default 0 depth
+    #
+    #     context['depth'] = depth
+    #
+    #     return context
+
     def get_permissions(self):
         if self.action in ["delete", "update", "partial_update"]:
             return [IsCommunityAdministrator]

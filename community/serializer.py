@@ -105,6 +105,10 @@ class CommunitySerializer(serializers.ModelSerializer):
         model = Community
         fields = "__all__"
 
+    # def __init__(self, *args, **kwargs):
+    #     super().__init__(*args, **kwargs)
+    #     self.Meta.depth = self.context.get('depth', 0)
+
     def create(self, validated_data):
         validated_data["created_by"] = self.context["request"].user
         return super().create(**validated_data)

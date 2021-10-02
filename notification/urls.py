@@ -1,8 +1,7 @@
-from rest_framework.routers import DefaultRouter
+from django.urls import path
 
-router = DefaultRouter()
-# router.register(r"comment", CommentViewSet)
+from notification.views import NotificationListCreateView
 
-urlpatterns = router.urls
-
-urlpatterns += []
+urlpatterns = [
+    path("notification/", NotificationListCreateView.as_view())
+]
