@@ -7,8 +7,7 @@ on:
     branches: [ main ]
 
 jobs:
-  build:
-
+  lint:
     runs-on: ubuntu-latest
 
     steps:
@@ -20,6 +19,7 @@ jobs:
     - name: Python Linter
       uses: sunnysid3up/python-linter@v0.1-beta.7
 
+  build:
     - name: Set up Python 3.9
       uses: actions/setup-python@v2
       with:
