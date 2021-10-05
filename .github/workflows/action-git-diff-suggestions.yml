@@ -1,4 +1,4 @@
-name: ActionGitDiffSuggestions
+name: LintsAndChecks
 
 on:
   push:
@@ -14,5 +14,13 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - uses: getsentry/action-git-diff-suggestions@v1
+      - name: action-git-diff-suggestions
+        uses: getsentry/action-git-diff-suggestions@v1
+      - name: python-linter
+        uses: sunnysid3up/python-linter@v0.1-beta.7
+        with:
+          source: "./"
+          isort-options: "-w 100"
+          django: true
+      
 
