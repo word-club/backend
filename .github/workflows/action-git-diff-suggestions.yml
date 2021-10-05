@@ -1,4 +1,4 @@
-name: WordClubApplication
+name: ActionGitDiffSuggestions
 
 on:
   push:
