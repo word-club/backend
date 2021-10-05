@@ -10,10 +10,14 @@ class IsOwner(permissions.BasePermission):
     # created_by -> every other model
 
     def has_object_permission(self, request, view, obj):
-        if obj.created_by: return obj.created_by == request.user
-        elif obj.user: return obj.user == request.user
-        elif obj.profile: return obj.profile.user == request.user
-        else: return False
+        if obj.created_by:
+            return obj.created_by == request.user
+        elif obj.user:
+            return obj.user == request.user
+        elif obj.profile:
+            return obj.profile.user == request.user
+        else:
+            return False
 
 
 class IsSuperUser(permissions.BasePermission):

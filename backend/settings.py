@@ -216,6 +216,6 @@ CHANNEL_LAYERS = {
             "hosts": [(os.getenv("REDIS_URL", 6379))],
             "capacity": 1500,  # default 100
             "expiry": 10,  # default 60
-        }
+        },
     }
 }

@@ -6,7 +6,10 @@ from account.models import *
 from account.serializers.follow import FollowUserSerializer
 from community.serializer import CommunityGlobalSerializer
 from notification.serializers import NotificationReceiverSerializer
-from publication.serializers import PublicationSerializer, BookmarkedPublicationsSerializers
+from publication.serializers import (
+    PublicationSerializer,
+    BookmarkedPublicationsSerializers,
+)
 
 
 class ProfilePostSerializer(serializers.ModelSerializer):

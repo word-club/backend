@@ -1,9 +1,17 @@
 from django.urls import path
 
 from comment.views import (
-    AddPublicationComment, UpdateDestroyCommentView, UpVoteACommentView, DownVoteACommentView,
-    ReportACommentView, RemoveCommentReportView, RemoveCommentImageView, RemoveCommentImageUrlView,
-    RemoveCommentVideoUrlView, RemoveUpVoteForACommentView, RemoveDownVoteForACommentView,
+    AddPublicationComment,
+    UpdateDestroyCommentView,
+    UpVoteACommentView,
+    DownVoteACommentView,
+    ReportACommentView,
+    RemoveCommentReportView,
+    RemoveCommentImageView,
+    RemoveCommentImageUrlView,
+    RemoveCommentVideoUrlView,
+    RemoveUpVoteForACommentView,
+    RemoveDownVoteForACommentView,
 )
 
 urlpatterns = [

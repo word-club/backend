@@ -47,7 +47,8 @@ class SetANotificationAsSeen(APIView):
     def post(self, request, pk):
         notification_to = get_object_or_404(NotificationTo, pk=pk)
         self.check_object_permissions(request, notification_to)
-        if notification_to.seen: return Response(status=status.HTTP_204_NO_CONTENT)
+        if notification_to.seen:
+            return Response(status=status.HTTP_204_NO_CONTENT)
         else:
             notification_to.seen = True
             notification_to.save()

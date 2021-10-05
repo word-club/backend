@@ -25,7 +25,7 @@ class Publication(models.Model):
         get_user_model(),
         on_delete=models.CASCADE,
         related_name="publications",
-        editable=False
+        editable=False,
     )
 
     is_published = models.BooleanField(default=False, editable=False)
@@ -40,9 +40,10 @@ class Publication(models.Model):
 
     community = models.ForeignKey(
         Community,
-        null=True, blank=True,
+        null=True,
+        blank=True,
         on_delete=models.CASCADE,
-        related_name="publications"
+        related_name="publications",
     )
 
     class Meta:
@@ -88,7 +89,10 @@ class PublicationImageUrl(models.Model):
     id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
     image_url = models.URLField()
     publication = models.ForeignKey(
-        "Publication", related_name="image_urls", on_delete=models.CASCADE, editable=False
+        "Publication",
+        related_name="image_urls",
+        on_delete=models.CASCADE,
+        editable=False,
     )
     timestamp = models.DateTimeField(auto_now=True)
 
@@ -101,10 +105,16 @@ class PublicationBookmark(models.Model):
     is_bookmarked = models.BooleanField(default=True, editable=False)
 
     publication = models.ForeignKey(
-        "Publication", related_name="bookmarks", on_delete=models.CASCADE, editable=False
+        "Publication",
+        related_name="bookmarks",
+        on_delete=models.CASCADE,
+        editable=False,
     )
     created_by = models.ForeignKey(
-        get_user_model(), on_delete=models.CASCADE, related_name="bookmarks", editable=False
+        get_user_model(),
+        on_delete=models.CASCADE,
+        related_name="bookmarks",
+        editable=False,
     )
     timestamp = models.DateTimeField(auto_now=True)
 
@@ -120,7 +130,10 @@ class PublicationUpVote(models.Model):
         "Publication", related_name="up_votes", on_delete=models.CASCADE, editable=False
     )
     created_by = models.ForeignKey(
-        get_user_model(), on_delete=models.CASCADE, related_name="up_voted_publications", editable=False
+        get_user_model(),
+        on_delete=models.CASCADE,
+        related_name="up_voted_publications",
+        editable=False,
     )
     timestamp = models.DateTimeField(auto_now=True)
 
@@ -133,13 +146,16 @@ class PublicationDownVote(models.Model):
     id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
 
     publication = models.ForeignKey(
-        "Publication", related_name="down_votes", on_delete=models.CASCADE, editable=False
+        "Publication",
+        related_name="down_votes",
+        on_delete=models.CASCADE,
+        editable=False,
     )
     created_by = models.ForeignKey(
         get_user_model(),
         on_delete=models.CASCADE,
         related_name="down_voted_publications",
-        editable=False
+        editable=False,
     )
     timestamp = models.DateTimeField(auto_now=True)
 
@@ -155,7 +171,10 @@ class HidePublication(models.Model):
         "Publication", on_delete=models.CASCADE, related_name="hides", editable=False
     )
     created_by = models.ForeignKey(
-        get_user_model(), on_delete=models.CASCADE, related_name="hidden_publications", editable=False
+        get_user_model(),
+        on_delete=models.CASCADE,
+        related_name="hidden_publications",
+        editable=False,
     )
     timestamp = models.DateTimeField(auto_now=True)
 
@@ -172,7 +191,10 @@ class ReportPublication(models.Model):
         "Publication", on_delete=models.CASCADE, related_name="reports", editable=False
     )
     created_by = models.ForeignKey(
-        get_user_model(), on_delete=models.CASCADE, related_name="reported_publications", editable=False
+        get_user_model(),
+        on_delete=models.CASCADE,
+        related_name="reported_publications",
+        editable=False,
     )
     timestamp = models.DateTimeField(auto_now=True)
 

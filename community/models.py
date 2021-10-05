@@ -206,13 +206,13 @@ class CommunityAuthorizationCode(models.Model):
         "Community",
         editable=False,
         on_delete=models.CASCADE,
-        related_name="authorization_codes"
+        related_name="authorization_codes",
     )
     created_by = models.ForeignKey(
         get_user_model(),
         on_delete=models.CASCADE,
         related_name="requested_community_authorization_codes",
-        editable=False
+        editable=False,
     )
     timestamp = models.DateTimeField(auto_now_add=True)
 

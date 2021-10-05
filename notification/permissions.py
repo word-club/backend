@@ -14,5 +14,6 @@ class IsNotificationReceiver(permissions.BasePermission):
         notification = obj.notification if obj.notification else obj
         receivers = NotificationTo.objects.filter(notification=notification)
         for receiver in receivers:
-            if receiver.user == request.user: return True
+            if receiver.user == request.user:
+                return True
         return False

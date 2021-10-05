@@ -32,7 +32,7 @@ class NotificationTo(models.Model):
         "Notification",
         on_delete=models.CASCADE,
         related_name="receivers",
-        editable=False
+        editable=False,
     )
 
     timestamp = models.DateTimeField(auto_now_add=True)
@@ -53,7 +53,7 @@ class PublicationNotification(models.Model):
         "Notification",
         on_delete=models.CASCADE,
         related_name="publications",
-        editable=False
+        editable=False,
     )
 
     class Meta:
@@ -72,7 +72,7 @@ class CommunityNotification(models.Model):
         "Notification",
         on_delete=models.CASCADE,
         related_name="communities",
-        editable=False
+        editable=False,
     )
 
     class Meta:
@@ -90,7 +90,7 @@ class CommentNotification(models.Model):
         "Notification",
         on_delete=models.CASCADE,
         related_name="comments",
-        editable=False
+        editable=False,
     )
 
     timestamp = models.DateTimeField(auto_now=True)
