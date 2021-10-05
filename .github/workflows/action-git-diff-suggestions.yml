@@ -1,4 +1,4 @@
-name: action-git-diff-suggestions
+name: WordClubApplication
 
 on:
   push:
@@ -13,6 +13,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-     - name: action-git-diff-suggestions
-     - uses: getsentry/action-git-diff-suggestions@v1
+      - uses: actions/checkout@v2
+      - uses: getsentry/action-git-diff-suggestions@v1
 
