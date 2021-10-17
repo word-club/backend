@@ -21,10 +21,17 @@ class NotificationCommentSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
+class NotificationToSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = NotificationTo
+        fields = "__all__"
+
+
 class NotificationSerializer(serializers.ModelSerializer):
     publications = NotificationPublicationSerializer(many=True, read_only=True)
     communities = NotificationCommunitySerializer(many=True, read_only=True)
     comments = NotificationCommentSerializer(many=True, read_only=True)
+    receivers = NotificationToSerializer(many=True, read_only=True)
 
     class Meta:
         model = Notification
@@ -41,24 +48,26 @@ class NotificationReceiverSerializer(serializers.ModelSerializer):
 
 class NotificationPostSerializer(serializers.ModelSerializer):
     to_list = serializers.ListField(
-        child=serializers.PrimaryKeyRelatedField(queryset=get_user_model().objects.all()),
+        child=serializers.PrimaryKeyRelatedField(
+            queryset=get_user_model().objects.all()
+        ),
         max_length=1000,
-        required=False
+        required=False,
     )
     publication = serializers.ListField(
         child=serializers.PrimaryKeyRelatedField(queryset=Publication.objects.all()),
         max_length=1000,
-        required=False
+        required=False,
     )
     community = serializers.ListField(
         child=serializers.PrimaryKeyRelatedField(queryset=Community.objects.all()),
         max_length=1000,
-        required=False
+        required=False,
     )
     comment = serializers.ListField(
         child=serializers.PrimaryKeyRelatedField(queryset=Comment.objects.all()),
         max_length=1000,
-        required=False
+        required=False,
     )
 
     class Meta:
@@ -79,28 +88,30 @@ class NotificationPostSerializer(serializers.ModelSerializer):
             is_global=is_global,
         )
 
-        if to_list: [
-            NotificationTo.objects.create(
-                notification=notification,
-                user=user
-            ) for user in to_list
-        ]
-        if publications: [
-            PublicationNotification.objects.create(
-                notification=notification,
-                publication=publication
-            ) for publication in publications
-        ]
-        if communities: [
-            CommunityNotification.objects.create(
-                notification=notification,
-                community=community
-            ) for community in communities
-        ]
-        if comments: [
-            CommentNotification.objects.create(
-                notification=notification,
-                comment=comment
-            ) for comment in comments
-        ]
+        if to_list:
+            [
+                NotificationTo.objects.create(notification=notification, user=user)
+                for user in to_list
+            ]
+        if publications:
+            [
+                PublicationNotification.objects.create(
+                    notification=notification, publication=publication
+                )
+                for publication in publications
+            ]
+        if communities:
+            [
+                CommunityNotification.objects.create(
+                    notification=notification, community=community
+                )
+                for community in communities
+            ]
+        if comments:
+            [
+                CommentNotification.objects.create(
+                    notification=notification, comment=comment
+                )
+                for comment in comments
+            ]
         return notification

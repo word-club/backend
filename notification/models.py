@@ -1,5 +1,3 @@
-import uuid
-
 from django.contrib.auth import get_user_model
 from django.db import models
 
@@ -9,7 +7,6 @@ from publication.models import Publication
 
 
 class Notification(models.Model):
-    id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
     is_global = models.BooleanField(default=False)
 
     subject = models.CharField(max_length=64)
@@ -21,7 +18,6 @@ class Notification(models.Model):
 
 
 class NotificationTo(models.Model):
-    id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
     seen = models.BooleanField(default=False, editable=False)
     user = models.ForeignKey(
         get_user_model(),
@@ -32,7 +28,7 @@ class NotificationTo(models.Model):
         "Notification",
         on_delete=models.CASCADE,
         related_name="receivers",
-        editable=False
+        editable=False,
     )
 
     timestamp = models.DateTimeField(auto_now_add=True)
@@ -42,7 +38,6 @@ class NotificationTo(models.Model):
 
 
 class PublicationNotification(models.Model):
-    id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
     publication = models.ForeignKey(
         Publication,
         on_delete=models.CASCADE,
@@ -53,7 +48,7 @@ class PublicationNotification(models.Model):
         "Notification",
         on_delete=models.CASCADE,
         related_name="publications",
-        editable=False
+        editable=False,
     )
 
     class Meta:
@@ -61,7 +56,6 @@ class PublicationNotification(models.Model):
 
 
 class CommunityNotification(models.Model):
-    id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
     community = models.ForeignKey(
         Community,
         on_delete=models.CASCADE,
@@ -72,7 +66,7 @@ class CommunityNotification(models.Model):
         "Notification",
         on_delete=models.CASCADE,
         related_name="communities",
-        editable=False
+        editable=False,
     )
 
     class Meta:
@@ -80,7 +74,6 @@ class CommunityNotification(models.Model):
 
 
 class CommentNotification(models.Model):
-    id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
     comment = models.ForeignKey(
         Comment,
         on_delete=models.CASCADE,
@@ -90,7 +83,7 @@ class CommentNotification(models.Model):
         "Notification",
         on_delete=models.CASCADE,
         related_name="comments",
-        editable=False
+        editable=False,
     )
 
     timestamp = models.DateTimeField(auto_now=True)
