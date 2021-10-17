@@ -12,9 +12,7 @@ from publication.serializers import *
 
 
 class PublicationListRetrieveView(
-    mixins.ListModelMixin,
-    mixins.RetrieveModelMixin,
-    viewsets.GenericViewSet
+    mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet
 ):
     queryset = Publication.objects.all()
     serializer_class = PublicationSerializer
@@ -143,11 +141,12 @@ class UpVoteAPublicationView(APIView):
     def post(request, pk):
         publication = get_object_or_404(Publication, pk=pk)
         up_vote, created = PublicationUpVote.objects.get_or_create(
-            created_by=request.user,
-            publication=publication
+            created_by=request.user, publication=publication
         )
-        if created: Response(status=status.HTTP_201_CREATED)
-        else: Response(status=status.HTTP_200_OK)
+        if created:
+            Response(status=status.HTTP_201_CREATED)
+        else:
+            Response(status=status.HTTP_200_OK)
 
 
 class RemovePublicationUpVote(APIView):
@@ -168,11 +167,12 @@ class DownVoteAPublication(APIView):
     def post(request, pk):
         publication = get_object_or_404(Publication, pk=pk)
         down_vote, created = PublicationDownVote.objects.get_or_create(
-            created_by=request.user,
-            publication=publication
+            created_by=request.user, publication=publication
         )
-        if created: Response(status=status.HTTP_201_CREATED)
-        else: Response(status=status.HTTP_200_OK)
+        if created:
+            Response(status=status.HTTP_201_CREATED)
+        else:
+            Response(status=status.HTTP_200_OK)
 
 
 class RemovePublicationDownVote(APIView):
@@ -193,11 +193,12 @@ class BookmarkAPublicationView(APIView):
     def post(request, pk):
         publication = get_object_or_404(Publication, pk=pk)
         bookmark, created = PublicationBookmark.objects.get_or_create(
-            created_by=request.user,
-            publication=publication
+            created_by=request.user, publication=publication
         )
-        if created: Response(status=status.HTTP_201_CREATED)
-        else: Response(status=status.HTTP_200_OK)
+        if created:
+            Response(status=status.HTTP_201_CREATED)
+        else:
+            Response(status=status.HTTP_200_OK)
 
 
 class RemovePublicationBookmarkView(APIView):
@@ -218,11 +219,12 @@ class HideAPublicationView(APIView):
     def post(request, pk):
         publication = get_object_or_404(Publication, pk=pk)
         up_vote, created = HidePublication.objects.get_or_create(
-            created_by=request.user,
-            publication=publication
+            created_by=request.user, publication=publication
         )
-        if created: Response(status=status.HTTP_201_CREATED)
-        else: Response(status=status.HTTP_200_OK)
+        if created:
+            Response(status=status.HTTP_201_CREATED)
+        else:
+            Response(status=status.HTTP_200_OK)
 
 
 class RemovePublicationHiddenStateView(APIView):
@@ -242,13 +244,16 @@ class ReportAPublicationView(APIView):
     @staticmethod
     def post(request, pk):
         publication = get_object_or_404(Publication, pk=pk)
-        reports = ReportPublication.objects.filter(created_by=request.user, publication=publication)
+        reports = ReportPublication.objects.filter(
+            created_by=request.user, publication=publication
+        )
         most_recent_report_found, diff = helper.is_recent_report_present(reports)
 
-        if most_recent_report_found: return Response(
-            data={"details": "recently reported", "remaining": 15 - diff},
-            status=status.HTTP_403_FORBIDDEN
-        )
+        if most_recent_report_found:
+            return Response(
+                data={"details": "recently reported", "remaining": 15 - diff},
+                status=status.HTTP_403_FORBIDDEN,
+            )
 
         context = {"publication": publication, "request": request}
         serializer = PublicationReportSerializer(data=request.data, context=context)
@@ -267,4 +272,3 @@ class RemovePublicationReportView(APIView):
         self.check_object_permissions(request, report)
         report.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
-

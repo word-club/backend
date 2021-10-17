@@ -17,11 +17,7 @@ def upload_comment_image_to(instance, filename):
 
 
 class Comment(models.Model):
-    id = models.UUIDField(
-        default=uuid.uuid4,
-        editable=False,
-        primary_key=True
-    )
+    id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
     comment = models.TextField()
     publication = models.ForeignKey(
         Publication,
@@ -42,11 +38,7 @@ class Comment(models.Model):
 
 
 class CommentReply(models.Model):
-    id = models.UUIDField(
-        default=uuid.uuid4,
-        editable=False,
-        primary_key=True
-    )
+    id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
     reply = models.TextField()
     created_by = models.ForeignKey(
         get_user_model(),
@@ -67,11 +59,7 @@ class CommentReply(models.Model):
 
 
 class CommentImage(models.Model):
-    id = models.UUIDField(
-        default=uuid.uuid4,
-        editable=False,
-        primary_key=True
-    )
+    id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
     image = models.ImageField(
         upload_to=upload_comment_image_to,
         validators=[FileExtensionValidator(ALLOWED_IMAGES_EXTENSIONS)],
@@ -93,11 +81,7 @@ class CommentImage(models.Model):
 
 
 class CommentImageUrl(models.Model):
-    id = models.UUIDField(
-        default=uuid.uuid4,
-        editable=False,
-        primary_key=True
-    )
+    id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
     url = models.URLField()
     comment = models.ForeignKey(
         "Comment",
@@ -112,11 +96,7 @@ class CommentImageUrl(models.Model):
 
 
 class CommentVideoUrl(models.Model):
-    id = models.UUIDField(
-        default=uuid.uuid4,
-        editable=False,
-        primary_key=True
-    )
+    id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
     url = models.URLField()
     comment = models.ForeignKey(
         "Comment",
@@ -131,11 +111,7 @@ class CommentVideoUrl(models.Model):
 
 
 class CommentUpVote(models.Model):
-    id = models.UUIDField(
-        default=uuid.uuid4,
-        editable=False,
-        primary_key=True
-    )
+    id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
     comment = models.ForeignKey(
         "Comment",
         related_name="up_votes",
@@ -146,7 +122,7 @@ class CommentUpVote(models.Model):
         get_user_model(),
         on_delete=models.CASCADE,
         related_name="up_voted_comments",
-        editable=False
+        editable=False,
     )
     timestamp = models.DateTimeField(auto_now=True)
 
@@ -156,11 +132,7 @@ class CommentUpVote(models.Model):
 
 
 class CommentDownVote(models.Model):
-    id = models.UUIDField(
-        default=uuid.uuid4,
-        editable=False,
-        primary_key=True
-    )
+    id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
     comment = models.ForeignKey(
         "Comment",
         related_name="down_votes",
@@ -171,7 +143,7 @@ class CommentDownVote(models.Model):
         get_user_model(),
         on_delete=models.CASCADE,
         related_name="down_voted_comments",
-        editable=False
+        editable=False,
     )
     timestamp = models.DateTimeField(auto_now=True)
 
@@ -181,17 +153,10 @@ class CommentDownVote(models.Model):
 
 
 class ReportComment(models.Model):
-    id = models.UUIDField(
-        default=uuid.uuid4,
-        editable=False,
-        primary_key=True
-    )
+    id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
     reason = models.TextField()
     comment = models.ForeignKey(
-        "Comment",
-        on_delete=models.CASCADE,
-        related_name="reports",
-        editable=False
+        "Comment", on_delete=models.CASCADE, related_name="reports", editable=False
     )
     created_by = models.ForeignKey(
         get_user_model(),

@@ -82,17 +82,13 @@ class CommentPostSerializer(serializers.ModelSerializer):
     images = serializers.ListField(
         child=serializers.ImageField(allow_empty_file=False, use_url=False),
         max_length=3,
-        required=False
+        required=False,
     )
     image_urls = serializers.ListField(
-        child=serializers.URLField(),
-        max_length=3,
-        required=False
+        child=serializers.URLField(), max_length=3, required=False
     )
     video_urls = serializers.ListField(
-        child=serializers.URLField(),
-        max_length=3,
-        required=False
+        child=serializers.URLField(), max_length=3, required=False
     )
 
     @staticmethod
@@ -108,17 +104,29 @@ class CommentPostSerializer(serializers.ModelSerializer):
         comment = Comment.objects.create(
             comment=validated_data["comment"],
             publication=self.context["publication"],
-            created_by=self.context["request"].user
+            created_by=self.context["request"].user,
         )
 
         images = validated_data.get("images")
-        if images: [CommentImage.objects.create(comment=comment, image=image) for image in images]
+        if images:
+            [
+                CommentImage.objects.create(comment=comment, image=image)
+                for image in images
+            ]
 
         image_urls = validated_data.get("image_urls")
-        if image_urls: [CommentImageUrl.objects.create(comment=comment, url=url) for url in image_urls]
+        if image_urls:
+            [
+                CommentImageUrl.objects.create(comment=comment, url=url)
+                for url in image_urls
+            ]
 
         video_urls = validated_data.get("video_urls")
-        if video_urls: [CommentVideoUrl.objects.create(comment=comment, url=url) for url in video_urls]
+        if video_urls:
+            [
+                CommentVideoUrl.objects.create(comment=comment, url=url)
+                for url in video_urls
+            ]
 
         return comment
 

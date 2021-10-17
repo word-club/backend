@@ -22,7 +22,7 @@ def upload_cover_image_to(instance, filename):
 
 
 class Profile(models.Model):
-    id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
+
     user = models.OneToOneField(
         get_user_model(), on_delete=models.CASCADE, editable=False
     )
@@ -39,7 +39,7 @@ class Profile(models.Model):
 
 
 class ProfileAvatar(models.Model):
-    id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
+
     is_active = models.BooleanField(default=False, editable=False)
     image = models.ImageField(
         upload_to=upload_profile_image_to,
@@ -60,7 +60,7 @@ class ProfileAvatar(models.Model):
 
 
 class ProfileCover(models.Model):
-    id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
+
     is_active = models.BooleanField(default=False, editable=False)
     image = models.ImageField(
         upload_to=upload_cover_image_to,
@@ -89,7 +89,7 @@ class ResetPasswordCode(models.Model):
 
 
 class FollowUser(models.Model):
-    id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
+
     to_follow = models.ForeignKey(
         get_user_model(),
         on_delete=models.CASCADE,

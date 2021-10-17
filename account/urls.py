@@ -39,8 +39,8 @@ urlpatterns += [
         ConfirmResetPassword.as_view(),
         name="confirm-reset-password",
     ),
-    path("profile/<str:pk>/cover/", AddProfileCoverView.as_view()),
-    path("profile/<str:pk>/avatar/", AddProfileAvatarView.as_view()),
+    path("profile/<int:pk>/cover/", AddProfileCoverView.as_view()),
+    path("profile/<int:pk>/avatar/", AddProfileAvatarView.as_view()),
     path("profile-cover/<int:pk>/set-active/", SetActiveProfileCoverView.as_view()),
     path("profile-avatar/<int:pk>/set-active/", SetActiveProfileAvatarView.as_view()),
 ]

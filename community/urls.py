@@ -8,76 +8,76 @@ router.register(r"community", CommunityViewSet, basename="community")
 urlpatterns = router.urls
 
 urlpatterns += [
-    path("community/<str:pk>/report/", ReportACommunity.as_view()),
-    path("community/<str:pk>/subscribe", SubscribeToACommunity.as_view()),
+    path("community/<int:pk>/report/", ReportACommunity.as_view()),
+    path("community/<int:pk>/subscribe", SubscribeToACommunity.as_view()),
     path(
-        "community/<str:pk>/disable-notifications/",
+        "community/<int:pk>/disable-notifications/",
         DisableNotificationsForACommunity.as_view(),
     ),
     path(
-        "community/<str:pk>/avatar/",
+        "community/<int:pk>/avatar/",
         AddCommunityAvatar.as_view(),
     ),
     path(
-        "community/<str:pk>/cover/",
+        "community/<int:pk>/cover/",
         AddCommunityCover.as_view(),
     ),
     path(
-        "community/<str:pk>/hashtag/",
+        "community/<int:pk>/hashtag/",
         AddCommunityHashtag.as_view(),
     ),
     path(
-        "community/<str:pk>/admin/",
+        "community/<int:pk>/admin/",
         AddCommunityAdmin.as_view(),
     ),
     path(
-        "disable-notifications/<str:pk>/",
+        "disable-notifications/<int:pk>/",
         RemoveCommunityDisableNotification.as_view(),
     ),
     path(
-        "community-rule/<str:pk>/",
+        "community-rule/<int:pk>/",
         DeleteCommunityRule.as_view(),
     ),
     path(
-        "community-cover/<str:pk>/",
+        "community-cover/<int:pk>/",
         DeleteCommunityCover.as_view(),
     ),
     path(
-        "community-avatar/<str:pk>/",
+        "community-avatar/<int:pk>/",
         DeleteCommunityAvatar.as_view(),
     ),
     path(
-        "community-report/<str:pk>/",
+        "community-report/<int:pk>/",
         DeleteCommunityReport.as_view(),
     ),
     path(
-        "community-unsubscribe/<str:pk>/",
+        "community-unsubscribe/<int:pk>/",
         RemoveCommunityDisableNotification.as_view(),
     ),
     path(
-        "community-hashtag/<str:pk>/",
+        "community-hashtag/<int:pk>/",
         RemoveCommunityHashtag.as_view(),
     ),
     path(
-        "community-avatar/<str:pk>/set-active/",
+        "community-avatar/<int:pk>/set-active/",
         SetActiveCommunityAvatar.as_view(),
     ),
     path(
-        "community-cover/<str:pk>/set-active/",
+        "community-cover/<int:pk>/set-active/",
         SetActiveCommunityCover.as_view(),
     ),
     path(
-        "community-admin/<str:pk>/admin/",
+        "community-admin/<int:pk>/admin/",
         RemoveCommunityAdmin.as_view(),
     ),
     path(
-        "authorize-community/<str:pk>/",
+        "authorize-community/<int:pk>/",
         RequestCommunityAuthorization.as_view(),
-        name="authorize-community"
+        name="authorize-community",
     ),
     path(
-        "authorize-community/<str:pk>/",
+        "authorize-community/<int:pk>/",
         ConfirmCommunityAuthorization.as_view,
-        name="confirm-authorize-community"
-    )
+        name="confirm-authorize-community",
+    ),
 ]

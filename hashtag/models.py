@@ -5,7 +5,7 @@ from django.db import models
 
 
 class Hashtag(models.Model):
-    id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
+
     tag = models.CharField(max_length=64, unique=True)
 
     created_by = models.ForeignKey(

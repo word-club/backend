@@ -288,10 +288,13 @@ class RequestCommunityAuthorization(APIView):
         if community.email:
             return Response(
                 status=status.HTTP_400_BAD_REQUEST,
-                data={"details": "Community does not have email set."}
+                data={"details": "Community does not have email set."},
             )
         if community.is_authorized:
-            return Response(status=status.HTTP_204_NO_CONTENT, data={"details": "Community is already authorized."})
+            return Response(
+                status=status.HTTP_204_NO_CONTENT,
+                data={"details": "Community is already authorized."},
+            )
         codes = CommunityAuthorizationCode.objects.filter(community=community)
         [code.delete() for code in codes]  # delete every pre-existing codes
         code = CommunityAuthorizationCode.objects.create(community=community)

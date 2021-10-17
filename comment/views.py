@@ -32,7 +32,9 @@ class UpdateDestroyCommentView(APIView):
     def patch(self, request, pk):
         comment = get_object_or_404(Comment, pk=pk)
         self.check_object_permissions(request, comment)
-        serializer = CommentSerializer(comment, data=request.data, context={"request": request})
+        serializer = CommentSerializer(
+            comment, data=request.data, context={"request": request}
+        )
         if serializer.is_valid():
             serializer.save()
             return Response(status=status.HTTP_204_NO_CONTENT)
@@ -54,11 +56,12 @@ class UpVoteACommentView(APIView):
     def post(request, pk):
         comment = get_object_or_404(Comment, pk=pk)
         up_vote, created = CommentUpVote.objects.get_or_create(
-            created_by=request.user,
-            comment=comment
+            created_by=request.user, comment=comment
         )
-        if created: Response(status=status.HTTP_201_CREATED)
-        else: Response(status=status.HTTP_200_OK)
+        if created:
+            Response(status=status.HTTP_201_CREATED)
+        else:
+            Response(status=status.HTTP_200_OK)
 
 
 class DownVoteACommentView(APIView):
@@ -68,11 +71,12 @@ class DownVoteACommentView(APIView):
     def post(request, pk):
         comment = get_object_or_404(Comment, pk=pk)
         down_vote, created = CommentDownVote.objects.get_or_create(
-            created_by=request.user,
-            comment=comment
+            created_by=request.user, comment=comment
         )
-        if created: Response(status=status.HTTP_201_CREATED)
-        else: Response(status=status.HTTP_200_OK)
+        if created:
+            Response(status=status.HTTP_201_CREATED)
+        else:
+            Response(status=status.HTTP_200_OK)
 
 
 class ReportACommentView(APIView):
@@ -84,10 +88,11 @@ class ReportACommentView(APIView):
         reports = ReportComment.objects.filter(created_by=request.user, comment=comment)
         most_recent_report_found, diff = helper.is_recent_report_present(reports)
 
-        if most_recent_report_found: return Response(
-            data={"details": "recently reported", "remaining": 15 - diff},
-            status=status.HTTP_403_FORBIDDEN
-        )
+        if most_recent_report_found:
+            return Response(
+                data={"details": "recently reported", "remaining": 15 - diff},
+                status=status.HTTP_403_FORBIDDEN,
+            )
 
         context = {"comment": comment, "request": request}
         serializer = CommentReportSerializer(data=request.data, context=context)

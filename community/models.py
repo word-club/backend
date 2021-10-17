@@ -22,7 +22,6 @@ def upload_cover_to(instance, filename):
 
 
 class Community(models.Model):
-    id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
 
     name = models.CharField(max_length=64, unique=True)
     description = models.CharField(max_length=512, unique=True)
@@ -49,7 +48,7 @@ class Community(models.Model):
 
 
 class CommunityAvatar(models.Model):
-    id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
+
     is_active = models.BooleanField(default=False, editable=False)
     image = models.ImageField(
         upload_to=upload_avatar_to,
@@ -71,7 +70,7 @@ class CommunityAvatar(models.Model):
 
 
 class CommunityCover(models.Model):
-    id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
+
     is_active = models.BooleanField(default=False)
     image = models.ImageField(
         upload_to=upload_cover_to,
@@ -93,7 +92,7 @@ class CommunityCover(models.Model):
 
 
 class CommunityRule(models.Model):
-    id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
+
     rule = models.TextField()
     community = models.ForeignKey(
         "Community", on_delete=models.CASCADE, related_name="rules", editable=False
@@ -111,7 +110,7 @@ class CommunityRule(models.Model):
 
 
 class CommunitySubscription(models.Model):
-    id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
+
     subscriber = models.ForeignKey(
         get_user_model(),
         on_delete=models.CASCADE,
@@ -132,7 +131,7 @@ class CommunitySubscription(models.Model):
 
 
 class CommunityReport(models.Model):
-    id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
+
     reason = models.TextField()
     created_by = models.ForeignKey(
         get_user_model(),
@@ -150,7 +149,7 @@ class CommunityReport(models.Model):
 
 
 class CommunityDisableNotifications(models.Model):
-    id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
+
     created_by = models.ForeignKey(
         get_user_model(),
         on_delete=models.CASCADE,
@@ -171,7 +170,7 @@ class CommunityDisableNotifications(models.Model):
 
 
 class CommunityHashtag(models.Model):
-    id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
+
     tag = models.ForeignKey(
         Hashtag, related_name="communities", on_delete=models.CASCADE
     )
@@ -181,7 +180,7 @@ class CommunityHashtag(models.Model):
 
 
 class CommunityAdmin(models.Model):
-    id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
+
     community = models.ForeignKey(
         "Community", on_delete=models.CASCADE, related_name="admins"
     )
@@ -206,13 +205,13 @@ class CommunityAuthorizationCode(models.Model):
         "Community",
         editable=False,
         on_delete=models.CASCADE,
-        related_name="authorization_codes"
+        related_name="authorization_codes",
     )
     created_by = models.ForeignKey(
         get_user_model(),
         on_delete=models.CASCADE,
         related_name="requested_community_authorization_codes",
-        editable=False
+        editable=False,
     )
     timestamp = models.DateTimeField(auto_now_add=True)
 
