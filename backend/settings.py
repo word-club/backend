@@ -219,3 +219,5 @@ CHANNEL_LAYERS = {
         }
     }
 }
+
+ASGI_APPLICATION = "backend.asgi.application"
