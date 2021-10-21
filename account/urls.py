@@ -2,6 +2,7 @@ from django.urls import path
 from rest_framework.routers import DefaultRouter
 
 from account.views.auth import LoginView, LogoutView
+from account.views.follow import FollowUserViewSet, FollowAUserView, UnFollowAUserView
 from account.views.password import (
     UpdatePassword,
     ResetPasswordRequestCode,
@@ -21,6 +22,7 @@ router = DefaultRouter()
 router.register(r"user", UserViewSet, basename="user")
 router.register(r"profile-avatar", ProfileAvatarViewSet, basename="profile-avatar")
 router.register(r"profile-cover", ProfileCoverViewSet, basename="profile-cover")
+router.register(r"follower", FollowUserViewSet, basename="follower")
 
 urlpatterns = router.urls
 
@@ -43,4 +45,6 @@ urlpatterns += [
     path("profile/<int:pk>/avatar/", AddProfileAvatarView.as_view()),
     path("profile-cover/<int:pk>/set-active/", SetActiveProfileCoverView.as_view()),
     path("profile-avatar/<int:pk>/set-active/", SetActiveProfileAvatarView.as_view()),
+    path("user/<int:pk>/follow/", FollowAUserView.as_view()),
+    path("follower/<int:pk>/", UnFollowAUserView.as_view()),
 ]

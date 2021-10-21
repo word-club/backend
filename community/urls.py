@@ -9,7 +9,7 @@ urlpatterns = router.urls
 
 urlpatterns += [
     path("community/<int:pk>/report/", ReportACommunity.as_view()),
-    path("community/<int:pk>/subscribe", SubscribeToACommunity.as_view()),
+    path("community/<int:pk>/subscribe/", SubscribeToACommunity.as_view()),
     path(
         "community/<int:pk>/disable-notifications/",
         DisableNotificationsForACommunity.as_view(),
@@ -52,7 +52,7 @@ urlpatterns += [
     ),
     path(
         "community-unsubscribe/<int:pk>/",
-        RemoveCommunityDisableNotification.as_view(),
+        UnSubscribeCommunity.as_view(),
     ),
     path(
         "community-hashtag/<int:pk>/",
@@ -67,16 +67,16 @@ urlpatterns += [
         SetActiveCommunityCover.as_view(),
     ),
     path(
-        "community-admin/<int:pk>/admin/",
+        "community-admin/<int:pk>/",
         RemoveCommunityAdmin.as_view(),
     ),
     path(
-        "authorize-community/<int:pk>/",
+        "authorize-community/<int:pk>/request",
         RequestCommunityAuthorization.as_view(),
         name="authorize-community",
     ),
     path(
-        "authorize-community/<int:pk>/",
+        "authorize-community/<str:pk>/confirm",
         ConfirmCommunityAuthorization.as_view,
         name="confirm-authorize-community",
     ),
