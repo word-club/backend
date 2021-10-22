@@ -65,6 +65,12 @@ class PublishPublicationView(APIView):
         self.check_object_permissions(request, publication)
         if publication.is_published:
             return Response({"detail": "Publication already published."}, status=status.HTTP_204_NO_CONTENT)
+        if not publication.community:
+            return Response({"community": "This field is required."}, status=status.HTTP_400_BAD_REQUEST)
+        if not publication.title:
+            return Response({"title": "This field is required."}, status=status.HTTP_400_BAD_REQUEST)
+        if not publication.content:
+            return Response({"content": "This field is required."}, status=status.HTTP_400_BAD_REQUEST)
         publication.is_published = True
         publication.published_at = timezone.now()
         publication.save()
