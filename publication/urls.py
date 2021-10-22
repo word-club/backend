@@ -21,6 +21,7 @@ from publication.views import (
     RemovePublicationReportView,
     AddPublicationView,
     UpdatePublicationView,
+    PublishPublicationView
 )
 
 router = DefaultRouter()
@@ -33,6 +34,7 @@ urlpatterns = router.urls
 urlpatterns += [
     path("publication/", AddPublicationView.as_view()),
     path("publication/<int:pk>/", UpdatePublicationView.as_view()),
+    path("publication/<int:pk>/publish/", PublishPublicationView.as_view()),
     path("publication/<int:pk>/tag/", AddPublicationHashtag.as_view()),
     path("publication-tag/<int:pk>/", RemovePublicationHashtag.as_view()),
     path("publication/<int:pk>/image/", AddPublicationImageView.as_view()),

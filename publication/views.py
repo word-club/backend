@@ -1,3 +1,4 @@
+from django.utils import timezone
 from rest_framework import viewsets, mixins, status
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.generics import get_object_or_404
@@ -53,6 +54,21 @@ class UpdatePublicationView(APIView):
         self.check_object_permissions(request, publication)
         publication.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class PublishPublicationView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsOwner]
+
+    def post(self, request, pk):
+        publication = get_object_or_404(Publication, pk=pk)
+        self.check_object_permissions(request, publication)
+        if publication.is_published:
+            return Response({"detail": "Publication already published."}, status=status.HTTP_204_NO_CONTENT)
+        publication.is_published = True
+        publication.published_at = timezone.now()
+        publication.save()
+        return Response(status=status.HTTP_200_OK)
 
 
 class AddPublicationHashtag(APIView):
