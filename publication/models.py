@@ -1,6 +1,5 @@
 import os
 import random
-import uuid
 
 from django.contrib.auth import get_user_model
 from django.core.validators import FileExtensionValidator
@@ -19,7 +18,7 @@ def upload_publication_image_to(instance, filename):
 
 class Publication(models.Model):
 
-    title = models.CharField(max_length=255, null=True, blank=True)
+    title = models.CharField(max_length=255)
     content = models.TextField(null=True, blank=True)
     created_by = models.ForeignKey(
         get_user_model(),
