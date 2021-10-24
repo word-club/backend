@@ -71,28 +71,8 @@ class ProfileCoverSerializer(serializers.ModelSerializer):
 
 
 class ProfileSerializer(serializers.ModelSerializer):
-    avatars = ProfileAvatarSerializer(many=True, read_only=True)
-    covers = ProfileCoverSerializer(many=True, read_only=True)
-    active_profile = serializers.SerializerMethodField(allow_null=True)
-    active_cover = serializers.SerializerMethodField(allow_null=True)
-
-    @staticmethod
-    def get_active_profile(obj):
-        avatars = ProfileAvatar.objects.filter(is_active=True, profile=obj)
-        return (
-            helper.generate_url_for_media_resource(avatars.first().image.url)
-            if avatars.count() > 0
-            else None
-        )
-
-    @staticmethod
-    def get_active_cover(obj):
-        active_covers = ProfileCover.objects.filter(is_active=True, profile=obj)
-        return (
-            helper.generate_url_for_media_resource(active_covers.first().image.url)
-            if active_covers.count() > 0
-            else None
-        )
+    avatar = ProfileAvatarSerializer(read_only=True)
+    cover = ProfileCoverSerializer(read_only=True)
 
     class Meta:
         model = Profile

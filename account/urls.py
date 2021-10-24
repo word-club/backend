@@ -13,10 +13,8 @@ from account.views.profile import (
     ProfileCoverViewSet,
     AddProfileCoverView,
     AddProfileAvatarView,
-    SetActiveProfileAvatarView,
-    SetActiveProfileCoverView,
 )
-from account.views.user import RegisterUserView, UserViewSet
+from account.views.user import RegisterUserView, UserViewSet, DeleteReport, BlockAUser, ReportAUser, UnBlockAUser
 
 router = DefaultRouter()
 router.register(r"user", UserViewSet, basename="user")
@@ -43,8 +41,11 @@ urlpatterns += [
     ),
     path("profile/<int:pk>/cover/", AddProfileCoverView.as_view()),
     path("profile/<int:pk>/avatar/", AddProfileAvatarView.as_view()),
-    path("profile-cover/<int:pk>/set-active/", SetActiveProfileCoverView.as_view()),
-    path("profile-avatar/<int:pk>/set-active/", SetActiveProfileAvatarView.as_view()),
     path("user/<int:pk>/follow/", FollowAUserView.as_view()),
     path("follower/<int:pk>/", UnFollowAUserView.as_view()),
+    path("user/<int:pk>/report/", ReportAUser.as_view()),
+    path("user/<int:pk>/block/", BlockAUser.as_view()),
+    path("block/<int:pk>/", UnBlockAUser.as_view()),
+    path("report/<int:pk>/", DeleteReport.as_view()),
+
 ]

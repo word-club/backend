@@ -191,42 +191,6 @@ class AddCommunityCover(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class SetActiveCommunityAvatar(APIView):
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsCommunityAdministrator]
-
-    def post(self, request, pk):
-        community_avatar = get_object_or_404(CommunityAvatar, pk=pk)
-        self.check_object_permissions(request, community_avatar)
-        all_avatars = CommunityAvatar.objects.filter(
-            community=community_avatar.community, is_active=True
-        )
-        for item in all_avatars:
-            item.is_active = False
-            item.save()
-        community_avatar.is_active = True
-        community_avatar.save()
-        return Response(status=status.HTTP_200_OK)
-
-
-class SetActiveCommunityCover(APIView):
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsCommunityAdministrator]
-
-    def post(self, request, pk):
-        community_cover = get_object_or_404(CommunityAvatar, pk=pk)
-        self.check_object_permissions(request, community_cover)
-        all_covers = CommunityCover.objects.filter(
-            community=community_cover.community, is_active=True
-        )
-        for item in all_covers:
-            item.is_active = False
-            item.save()
-        community_cover.is_active = True
-        community_cover.save()
-        return Response(status=status.HTTP_200_OK)
-
-
 class AddCommunityHashtag(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsCommunityAdministrator]

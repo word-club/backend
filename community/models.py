@@ -54,8 +54,8 @@ class CommunityAvatar(models.Model):
         upload_to=upload_avatar_to,
         validators=[FileExtensionValidator(ALLOWED_IMAGES_EXTENSIONS)],
     )
-    community = models.ForeignKey(
-        "Community", on_delete=models.CASCADE, related_name="avatars", editable=False
+    community = models.OneToOneField(
+        "Community", on_delete=models.CASCADE, related_name="avatar", editable=False
     )
     created_by = models.ForeignKey(
         get_user_model(),
@@ -76,8 +76,8 @@ class CommunityCover(models.Model):
         upload_to=upload_cover_to,
         validators=[FileExtensionValidator(ALLOWED_IMAGES_EXTENSIONS)],
     )
-    community = models.ForeignKey(
-        "Community", on_delete=models.CASCADE, related_name="covers", editable=False
+    community = models.OneToOneField(
+        "Community", on_delete=models.CASCADE, related_name="cover", editable=False
     )
     created_by = models.ForeignKey(
         get_user_model(),

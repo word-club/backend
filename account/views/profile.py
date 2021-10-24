@@ -10,8 +10,6 @@ from account.serializers.user import ProfileAvatarSerializer, ProfileCoverSerial
 
 
 class ProfileAvatarViewSet(
-    mixins.ListModelMixin,
-    mixins.RetrieveModelMixin,
     mixins.DestroyModelMixin,
     viewsets.GenericViewSet,
 ):
@@ -29,8 +27,6 @@ class ProfileAvatarViewSet(
 
 
 class ProfileCoverViewSet(
-    mixins.ListModelMixin,
-    mixins.RetrieveModelMixin,
     mixins.DestroyModelMixin,
     viewsets.GenericViewSet,
 ):
@@ -75,39 +71,3 @@ class AddProfileCoverView(APIView):
             serializer.save()
             return Response(status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-class SetActiveProfileAvatarView(APIView):
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsOwner]
-
-    def post(self, request, pk):
-        profile_avatar = get_object_or_404(ProfileAvatar, pk=pk)
-        self.check_object_permissions(request, profile_avatar)
-        all_avatars = ProfileAvatar.objects.filter(
-            profile=profile_avatar.profile, is_active=True
-        )
-        for item in all_avatars:
-            item.is_active = False
-            item.save()
-        profile_avatar.is_active = True
-        profile_avatar.save()
-        return Response(status=status.HTTP_200_OK)
-
-
-class SetActiveProfileCoverView(APIView):
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsOwner]
-
-    def post(self, request, pk):
-        profile_cover = get_object_or_404(ProfileCover, pk=pk)
-        self.check_object_permissions(request, profile_cover)
-        all_avatars = ProfileCover.objects.filter(
-            profile=profile_cover.profile, is_active=True
-        )
-        for item in all_avatars:
-            item.is_active = False
-            item.save()
-        profile_cover.is_active = True
-        profile_cover.save()
-        return Response(status=status.HTTP_200_OK)

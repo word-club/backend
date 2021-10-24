@@ -59,14 +59,6 @@ urlpatterns += [
         RemoveCommunityHashtag.as_view(),
     ),
     path(
-        "community-avatar/<int:pk>/set-active/",
-        SetActiveCommunityAvatar.as_view(),
-    ),
-    path(
-        "community-cover/<int:pk>/set-active/",
-        SetActiveCommunityCover.as_view(),
-    ),
-    path(
         "community-admin/<int:pk>/",
         RemoveCommunityAdmin.as_view(),
     ),
