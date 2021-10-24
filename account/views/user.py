@@ -36,20 +36,30 @@ class ReportAUser(APIView):
     @staticmethod
     def post(request, pk):
         user = get_object_or_404(get_user_model(), pk=pk)
-        report, created = ReportUser.objects.get_or_create(to_report=user, user=request.user)
+        report, created = ReportUser.objects.get_or_create(
+            to_report=user, user=request.user
+        )
         if created:
             return Response(status=status.HTTP_201_CREATED)
-        return Response({"details": "Cannot report already reported user."}, status=status.HTTP_403_FORBIDDEN)
+        return Response(
+            {"details": "Cannot report already reported user."},
+            status=status.HTTP_403_FORBIDDEN,
+        )
 
 
 class BlockAUser(APIView):
     @staticmethod
     def post(request, pk):
         user = get_object_or_404(get_user_model(), pk=pk)
-        block, created = BlockUser.objects.get_or_create(to_block=user, user=request.user)
+        block, created = BlockUser.objects.get_or_create(
+            to_block=user, user=request.user
+        )
         if created:
             return Response(status=status.HTTP_201_CREATED)
-        return Response({"details": "Cannot block already blocked user."}, status=status.HTTP_403_FORBIDDEN)
+        return Response(
+            {"details": "Cannot block already blocked user."},
+            status=status.HTTP_403_FORBIDDEN,
+        )
 
 
 class UnBlockAUser(APIView):

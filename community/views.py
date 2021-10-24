@@ -109,7 +109,9 @@ class UnSubscribeCommunity(APIView):
 
     def delete(self, request, pk):
 
-        subscription = get_object_or_404(CommunitySubscription, community=pk, subscriber=request.user)
+        subscription = get_object_or_404(
+            CommunitySubscription, community=pk, subscriber=request.user
+        )
         self.check_object_permissions(request, subscription.community)
 
         subscription.delete()

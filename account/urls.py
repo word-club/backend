@@ -14,7 +14,14 @@ from account.views.profile import (
     AddProfileCoverView,
     AddProfileAvatarView,
 )
-from account.views.user import RegisterUserView, UserViewSet, DeleteReport, BlockAUser, ReportAUser, UnBlockAUser
+from account.views.user import (
+    RegisterUserView,
+    UserViewSet,
+    DeleteReport,
+    BlockAUser,
+    ReportAUser,
+    UnBlockAUser,
+)
 
 router = DefaultRouter()
 router.register(r"user", UserViewSet, basename="user")
@@ -47,5 +54,4 @@ urlpatterns += [
     path("user/<int:pk>/block/", BlockAUser.as_view()),
     path("block/<int:pk>/", UnBlockAUser.as_view()),
     path("report/<int:pk>/", DeleteReport.as_view()),
-
 ]
