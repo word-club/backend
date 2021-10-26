@@ -91,6 +91,21 @@ class CommunityAdminSerializer(serializers.ModelSerializer):
         return super().create(validated_data)
 
 
+class CommunityThemeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CommunityTheme
+        fields = "__all__"
+
+    def create(self, validated_data):
+        validated_data["created_by"] = self.context["request"].user
+        validated_data["community"] = self.context["community"]
+        return super().create(validated_data)
+
+    def update(self, instance, validated_data):
+        validated_data["created_by"] = self.context["request"].user
+        return super().update(instance, validated_data)
+
+
 class CommunitySerializer(serializers.ModelSerializer):
     hashtags = CommunityHashtagSerializer(many=True, read_only=True)
     admins = CommunityAdminSerializer(many=True, read_only=True)

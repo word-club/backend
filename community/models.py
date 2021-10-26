@@ -217,3 +217,32 @@ class CommunityAuthorizationCode(models.Model):
 
     class Meta:
         ordering = ["-timestamp"]
+
+
+COLOR_CHOICES = (
+    ("orange", "Orange"),
+    ("red", "Red"),
+    ("pink", "Pink"),
+    ("teal", "Teal"),
+    ("green", "Green"),
+    ("indigo", "Indigo"),
+    ("grey", "Grey"),
+    ("deep-purple", "Purple"),
+    ("amber", "Amber")
+)
+
+
+class CommunityTheme(models.Model):
+    color = models.CharField(choices=COLOR_CHOICES, max_length=50)
+    community = models.OneToOneField(
+        "Community",
+        editable=False,
+        on_delete=models.CASCADE,
+        related_name="theme",
+    )
+    created_by = models.ForeignKey(
+        get_user_model(),
+        on_delete=models.CASCADE,
+        related_name="added_themes",
+        editable=False,
+    )
