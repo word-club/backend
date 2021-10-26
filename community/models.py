@@ -228,7 +228,7 @@ COLOR_CHOICES = (
     ("indigo", "Indigo"),
     ("grey", "Grey"),
     ("deep-purple", "Purple"),
-    ("amber", "Amber")
+    ("amber", "Amber"),
 )
 
 

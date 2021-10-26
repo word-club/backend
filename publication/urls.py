@@ -21,7 +21,9 @@ from publication.views import (
     RemovePublicationReportView,
     AddPublicationView,
     UpdatePublicationView,
-    PublishPublicationView, EditOrRemovePublicationLink, AddPublicationLinkView,
+    PublishPublicationView,
+    EditOrRemovePublicationLink,
+    AddPublicationLinkView,
 )
 
 router = DefaultRouter()

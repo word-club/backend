@@ -32,12 +32,16 @@ class PublicationLinkSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         validated_data["publication"] = self.context["publication"]
-        validated_data["metadata"] = metadata_parser.MetadataParser(url=validated_data.get("link"))
+        validated_data["metadata"] = metadata_parser.MetadataParser(
+            url=validated_data.get("link")
+        )
         return super().create(validated_data)
 
     def update(self, instance, validated_data):
         if validated_data.get("link"):
-            validated_data["metadata"] = metadata_parser.MetadataParser(url=validated_data.get("link"))
+            validated_data["metadata"] = metadata_parser.MetadataParser(
+                url=validated_data.get("link")
+            )
         return super().update(instance, validated_data)
 
 

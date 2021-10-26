@@ -323,9 +323,7 @@ class UpdateCommunityTheme(APIView):
         community_theme = get_object_or_404(CommunityTheme, pk=pk)
         self.check_object_permissions(request, community_theme)
         serializer = CommunityThemeSerializer(
-            community_theme,
-            data=request.data,
-            context={"request": request}
+            community_theme, data=request.data, context={"request": request}
         )
         if serializer.is_valid():
             serializer.save()
