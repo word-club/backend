@@ -1,3 +1,4 @@
+import metadata_parser
 from rest_framework import serializers
 
 from comment.serializers import CommentSerializer
@@ -22,6 +23,22 @@ class PublicationImageSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         validated_data["publication"] = self.context["publication"]
         return super().create(validated_data)
+
+
+class PublicationLinkSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PublicationLink
+        fields = "__all__"
+
+    def create(self, validated_data):
+        validated_data["publication"] = self.context["publication"]
+        validated_data["metadata"] = metadata_parser.MetadataParser(url=validated_data.get("link"))
+        return super().create(validated_data)
+
+    def update(self, instance, validated_data):
+        if validated_data.get("link"):
+            validated_data["metadata"] = metadata_parser.MetadataParser(url=validated_data.get("link"))
+        return super().update(instance, validated_data)
 
 
 class PublicationImageUrlSerializer(serializers.ModelSerializer):

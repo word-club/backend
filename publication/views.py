@@ -305,3 +305,38 @@ class RemovePublicationReportView(APIView):
         self.check_object_permissions(request, report)
         report.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class AddPublicationLinkView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsOwner]
+
+    def post(self, request, pk):
+        publication = get_object_or_404(Publication, pk=pk)
+        self.check_object_permissions(request, publication)
+        context = {"publication": publication}
+        serializer = PublicationLinkSerializer(data=request.data, context=context)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class EditOrRemovePublicationLink(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsOwner, IsCommunityAdministrator]
+
+    def patch(self, request, pk):
+        publication_link = get_object_or_404(PublicationLink, pk=pk)
+        self.check_object_permissions(request, publication_link.publication)
+        serializer = PublicationLinkSerializer(publication_link, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, pk):
+        publication_link = get_object_or_404(PublicationLink, pk=pk)
+        self.check_object_permissions(request, publication_link.publication)
+        publication_link.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)

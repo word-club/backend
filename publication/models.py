@@ -197,3 +197,16 @@ class ReportPublication(models.Model):
     class Meta:
         ordering = ["-timestamp"]
         unique_together = [["publication", "created_by"]]
+
+
+class PublicationLink(models.Model):
+    link = models.URLField()
+    metadata = models.JSONField(null=True, blank=True, editable=False)
+    publication = models.ForeignKey(
+        "Publication", on_delete=models.CASCADE, related_name="links", editable=False
+    )
+    timestamp = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["-timestamp"]
+        unique_together = [["publication", "link"]]
