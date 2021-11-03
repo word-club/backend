@@ -21,6 +21,13 @@ def upload_cover_to(instance, filename):
     return f"communities/{instance.community.pk}/cover/{filename}"
 
 
+COMMUNITY_TYPES=(
+    ("public", "Public"),
+    ("restricted", "Restricted"),
+    ("private", "Private")
+)
+
+
 class Community(models.Model):
 
     name = models.CharField(max_length=64, unique=True)
@@ -29,6 +36,7 @@ class Community(models.Model):
 
     is_authorized = models.BooleanField(default=False, editable=False)
     authorized_at = models.DateTimeField(blank=True, null=True, editable=False)
+    type = models.CharField(max_length=64, choices=COMMUNITY_TYPES)
 
     created_by = models.ForeignKey(
         get_user_model(),
@@ -123,6 +131,13 @@ class CommunitySubscription(models.Model):
         related_name="subscribers",
         editable=False,
     )
+
+    is_approved = models.BooleanField(default=False, editable=False)
+    approved_at = models.DateTimeField(blank=True, null=True, editable=False)
+
+    is_banned = models.BooleanField(default=False, editable=False)
+    banned_at = models.DateTimeField(blank=True, null=True, editable=False)
+
     timestamp = models.DateTimeField(auto_now=True)
 
     class Meta:
