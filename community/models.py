@@ -21,10 +21,10 @@ def upload_cover_to(instance, filename):
     return f"communities/{instance.community.pk}/cover/{filename}"
 
 
-COMMUNITY_TYPES=(
+COMMUNITY_TYPES = (
     ("public", "Public"),
     ("restricted", "Restricted"),
-    ("private", "Private")
+    ("private", "Private"),
 )
 
 

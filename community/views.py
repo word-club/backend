@@ -345,14 +345,13 @@ class AcceptRejectACommunitySubscriber(APIView):
         community_subscriber = get_object_or_404(CommunitySubscription, pk=pk)
         self.check_object_permissions(request, community_subscriber)
         if community_subscriber.is_banned:
-            return Response({
-                "detail": "Cannot accept a banned subscriber."
-            }, status=status.HTTP_403_FORBIDDEN)
+            return Response(
+                {"detail": "Cannot accept a banned subscriber."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
         else:
             if community_subscriber.is_accepted:
-                return Response({
-                    "detail": "Subscriber already accepted."
-                })
+                return Response({"detail": "Subscriber already accepted."})
             else:
                 community_subscriber.is_accepted = True
                 community_subscriber.accepted_at = timezone.now()
@@ -374,9 +373,10 @@ class BanUnBanACommunitySubscriber(APIView):
         community_subscriber = get_object_or_404(CommunitySubscription, pk=pk)
         self.check_object_permissions(request, community_subscriber)
         if community_subscriber.is_banned:
-            return Response({
-                "detail": "Cannot ban an already banned subscriber."
-            }, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"detail": "Cannot ban an already banned subscriber."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
         else:
             community_subscriber.is_banned = True
             community_subscriber.banned_at = timezone.now()
