@@ -1,3 +1,4 @@
+from django.utils import timezone
 from rest_framework import serializers
 
 from community.models import *
@@ -54,8 +55,12 @@ class SubscribeCommunitySerializer(serializers.ModelSerializer):
         fields = "__all__"
 
     def create(self, validated_data):
+        community = self.context["community"]
         validated_data["created_by"] = self.context["request"].user
-        validated_data["community"] = self.context["community"]
+        validated_data["community"] = community
+        if community.type == "public":
+            validated_data["is_approved"] = True
+            validated_data["approved_at"] = timezone.now()
         return super().create(**validated_data)
 
 

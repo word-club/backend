@@ -2,7 +2,6 @@ from django.conf import settings
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
-from django.utils import timezone
 from rest_framework import viewsets, status
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.generics import get_object_or_404
@@ -24,6 +23,7 @@ class CommunityViewSet(viewsets.ModelViewSet):
     queryset = Community.objects.all()
     serializer_class = CommunitySerializer
     search_fields = ["name"]
+    filterset_fields = ["type", "is_authorized"]
 
     # def get_serializer_context(self):
     #     context = super().get_serializer_context()
@@ -255,12 +255,12 @@ class RequestCommunityAuthorization(APIView):
         if community.email:
             return Response(
                 status=status.HTTP_400_BAD_REQUEST,
-                data={"details": "Community does not have email set."},
+                data={"detail": "Community does not have email set."},
             )
         if community.is_authorized:
             return Response(
                 status=status.HTTP_204_NO_CONTENT,
-                data={"details": "Community is already authorized."},
+                data={"detail": "Community is already authorized."},
             )
         codes = CommunityAuthorizationCode.objects.filter(community=community)
         [code.delete() for code in codes]  # delete every pre-existing codes
@@ -335,3 +335,58 @@ class UpdateCommunityTheme(APIView):
         self.check_object_permissions(request, community_theme)
         community_theme.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class AcceptRejectACommunitySubscriber(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsCommunityAdministrator]
+
+    def post(self, request, pk):
+        community_subscriber = get_object_or_404(CommunitySubscription, pk=pk)
+        self.check_object_permissions(request, community_subscriber)
+        if community_subscriber.is_banned:
+            return Response({
+                "detail": "Cannot accept a banned subscriber."
+            }, status=status.HTTP_403_FORBIDDEN)
+        else:
+            if community_subscriber.is_accepted:
+                return Response({
+                    "detail": "Subscriber already accepted."
+                })
+            else:
+                community_subscriber.is_accepted = True
+                community_subscriber.accepted_at = timezone.now()
+                community_subscriber.save()
+                return Response(status=status.HTTP_200_OK)
+
+    def delete(self, request, pk):
+        community_subscriber = get_object_or_404(CommunitySubscription, pk=pk)
+        self.check_object_permissions(request, community_subscriber)
+        community_subscriber.delete()
+        return Response(status=status.HTTP_200_OK)
+
+
+class BanUnBanACommunitySubscriber(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsCommunityAdministrator]
+
+    def post(self, request, pk):
+        community_subscriber = get_object_or_404(CommunitySubscription, pk=pk)
+        self.check_object_permissions(request, community_subscriber)
+        if community_subscriber.is_banned:
+            return Response({
+                "detail": "Cannot ban an already banned subscriber."
+            }, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            community_subscriber.is_banned = True
+            community_subscriber.banned_at = timezone.now()
+            community_subscriber.save()
+            return Response(status=status.HTTP_200_OK)
+
+    def delete(self, request, pk):
+        community_subscriber = get_object_or_404(CommunitySubscription, pk=pk)
+        self.check_object_permissions(request, community_subscriber)
+        community_subscriber.is_banned = False
+        community_subscriber.banned_at = None
+        community_subscriber.save()
+        return Response(status=status.HTTP_200_OK)

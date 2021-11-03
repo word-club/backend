@@ -90,7 +90,7 @@ class ReportACommentView(APIView):
 
         if most_recent_report_found:
             return Response(
-                data={"details": "recently reported", "remaining": 15 - diff},
+                data={"detail": "recently reported", "remaining": 15 - diff},
                 status=status.HTTP_403_FORBIDDEN,
             )
 

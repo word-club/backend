@@ -42,7 +42,7 @@ class ReportAUser(APIView):
         if created:
             return Response(status=status.HTTP_201_CREATED)
         return Response(
-            {"details": "Cannot report already reported user."},
+            {"detail": "Cannot report already reported user."},
             status=status.HTTP_403_FORBIDDEN,
         )
 
@@ -57,7 +57,7 @@ class BlockAUser(APIView):
         if created:
             return Response(status=status.HTTP_201_CREATED)
         return Response(
-            {"details": "Cannot block already blocked user."},
+            {"detail": "Cannot block already blocked user."},
             status=status.HTTP_403_FORBIDDEN,
         )
 
