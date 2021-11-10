@@ -1,10 +1,9 @@
 from django.contrib.auth.password_validation import validate_password
 from rest_framework import serializers
 
-import helper
 from account.models import *
 from account.serializers.follow import FollowUserSerializer
-from community.serializer import CommunityGlobalSerializer
+from community.serializer import SubscribeCommunitySerializer
 from notification.serializers import NotificationReceiverSerializer
 from publication.serializers import (
     PublicationSerializer,
@@ -91,7 +90,7 @@ class UserInfoSerializer(serializers.ModelSerializer):
     profile = ProfileSerializer(read_only=True)
     followers = FollowUserSerializer(many=True, read_only=True)
     following = FollowUserSerializer(many=True, read_only=True)
-    subscribed_communities = CommunityGlobalSerializer(many=True, read_only=True)
+    subscribed_communities = SubscribeCommunitySerializer(many=True, read_only=True)
     created_publications = PublicationSerializer(many=True, read_only=True)
     received_notifications = NotificationReceiverSerializer(many=True, read_only=True)
     bookmarks = BookmarkedPublicationsSerializers(many=True, read_only=True)

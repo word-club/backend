@@ -56,12 +56,12 @@ class SubscribeCommunitySerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         community = self.context["community"]
-        validated_data["created_by"] = self.context["request"].user
+        validated_data["subscriber"] = self.context["request"].user
         validated_data["community"] = community
         if community.type == "public":
             validated_data["is_approved"] = True
             validated_data["approved_at"] = timezone.now()
-        return super().create(**validated_data)
+        return CommunitySubscription.objects.create(**validated_data)
 
 
 class DisableNotificationSerializer(serializers.ModelSerializer):
@@ -111,6 +111,12 @@ class CommunityThemeSerializer(serializers.ModelSerializer):
         return super().update(instance, validated_data)
 
 
+class CreateProgressSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CommunityCreateProgress
+        fields = "__all__"
+
+
 class CommunitySerializer(serializers.ModelSerializer):
     hashtags = CommunityHashtagSerializer(many=True, read_only=True)
     admins = CommunityAdminSerializer(many=True, read_only=True)
@@ -120,18 +126,20 @@ class CommunitySerializer(serializers.ModelSerializer):
     reports = ReportCommunitySerializer(many=True, read_only=True)
     subscribers = SubscribeCommunitySerializer(many=True, read_only=True)
     publications = PublicationSerializer(many=True, read_only=True)
+    create_progress = CreateProgressSerializer(many=True, read_only=True)
+    theme = CommunityThemeSerializer(read_only=True)
 
     class Meta:
         model = Community
         fields = "__all__"
 
-    # def __init__(self, *args, **kwargs):
-    #     super().__init__(*args, **kwargs)
-    #     self.Meta.depth = self.context.get('depth', 0)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.Meta.depth = self.context.get("depth", 0)
 
     def create(self, validated_data):
         validated_data["created_by"] = self.context["request"].user
-        return super().create(**validated_data)
+        return Community.objects.create(**validated_data)
 
 
 class CommunityGlobalSerializer(serializers.ModelSerializer):

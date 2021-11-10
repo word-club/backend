@@ -18,13 +18,11 @@ from notification.consumers import NotificationConsumer
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "backend.settings")
 
+websockets = URLRouter([path("ws/notification/", NotificationConsumer.as_asgi())])
+
 application = ProtocolTypeRouter(
     {
-        # Django's ASGI application to handle traditional HTTP requests
-        "http": get_asgi_application(),
         # websocket handler
-        "websocket": AuthMiddlewareStack(
-            URLRouter([path("ws/notification/", NotificationConsumer.as_asgi())])
-        ),
+        "websocket": AuthMiddlewareStack(websockets),
     }
 )

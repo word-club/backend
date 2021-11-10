@@ -6,6 +6,7 @@ from django.contrib.auth import get_user_model
 from django.core.validators import FileExtensionValidator
 from django.db import models
 from backend.settings import ALLOWED_IMAGES_EXTENSIONS
+from choices import COMMUNITY_TYPES, PROGRESS_STATES, COLOR_CHOICES
 from hashtag.models import Hashtag
 
 
@@ -21,22 +22,17 @@ def upload_cover_to(instance, filename):
     return f"communities/{instance.community.pk}/cover/{filename}"
 
 
-COMMUNITY_TYPES = (
-    ("public", "Public"),
-    ("restricted", "Restricted"),
-    ("private", "Private"),
-)
-
-
 class Community(models.Model):
 
     name = models.CharField(max_length=64, unique=True)
-    description = models.CharField(max_length=512, unique=True)
-    email = models.EmailField(unique=True)
+    description = models.CharField(max_length=256)
+    email = models.EmailField(unique=True, null=True, blank=True)
 
     is_authorized = models.BooleanField(default=False, editable=False)
     authorized_at = models.DateTimeField(blank=True, null=True, editable=False)
     type = models.CharField(max_length=64, choices=COMMUNITY_TYPES)
+
+    contains_adult_content = models.BooleanField(default=False)
 
     created_by = models.ForeignKey(
         get_user_model(),
@@ -48,8 +44,22 @@ class Community(models.Model):
 
     timestamp = models.DateTimeField(auto_now=True)
 
-    def __str__(self):
-        return self.name
+    class Meta:
+        ordering = ["-timestamp"]
+
+
+class CommunityCreateProgress(models.Model):
+    community = models.ForeignKey(
+        "Community",
+        on_delete=models.CASCADE,
+        related_name="create_progress",
+        editable=False,
+    )
+    state = models.CharField(max_length=64, choices=PROGRESS_STATES)
+    is_completed = models.BooleanField(default=False)
+    is_skipped = models.BooleanField(default=False)
+
+    timestamp = models.DateTimeField(auto_now=True)
 
     class Meta:
         ordering = ["-timestamp"]
@@ -212,6 +222,30 @@ class CommunityAdmin(models.Model):
 
     class Meta:
         ordering = ["-timestamp"]
+        unique_together = [["user", "community"]]
+
+
+class CommunitySubAdmin(models.Model):
+
+    community = models.ForeignKey(
+        "Community", on_delete=models.CASCADE, related_name="sub_admins"
+    )
+    user = models.ForeignKey(
+        get_user_model(),
+        on_delete=models.CASCADE,
+        related_name="sub_managed_communities",
+    )
+    created_by = models.ForeignKey(
+        get_user_model(),
+        on_delete=models.CASCADE,
+        related_name="created_community_sub_admins",
+        editable=False,
+    )
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-timestamp"]
+        unique_together = [["user", "community"]]
 
 
 class CommunityAuthorizationCode(models.Model):
@@ -234,21 +268,10 @@ class CommunityAuthorizationCode(models.Model):
         ordering = ["-timestamp"]
 
 
-COLOR_CHOICES = (
-    ("orange", "Orange"),
-    ("red", "Red"),
-    ("pink", "Pink"),
-    ("teal", "Teal"),
-    ("green", "Green"),
-    ("indigo", "Indigo"),
-    ("grey", "Grey"),
-    ("deep-purple", "Purple"),
-    ("amber", "Amber"),
-)
-
-
 class CommunityTheme(models.Model):
-    color = models.CharField(choices=COLOR_CHOICES, max_length=50)
+    color = models.CharField(choices=COLOR_CHOICES, max_length=32, default="primary")
+    to_call_subscriber = models.CharField(max_length=64, default="Subscribers")
+    state_after_subscription = models.CharField(max_length=64, default="Awesome")
     community = models.OneToOneField(
         "Community",
         editable=False,
@@ -261,3 +284,4 @@ class CommunityTheme(models.Model):
         related_name="added_themes",
         editable=False,
     )
+    timestamp = models.DateTimeField(auto_now_add=True)

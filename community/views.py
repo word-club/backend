@@ -23,25 +23,24 @@ class CommunityViewSet(viewsets.ModelViewSet):
     queryset = Community.objects.all()
     serializer_class = CommunitySerializer
     search_fields = ["name"]
-    filterset_fields = ["type", "is_authorized"]
+    filterset_fields = ["type", "is_authorized", "contains_adult_content"]
 
-    # def get_serializer_context(self):
-    #     context = super().get_serializer_context()
-    #     depth = 0
-    #     try:
-    #         depth = int(self.request.query_params.get('depth', 0))
-    #     except ValueError:
-    #         pass  # Ignore non-numeric parameters and keep default 0 depth
-    #
-    #     context['depth'] = depth
-    #
-    #     return context
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        depth = 0
+        try:
+            depth = int(self.request.query_params.get("depth", 0))
+        # Ignore non-numeric parameters and keep default 0 depth
+        except ValueError:
+            pass
+        context["depth"] = depth
+        return context
 
     def get_permissions(self):
         if self.action in ["delete", "update", "partial_update"]:
             return [IsCommunityAdministrator]
         elif self.action in ["list", "retrieve"]:
-            return [IsAdminUser]
+            return [IsAdminUser()]
         elif self.action == "create":
             return []  # TODO: maybe an authorized user
 
@@ -144,7 +143,7 @@ class SubscribeToACommunity(APIView):
         serializer = SubscribeCommunitySerializer(data=request.data, context=context)
         if serializer.is_valid():
             serializer.save()
-            return Response(status=status.HTTP_201_CREATED)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 

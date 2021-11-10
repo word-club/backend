@@ -18,8 +18,11 @@ class IsCommunityAdministrator(permissions.BasePermission):
         if not check_models(user, community):
             return False
 
-        community_admins = CommunityAdmin.objects.filter(community=community, user=user)
-        return True if user in community_admins else False
+        try:
+            CommunityAdmin.objects.get(community=community, user=user)
+            return True
+        except CommunityAdmin.DoesNotExist:
+            return False
 
 
 class IsSubscriber(permissions.BasePermission):
@@ -29,10 +32,28 @@ class IsSubscriber(permissions.BasePermission):
         community = obj
         if not check_models(user, community):
             return False
-        community_subscribers = CommunitySubscription.objects.filter(
-            community=community
-        )
-        return True if user in community_subscribers else False
+        try:
+            subscription = CommunitySubscription.objects.get(
+                community=community, subscriber=user
+            )
+            return not subscription.is_banned
+        except CommunitySubscription.DoesNotExist:
+            return False
+
+
+class IsApprovedSubscriber(permissions.BasePermission):
+    def has_object_permission(self, request, view, obj):
+        user = request.user
+        community = obj
+        if not check_models(user, community):
+            return False
+        try:
+            subscription = CommunitySubscription.objects.get(
+                community=community, subscriber=user
+            )
+            return subscription.is_approved
+        except CommunitySubscription.DoesNotExist:
+            return False
 
 
 class IsNotASubscriber(permissions.BasePermission):
@@ -41,7 +62,8 @@ class IsNotASubscriber(permissions.BasePermission):
         community = obj
         if not check_models(user, community):
             return False
-        community_subscribers = CommunitySubscription.objects.filter(
-            community=community
-        )
-        return True if user not in community_subscribers else False
+        try:
+            CommunitySubscription.objects.get(community=community, subscriber=user)
+            return False
+        except CommunitySubscription.DoesNotExist:
+            return True

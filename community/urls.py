@@ -72,4 +72,11 @@ urlpatterns += [
         ConfirmCommunityAuthorization.as_view,
         name="confirm-authorize-community",
     ),
+    path("community/<int:pk>/theme/", AddCommunityTheme.as_view()),
+    path("community-theme/<int:pk>/", UpdateCommunityTheme.as_view()),
+    path(
+        "community-subscriber/<int:pk>/approve",
+        AcceptRejectACommunitySubscriber.as_view(),
+    ),
+    path("community-subscriber/<int:pk>/ban", BanUnBanACommunitySubscriber.as_view()),
 ]

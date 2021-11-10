@@ -8,7 +8,8 @@ from rest_framework.views import APIView
 
 import helper
 from account.permissions import IsOwner
-from community.permissions import IsCommunityAdministrator
+from community.models import CommunitySubscription
+from community.permissions import IsCommunityAdministrator, IsSubscriber
 from publication.serializers import *
 
 
@@ -22,6 +23,34 @@ class PublicationListRetrieveView(
     filterset_fields = ["created_by", "is_published", "timestamp"]
     search_fields = ["title", "content"]
 
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        depth = 0
+        try:
+            depth = int(self.request.query_params.get("depth", 0))
+        # Ignore non-numeric parameters and keep default 0 depth
+        except ValueError:
+            pass
+        context["depth"] = depth
+        return context
+
+
+def check_community_law(community, user):
+    if community:
+        try:
+            subscriber = CommunitySubscription.objects.get(subscriber=user)
+            if subscriber.is_banned:
+                return True, {
+                    "detail": "Subscriber is banned for the selected community."
+                }
+            if community.type != "public":
+                if not subscriber.is_approved:
+                    return True, {"detail": "Subscriber is not approved yet."}
+        except CommunitySubscription.DoesNotExist:
+            return True, {
+                "detail": "Please subscribe the community first to add publication."
+            }
+
 
 class AddPublicationView(APIView):
     authentication_classes = [TokenAuthentication]
@@ -31,6 +60,10 @@ class AddPublicationView(APIView):
         context = {"request": request}
         serializer = PublicationSerializer(data=request.data, context=context)
         if serializer.is_valid():
+            community = serializer.validated_data.get("community")
+            do_break, detail = check_community_law(community, request.user)
+            if do_break:
+                return Response(detail, status=status.HTTP_403_FORBIDDEN)
             serializer.save()
             return Response(status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -38,15 +71,19 @@ class AddPublicationView(APIView):
 
 class UpdatePublicationView(APIView):
     authentication_classes = [TokenAuthentication]
-    permission_classes = [IsOwner, IsCommunityAdministrator]
+    permission_classes = [IsOwner | IsCommunityAdministrator]
 
     def patch(self, request, pk):
         publication = get_object_or_404(Publication, pk=pk)
         self.check_object_permissions(request, publication)
         serializer = PublicationSerializer(publication, data=request.data, partial=True)
         if serializer.is_valid():
+            community = serializer.validated_data.get("community")
+            do_break, detail = check_community_law(community, request.user)
+            if do_break:
+                return Response(detail, status=status.HTTP_403_FORBIDDEN)
             serializer.save()
-            return Response(status=status.HTTP_201_CREATED)
+            return Response(status=status.HTTP_204_NO_CONTENT)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, pk):
@@ -82,6 +119,9 @@ class PublishPublicationView(APIView):
                 {"content": "This field is required."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
+        do_break, detail = check_community_law(publication.community, request.user)
+        if do_break:
+            return Response(detail, status=status.HTTP_403_FORBIDDEN)
         publication.is_published = True
         publication.published_at = timezone.now()
         publication.save()
