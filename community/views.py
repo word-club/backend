@@ -1,8 +1,9 @@
 from django.conf import settings
+from django.db.utils import IntegrityError
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
-from rest_framework import viewsets, status
+from rest_framework import viewsets, status, mixins
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAdminUser
@@ -18,12 +19,17 @@ from community.permissions import (
 from community.serializer import *
 
 
-class CommunityViewSet(viewsets.ModelViewSet):
+class CommunityViewSet(
+    mixins.ListModelMixin,
+    mixins.RetrieveModelMixin,
+    mixins.CreateModelMixin,
+    viewsets.GenericViewSet
+):
     authentication_classes = [TokenAuthentication]
     queryset = Community.objects.all()
     serializer_class = CommunitySerializer
     search_fields = ["name"]
-    filterset_fields = ["type", "is_authorized", "contains_adult_content"]
+    filterset_fields = ["type", "is_authorized", "contains_adult_content", "completed_registration_steps"]
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
@@ -37,12 +43,29 @@ class CommunityViewSet(viewsets.ModelViewSet):
         return context
 
     def get_permissions(self):
-        if self.action in ["delete", "update", "partial_update"]:
-            return [IsCommunityAdministrator]
-        elif self.action in ["list", "retrieve"]:
+        if self.action in ["list"]:
             return [IsAdminUser()]
-        elif self.action == "create":
-            return []  # TODO: maybe an authorized user
+        else: return []
+
+
+class PatchDeleteCommunity(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsCommunityAdministrator]
+
+    def patch(self, request, pk):
+        community = get_object_or_404(Community, pk=pk)
+        self.check_object_permissions(request, community)
+        serializer = CommunitySerializer(data=request.data, instance=community, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, pk):
+        community = get_object_or_404(Community, pk=pk)
+        self.check_object_permissions(request, community)
+        community.delete()
+        return Response(status=status.HTTP_200_OK)
 
 
 class RemoveCommunityDisableNotification(APIView):
@@ -64,7 +87,10 @@ class DeleteCommunityRule(APIView):
         rule = get_object_or_404(CommunityRule, pk=pk)
         self.check_object_permissions(request, rule)
         rule.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response(
+            CommunitySerializer(rule.community).data,
+            status=status.HTTP_200_OK
+        )
 
 
 class DeleteCommunityCover(APIView):
@@ -172,8 +198,14 @@ class AddCommunityAvatar(APIView):
         context = {"community": community, "request": request}
         serializer = CommunityAvatarSerializer(data=request.data, context=context)
         if serializer.is_valid():
+            previous_avatar = CommunityAvatar.objects.filter(community=community)
+            [img.image.delete() for img in previous_avatar]
+            [img.delete() for img in previous_avatar]
             serializer.save()
-            return Response(status=status.HTTP_201_CREATED)
+            return Response(
+                CommunitySerializer(community).data,
+                status=status.HTTP_201_CREATED
+            )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -187,8 +219,14 @@ class AddCommunityCover(APIView):
         context = {"community": community, "request": request}
         serializer = CommunityCoverSerializer(data=request.data, context=context)
         if serializer.is_valid():
+            previous_cover = CommunityCover.objects.filter(community=community)
+            [img.image.delete() for img in previous_cover]
+            [img.delete() for img in previous_cover]
             serializer.save()
-            return Response(status=status.HTTP_201_CREATED)
+            return Response(
+                CommunitySerializer(community).data,
+                status=status.HTTP_201_CREATED
+            )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -199,11 +237,36 @@ class AddCommunityHashtag(APIView):
     def post(self, request, pk):
         community = get_object_or_404(Community, pk=pk)
         self.check_object_permissions(request, community)
+        serializer = CommunityHashtagPostSerializer(data=request.data)
+        if serializer.is_valid():
+            errors = {}
+            validated_data = serializer.validated_data
+            tags = validated_data.get("tags")
+            for tag in tags:
+                try: CommunityHashtag.objects.create(tag=tag, community=community)
+                except IntegrityError: errors[tag.id] = 'cannot add non-unique tag {}'.format(tag.tag)
+            return Response(
+                CommunitySerializer(community, context={"depth": 3}).data,
+                status=status.HTTP_201_CREATED
+            )
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class AddCommunityRule(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsCommunityAdministrator]
+
+    def post(self, request, pk):
+        community = get_object_or_404(Community, pk=pk)
+        self.check_object_permissions(request, community)
         context = {"community": community, "request": request}
-        serializer = CommunityHashtagSerializer(request.data, context=context)
+        serializer = CommunityRuleSerializer(data=request.data, context=context)
         if serializer.is_valid():
             serializer.save()
-            return Response(status=status.HTTP_201_CREATED)
+            return Response(
+                CommunitySerializer(community).data,
+                status=status.HTTP_201_CREATED
+            )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -226,7 +289,7 @@ class AddCommunityAdmin(APIView):
         community = get_object_or_404(Community, pk=pk)
         self.check_object_permissions(request, community)
         context = {"community": community, "request": request}
-        serializer = CommunityAdminSerializer(request.data, context=context)
+        serializer = CommunityAdminSerializer(data=request.data, context=context)
         if serializer.is_valid():
             serializer.save()
             return Response(status=status.HTTP_201_CREATED)
@@ -251,7 +314,7 @@ class RequestCommunityAuthorization(APIView):
     def post(self, request, pk):
         community = get_object_or_404(Community, pk=pk)
         self.check_object_permissions(request, community)
-        if community.email:
+        if not community.email:
             return Response(
                 status=status.HTTP_400_BAD_REQUEST,
                 data={"detail": "Community does not have email set."},
@@ -261,9 +324,15 @@ class RequestCommunityAuthorization(APIView):
                 status=status.HTTP_204_NO_CONTENT,
                 data={"detail": "Community is already authorized."},
             )
-        codes = CommunityAuthorizationCode.objects.filter(community=community)
-        [code.delete() for code in codes]  # delete every pre-existing codes
-        code = CommunityAuthorizationCode.objects.create(community=community)
+        codes = CommunityAuthorizationCode.objects.filter(
+            community=community,
+            created_by=request.user
+        )
+        [code.delete() for code in codes]  # delete every pre-requested codes
+        code = CommunityAuthorizationCode.objects.create(
+            community=community,
+            created_by=request.user
+        )
         mail_subject = "Authorize Community"
         message = render_to_string(
             "authorize_community.html",
@@ -288,15 +357,18 @@ class ConfirmCommunityAuthorization(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsCommunityAdministrator]
 
-    def post(self, request, pk):
-        community_authorize_code = get_object_or_404(CommunityAuthorizationCode, pk=pk)
+    def post(self, request, code):
+        community_authorize_code = get_object_or_404(CommunityAuthorizationCode, code=code)
         self.check_object_permissions(request, community_authorize_code)
         community_to_authorize = community_authorize_code.community
         community_to_authorize.is_authorized = True
         community_to_authorize.authorized_at = timezone.now()
         community_to_authorize.save()
         community_authorize_code.delete()
-        return Response(status=status.HTTP_200_OK)
+        return Response(
+            CommunitySerializer(community_to_authorize).data,
+            status=status.HTTP_200_OK
+        )
 
 
 class AddCommunityTheme(APIView):
@@ -326,7 +398,10 @@ class UpdateCommunityTheme(APIView):
         )
         if serializer.is_valid():
             serializer.save()
-            return Response(status=status.HTTP_200_OK)
+            return Response(
+                CommunitySerializer(community_theme.community).data,
+                status=status.HTTP_200_OK
+            )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, pk):
@@ -389,3 +464,55 @@ class BanUnBanACommunitySubscriber(APIView):
         community_subscriber.banned_at = None
         community_subscriber.save()
         return Response(status=status.HTTP_200_OK)
+
+
+class SetProgressStepAsComplete(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsCommunityAdministrator]
+
+    def post(self, request, pk):
+        progress_state = get_object_or_404(CommunityCreateProgress, pk=pk)
+        self.check_object_permissions(request, progress_state)
+        if progress_state.is_completed:
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        progress_state.is_completed = True
+        progress_state.save()
+        community_serializer = CommunitySerializer(progress_state.community)
+        return Response(community_serializer.data, status=status.HTTP_200_OK)
+
+
+class SetProgressStepAsSkipped(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsCommunityAdministrator]
+
+    def post(self, request, pk):
+        progress_state = get_object_or_404(CommunityCreateProgress, pk=pk)
+        self.check_object_permissions(request, progress_state)
+        if progress_state.is_completed:
+            return Response(
+                {"detail": "Failed to skip. State is already completed."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        if progress_state.is_skipped:
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        progress_state.is_skipped = True
+        progress_state.save()
+        community_serializer = CommunitySerializer(progress_state.community)
+        return Response(community_serializer.data, status=status.HTTP_200_OK)
+
+
+class CompleteRegistrationSteps(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsCommunityAdministrator]
+
+    def post(self, request, pk):
+        community = get_object_or_404(Community, pk=pk)
+        self.check_object_permissions(request, community)
+        if community.completed_registration_steps:
+            return Response(status=status.HTTP_200_OK)
+        community.completed_registration_steps = True
+        community.save()
+        return Response(
+            CommunitySerializer(community).data,
+            status=status.HTTP_200_OK
+        )

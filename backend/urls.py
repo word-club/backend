@@ -16,6 +16,7 @@ urlpatterns = [
     path("api/", include("publication.urls")),
     path("api/", include("comment.urls")),
     path("api/", include("notification.urls")),
+    path("api/", include("hashtag.urls")),
     url(r"^media/(?P<path>.*)$", serve, {"document_root": settings.MEDIA_ROOT}),
     url(
         r"^robots.txt",

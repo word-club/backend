@@ -4,10 +4,13 @@ from rest_framework.routers import DefaultRouter
 from community.views import *
 
 router = DefaultRouter()
-router.register(r"community", CommunityViewSet, basename="community")
+router.register(r"community-view", CommunityViewSet, basename="community")
 urlpatterns = router.urls
 
+app_name = "community"
+
 urlpatterns += [
+    path("community/<int:pk>/", PatchDeleteCommunity.as_view()),
     path("community/<int:pk>/report/", ReportACommunity.as_view()),
     path("community/<int:pk>/subscribe/", SubscribeToACommunity.as_view()),
     path(
@@ -25,6 +28,10 @@ urlpatterns += [
     path(
         "community/<int:pk>/hashtag/",
         AddCommunityHashtag.as_view(),
+    ),
+    path(
+        "community/<int:pk>/rule/",
+        AddCommunityRule.as_view(),
     ),
     path(
         "community/<int:pk>/admin/",
@@ -63,20 +70,23 @@ urlpatterns += [
         RemoveCommunityAdmin.as_view(),
     ),
     path(
-        "authorize-community/<int:pk>/request",
+        "authorize-community/<int:pk>/request/",
         RequestCommunityAuthorization.as_view(),
         name="authorize-community",
     ),
     path(
-        "authorize-community/<str:pk>/confirm",
-        ConfirmCommunityAuthorization.as_view,
+        "authorize-community/<str:code>/confirm/",
+        ConfirmCommunityAuthorization.as_view(),
         name="confirm-authorize-community",
     ),
     path("community/<int:pk>/theme/", AddCommunityTheme.as_view()),
     path("community-theme/<int:pk>/", UpdateCommunityTheme.as_view()),
     path(
-        "community-subscriber/<int:pk>/approve",
+        "community-subscriber/<int:pk>/approve/",
         AcceptRejectACommunitySubscriber.as_view(),
     ),
-    path("community-subscriber/<int:pk>/ban", BanUnBanACommunitySubscriber.as_view()),
+    path("community-subscriber/<int:pk>/ban/", BanUnBanACommunitySubscriber.as_view()),
+    path("community-progress/<int:pk>/complete/", SetProgressStepAsComplete.as_view()),
+    path("community-progress/<int:pk>/skip/", SetProgressStepAsSkipped.as_view()),
+    path("community/<int:pk>/complete-registration", CompleteRegistrationSteps.as_view())
 ]

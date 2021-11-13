@@ -12,6 +12,6 @@ class HashtagViewSet(viewsets.ModelViewSet):
 
     def get_permissions(self):
         if self.action in ["list", "create"]:
-            return [IsAuthenticated]
+            return [IsAuthenticated()]
         else:
-            return [IsAdminUser]
+            return [IsAdminUser()]

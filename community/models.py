@@ -4,6 +4,7 @@ import uuid
 
 from django.contrib.auth import get_user_model
 from django.core.validators import FileExtensionValidator
+from django.core.exceptions import ValidationError
 from django.db import models
 from backend.settings import ALLOWED_IMAGES_EXTENSIONS
 from choices import COMMUNITY_TYPES, PROGRESS_STATES, COLOR_CHOICES
@@ -21,9 +22,18 @@ def upload_cover_to(instance, filename):
     filename = str(random.getrandbits(64)) + file_extension
     return f"communities/{instance.community.pk}/cover/{filename}"
 
+def validate_unique_id(value):
+    items_to_ignore = ["\\", " ", "#", "?", "/", "&", "^", "%", "@", "!"]
+    for item in items_to_ignore:
+        if item in value:
+            raise ValidationError(
+                ", ".join(items_to_ignore) + " are not allowed."
+            )
+
 
 class Community(models.Model):
 
+    unique_id = models.CharField(max_length=64, unique=True, validators=[validate_unique_id])
     name = models.CharField(max_length=64, unique=True)
     description = models.CharField(max_length=256)
     email = models.EmailField(unique=True, null=True, blank=True)
@@ -31,6 +41,8 @@ class Community(models.Model):
     is_authorized = models.BooleanField(default=False, editable=False)
     authorized_at = models.DateTimeField(blank=True, null=True, editable=False)
     type = models.CharField(max_length=64, choices=COMMUNITY_TYPES)
+
+    completed_registration_steps = models.BooleanField(default=False, editable=False)
 
     contains_adult_content = models.BooleanField(default=False)
 
@@ -66,8 +78,6 @@ class CommunityCreateProgress(models.Model):
 
 
 class CommunityAvatar(models.Model):
-
-    is_active = models.BooleanField(default=False, editable=False)
     image = models.ImageField(
         upload_to=upload_avatar_to,
         validators=[FileExtensionValidator(ALLOWED_IMAGES_EXTENSIONS)],
@@ -88,8 +98,6 @@ class CommunityAvatar(models.Model):
 
 
 class CommunityCover(models.Model):
-
-    is_active = models.BooleanField(default=False)
     image = models.ImageField(
         upload_to=upload_cover_to,
         validators=[FileExtensionValidator(ALLOWED_IMAGES_EXTENSIONS)],
@@ -111,7 +119,8 @@ class CommunityCover(models.Model):
 
 class CommunityRule(models.Model):
 
-    rule = models.TextField()
+    title = models.CharField(max_length=64)
+    description = models.TextField()
     community = models.ForeignKey(
         "Community", on_delete=models.CASCADE, related_name="rules", editable=False
     )
@@ -125,6 +134,7 @@ class CommunityRule(models.Model):
 
     class Meta:
         ordering = ["-timestamp"]
+        unique_together = [["community", "title"]]
 
 
 class CommunitySubscription(models.Model):
@@ -199,9 +209,12 @@ class CommunityHashtag(models.Model):
     tag = models.ForeignKey(
         Hashtag, related_name="communities", on_delete=models.CASCADE
     )
-    publication = models.ForeignKey(
+    community = models.ForeignKey(
         "Community", related_name="hashtags", on_delete=models.CASCADE, editable=False
     )
+
+    class Meta:
+        unique_together = [["tag", "community"]]
 
 
 class CommunityAdmin(models.Model):

@@ -35,7 +35,7 @@ class CommunityRuleSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         validated_data["created_by"] = self.context["request"].user
         validated_data["community"] = self.context["community"]
-        return super().create(**validated_data)
+        return CommunityRule.objects.create(**validated_data)
 
 
 class ReportCommunitySerializer(serializers.ModelSerializer):
@@ -76,13 +76,24 @@ class DisableNotificationSerializer(serializers.ModelSerializer):
 
 
 class CommunityHashtagSerializer(serializers.ModelSerializer):
+    name = serializers.SerializerMethodField()
+
+    @staticmethod
+    def get_name(obj):
+        return obj.tag.tag
+
+
     class Meta:
         model = CommunityHashtag
         fields = "__all__"
 
-    def create(self, validated_data):
-        validated_data["community"] = self.context["community"]
-        return super().create(validated_data)
+
+class CommunityHashtagPostSerializer(serializers.Serializer):
+    tags = serializers.ListField(
+        child=serializers.PrimaryKeyRelatedField(queryset=Hashtag.objects.all()),
+        required=True,
+        max_length=16
+    )
 
 
 class CommunityAdminSerializer(serializers.ModelSerializer):

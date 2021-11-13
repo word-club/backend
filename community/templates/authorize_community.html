@@ -4,15 +4,16 @@
     </head>
     <body>
         <div>
-            Community Admin: {{ user }}
-            Domain: {{ domain }}
-            Authorization Code: {{ code }}
+            <div>
+                Browse to the provided url for email verification.
+            </div>
             <a
                 class="action-text"
                 type="POST"
-                href="{% if request.is_secure %}https{% else %}http{% endif %}://{{ domain }}{% url 'community:authorize-community-confirm' code=code %}">
+                href="{% if request.is_secure %}https{% else %}http{% endif %}://{{ domain }}{% url 'community:confirm-authorize-community' code=code %}">
                 <h5 class="waves-effect waves-light">Click here to proceed.<i class="fas fa-lock-open ml-2"></i></h5>
             </a>
+            <a href="http://localhost:8080/#/register-community/authorization/{{ code }}">Confirm Authorization</a>
         </div>
     </body>
 </html>
