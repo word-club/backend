@@ -20,7 +20,7 @@ class PublicationListRetrieveView(
     serializer_class = PublicationSerializer
     authentication_classes = []
     permission_classes = []
-    filterset_fields = ["created_by", "is_published", "timestamp"]
+    filterset_fields = ["created_by", "is_published", "timestamp", "type"]
     search_fields = ["title", "content"]
 
     def get_serializer_context(self):
@@ -61,11 +61,12 @@ class AddPublicationView(APIView):
         serializer = PublicationSerializer(data=request.data, context=context)
         if serializer.is_valid():
             community = serializer.validated_data.get("community")
-            do_break, detail = check_community_law(community, request.user)
-            if do_break:
-                return Response(detail, status=status.HTTP_403_FORBIDDEN)
+            if community:
+                do_break, detail = check_community_law(community, request.user)
+                if do_break:
+                    return Response(detail, status=status.HTTP_403_FORBIDDEN)
             serializer.save()
-            return Response(status=status.HTTP_201_CREATED)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -79,11 +80,12 @@ class UpdatePublicationView(APIView):
         serializer = PublicationSerializer(publication, data=request.data, partial=True)
         if serializer.is_valid():
             community = serializer.validated_data.get("community")
-            do_break, detail = check_community_law(community, request.user)
-            if do_break:
-                return Response(detail, status=status.HTTP_403_FORBIDDEN)
+            if community:
+                do_break, detail = check_community_law(community, request.user)
+                if do_break:
+                    return Response(detail, status=status.HTTP_403_FORBIDDEN)
             serializer.save()
-            return Response(status=status.HTTP_204_NO_CONTENT)
+            return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, pk):
@@ -105,58 +107,28 @@ class PublishPublicationView(APIView):
                 {"detail": "Publication already published."},
                 status=status.HTTP_204_NO_CONTENT,
             )
-        if not publication.community:
-            return Response(
-                {"community": "This field is required."},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
         if not publication.title:
             return Response(
                 {"title": "This field is required."}, status=status.HTTP_400_BAD_REQUEST
             )
-        if not publication.content:
+        if publication.type is 'editor' and not publication.content:
             return Response(
                 {"content": "This field is required."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
-        do_break, detail = check_community_law(publication.community, request.user)
-        if do_break:
-            return Response(detail, status=status.HTTP_403_FORBIDDEN)
+        if publication.community:
+            do_break, detail = check_community_law(publication.community, request.user)
+            if do_break:
+                return Response(detail, status=status.HTTP_403_FORBIDDEN)
         publication.is_published = True
         publication.published_at = timezone.now()
         publication.save()
-        return Response(status=status.HTTP_200_OK)
-
-
-class AddPublicationHashtag(APIView):
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsOwner, IsCommunityAdministrator]
-
-    def post(self, request, pk):
-        publication = get_object_or_404(Publication, pk=pk)
-        self.check_object_permissions(request, publication)
-        context = {"publication": publication, "request": request}
-        serializer = PublicationHashtagSerializer(data=request.data, context=context)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-class RemovePublicationHashtag(APIView):
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsOwner, IsCommunityAdministrator]
-
-    def delete(self, request, pk):
-        tag = get_object_or_404(PublicationHashtag, pk=pk)
-        self.check_object_permissions(request, tag.publication)
-        tag.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response(PublicationSerializer(publication).data, status=status.HTTP_200_OK)
 
 
 class AddPublicationImageView(APIView):
     authentication_classes = [TokenAuthentication]
-    permission_classes = [IsOwner, IsCommunityAdministrator]
+    permission_classes = [IsOwner]
 
     def post(self, request, pk):
         publication = get_object_or_404(Publication, pk=pk)
@@ -165,13 +137,13 @@ class AddPublicationImageView(APIView):
         serializer = PublicationImageSerializer(data=request.data, context=context)
         if serializer.is_valid():
             serializer.save()
-            return Response(status=status.HTTP_201_CREATED)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class RemovePublicationImageView(APIView):
     authentication_classes = [TokenAuthentication]
-    permission_classes = [IsOwner, IsCommunityAdministrator]
+    permission_classes = [IsOwner]
 
     def delete(self, request, pk):
         publication_image = get_object_or_404(PublicationImage, pk=pk)
@@ -183,7 +155,7 @@ class RemovePublicationImageView(APIView):
 
 class AddPublicationImageUrlView(APIView):
     authentication_classes = [TokenAuthentication]
-    permission_classes = [IsOwner, IsCommunityAdministrator]
+    permission_classes = [IsOwner]
 
     def post(self, request, pk):
         publication = get_object_or_404(Publication, pk=pk)
@@ -192,13 +164,13 @@ class AddPublicationImageUrlView(APIView):
         serializer = PublicationImageUrlSerializer(data=request.data, context=context)
         if serializer.is_valid():
             serializer.save()
-            return Response(status=status.HTTP_201_CREATED)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class RemovePublicationImageUrlView(APIView):
     authentication_classes = [TokenAuthentication]
-    permission_classes = [IsOwner, IsCommunityAdministrator]
+    permission_classes = [IsOwner]
 
     def delete(self, request, pk):
         img_url = get_object_or_404(PublicationImageUrl, pk=pk)
@@ -209,6 +181,7 @@ class RemovePublicationImageUrlView(APIView):
 
 class UpVoteAPublicationView(APIView):
     authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
 
     @staticmethod
     def post(request, pk):
@@ -235,6 +208,7 @@ class RemovePublicationUpVote(APIView):
 
 class DownVoteAPublication(APIView):
     authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
 
     @staticmethod
     def post(request, pk):
@@ -261,6 +235,7 @@ class RemovePublicationDownVote(APIView):
 
 class BookmarkAPublicationView(APIView):
     authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
 
     @staticmethod
     def post(request, pk):
@@ -287,6 +262,7 @@ class RemovePublicationBookmarkView(APIView):
 
 class HideAPublicationView(APIView):
     authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
 
     @staticmethod
     def post(request, pk):
@@ -313,6 +289,7 @@ class RemovePublicationHiddenStateView(APIView):
 
 class ReportAPublicationView(APIView):
     authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
 
     @staticmethod
     def post(request, pk):
@@ -358,13 +335,13 @@ class AddPublicationLinkView(APIView):
         serializer = PublicationLinkSerializer(data=request.data, context=context)
         if serializer.is_valid():
             serializer.save()
-            return Response(status=status.HTTP_201_CREATED)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class EditOrRemovePublicationLink(APIView):
     authentication_classes = [TokenAuthentication]
-    permission_classes = [IsOwner, IsCommunityAdministrator]
+    permission_classes = [IsOwner]
 
     def patch(self, request, pk):
         publication_link = get_object_or_404(PublicationLink, pk=pk)
@@ -372,7 +349,7 @@ class EditOrRemovePublicationLink(APIView):
         serializer = PublicationLinkSerializer(publication_link, data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return Response(status=status.HTTP_201_CREATED)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, pk):

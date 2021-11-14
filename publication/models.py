@@ -6,6 +6,7 @@ from django.core.validators import FileExtensionValidator
 from django.db import models
 
 from backend.settings import ALLOWED_IMAGES_EXTENSIONS
+from choices import PUBLICATION_TYPE_CHOICES
 from community.models import Community
 from hashtag.models import Hashtag
 
@@ -18,7 +19,7 @@ def upload_publication_image_to(instance, filename):
 
 class Publication(models.Model):
 
-    title = models.CharField(max_length=255)
+    title = models.CharField(max_length=128)
     content = models.TextField(null=True, blank=True)
     created_by = models.ForeignKey(
         get_user_model(),
@@ -36,6 +37,13 @@ class Publication(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
     timestamp = models.DateTimeField(auto_now=True)
+    tags = models.CharField(max_length=16, null=True, blank=True)
+
+    type = models.CharField(
+        max_length=32,
+        choices=PUBLICATION_TYPE_CHOICES,
+        default="editor"
+    )
 
     community = models.ForeignKey(
         Community,
@@ -50,19 +58,6 @@ class Publication(models.Model):
 
     def is_draft(self):
         return not self.is_published
-
-
-class PublicationHashtag(models.Model):
-
-    tag = models.ForeignKey(
-        Hashtag, related_name="publications", on_delete=models.CASCADE
-    )
-    publication = models.ForeignKey(
-        "Publication", related_name="hashtags", on_delete=models.CASCADE, editable=False
-    )
-
-    class Meta:
-        unique_together = [["publication", "tag"]]
 
 
 class PublicationImage(models.Model):
@@ -201,9 +196,11 @@ class ReportPublication(models.Model):
 
 class PublicationLink(models.Model):
     link = models.URLField()
-    metadata = models.JSONField(null=True, blank=True, editable=False)
-    publication = models.ForeignKey(
-        "Publication", on_delete=models.CASCADE, related_name="links", editable=False
+    title = models.CharField(max_length=512, editable=False, null=True)
+    image = models.URLField(editable=False, null=True)
+    description = models.TextField(editable=False, null=True)
+    publication = models.OneToOneField(
+        "Publication", on_delete=models.CASCADE, related_name="link", editable=False
     )
     timestamp = models.DateTimeField(auto_now=True)
 

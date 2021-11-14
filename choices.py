@@ -24,3 +24,10 @@ COLOR_CHOICES = (
     ("deep-purple", "Purple"),
     ("amber", "Amber"),
 )
+
+PUBLICATION_TYPE_CHOICES = (
+    ("editor", "Editor"),
+    ("media", "Media"),
+    ("link", "Link"),
+    ("poll", "Poll")
+)

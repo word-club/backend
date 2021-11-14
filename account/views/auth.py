@@ -7,7 +7,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from account.serializers.auth import LoginSerializer, LogoutSerializer
+from account.serializers.auth import LoginSerializer
 from account.serializers.user import UserInfoSerializer
 
 
@@ -58,39 +58,20 @@ class LogoutView(APIView):
         Logs out a user instance
         Removes member user token from database
         """
-        serializer = LogoutSerializer(data=request.data)
-        if serializer.is_valid():
-            username = serializer.data["username"]
-            try:
-                user = get_user_model().objects.get(username=username)
-                if not user.is_authenticated:
-                    return Response(
-                        {"detail": "User not logged in."},
-                        status=status.HTTP_400_BAD_REQUEST,
-                    )
-                logout(request)
-                try:
-                    token = Token.objects.get(user=user)
-                    token.delete()
-                    return Response(
-                        {
-                            "detail": "User member '{}' logged out successfully.".format(
-                                user.username
-                            )
-                        },
-                        status=status.HTTP_204_NO_CONTENT,
-                    )
-                except Token.DoesNotExist:
-                    return Response(
-                        {
-                            "detail": "User '{}' logged out successfully.".format(
-                                user.username
-                            )
-                        },
-                        status=status.HTTP_204_NO_CONTENT,
-                    )
-            except get_user_model().DoesNotExist:
-                return Response(
-                    {"detail": "User not found."}, status=status.HTTP_404_NOT_FOUND
+        user = request.user
+        if not user.is_authenticated:
+            return Response(
+                {"detail": "User not logged in."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        logout(request)
+        token = Token.objects.get(user=user)
+        token.delete()
+        return Response(
+            {
+                "detail": "User '{}' logged out successfully.".format(
+                    user.username
                 )
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            },
+            status=status.HTTP_204_NO_CONTENT,
+        )

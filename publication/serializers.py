@@ -5,16 +5,6 @@ from comment.serializers import CommentSerializer
 from publication.models import *
 
 
-class PublicationHashtagSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = PublicationHashtag
-        fields = "__all__"
-
-    def create(self, validated_data):
-        validated_data["publication"] = self.context["publication"]
-        return super().create(validated_data)
-
-
 class PublicationImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = PublicationImage
@@ -32,16 +22,27 @@ class PublicationLinkSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         validated_data["publication"] = self.context["publication"]
-        validated_data["metadata"] = metadata_parser.MetadataParser(
+        page = metadata_parser.MetadataParser(
             url=validated_data.get("link")
         )
+        image = page.get_metadata_link('image', allow_encoded_uri=True)
+        page_title = page.get_metadatas('title', strategy=['page', 'og', 'dc',])
+        page_desc = page.get_metadatas('description', strategy=['page', 'og', 'dc',])
+        validated_data['image'] = image
+        validated_data['title'] = page_title[0] if page_title else None
+        validated_data['description'] = page_desc[0] if page_desc else None
         return super().create(validated_data)
 
     def update(self, instance, validated_data):
-        if validated_data.get("link"):
-            validated_data["metadata"] = metadata_parser.MetadataParser(
-                url=validated_data.get("link")
-            )
+        page = metadata_parser.MetadataParser(
+            url=validated_data.get("link")
+        )
+        image = page.get_metadata_link('image', allow_encoded_uri=True)
+        page_title = page.get_metadatas('title', strategy=['page', 'og', 'dc', ])
+        page_desc = page.get_metadatas('description', strategy=['page', 'og', 'dc', ])
+        validated_data['image'] = image
+        validated_data['title'] = page_title[0] if page_title else None
+        validated_data['description'] = page_desc[0] if page_desc else None
         return super().update(instance, validated_data)
 
 
@@ -79,7 +80,7 @@ class PublicationReportSerializer(serializers.ModelSerializer):
 
 
 class PublicationSerializer(serializers.ModelSerializer):
-    hashtags = PublicationHashtagSerializer(read_only=True, many=True)
+    link = PublicationLinkSerializer(read_only=True)
     images = PublicationImageSerializer(read_only=True, many=True)
     image_urls = PublicationImageUrlSerializer(read_only=True, many=True)
     up_votes = PublicationUpVoteSerializer(read_only=True, many=True)
@@ -89,6 +90,7 @@ class PublicationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Publication
         fields = "__all__"
+        depth=2
 
     def create(self, validated_data):
         validated_data["created_by"] = self.context["request"].user

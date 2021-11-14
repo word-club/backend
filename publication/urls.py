@@ -3,8 +3,6 @@ from rest_framework.routers import DefaultRouter
 
 from publication.views import (
     PublicationListRetrieveView,
-    AddPublicationHashtag,
-    RemovePublicationHashtag,
     AddPublicationImageView,
     RemovePublicationImageView,
     AddPublicationImageUrlView,
@@ -37,10 +35,8 @@ urlpatterns += [
     path("publication/", AddPublicationView.as_view()),
     path("publication/<int:pk>/", UpdatePublicationView.as_view()),
     path("publication/<int:pk>/publish/", PublishPublicationView.as_view()),
-    path("publication/<int:pk>/tag/", AddPublicationHashtag.as_view()),
-    path("publication-tag/<int:pk>/", RemovePublicationHashtag.as_view()),
     path("publication/<int:pk>/image/", AddPublicationImageView.as_view()),
-    path("publication-imgage/<int:pk>/", RemovePublicationImageView.as_view()),
+    path("publication-image/<int:pk>/", RemovePublicationImageView.as_view()),
     path("publication/<int:pk>/image-url/", AddPublicationImageUrlView.as_view()),
     path("publication-image-url/<int:pk>/", RemovePublicationImageUrlView.as_view()),
     path("publication/<int:pk>/up-vote/", UpVoteAPublicationView.as_view()),
