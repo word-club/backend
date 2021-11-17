@@ -2,6 +2,7 @@ import metadata_parser
 from rest_framework import serializers
 
 from comment.serializers import CommentSerializer
+from helper import get_twitter_embed_data
 from publication.models import *
 
 
@@ -103,3 +104,13 @@ class BookmarkedPublicationsSerializers(serializers.ModelSerializer):
     class Meta:
         model = PublicationBookmark
         fields = "__all__"
+
+class TwitterOEmbedData:
+    def __init__(self, source, oembed):
+        self.source = source
+        self.oembed = oembed
+
+
+class TwitterEmbedSerializer(serializers.Serializer):
+    source = serializers.URLField()
+    oembed = serializers.JSONField()

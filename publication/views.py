@@ -357,3 +357,16 @@ class EditOrRemovePublicationLink(APIView):
         self.check_object_permissions(request, publication_link.publication)
         publication_link.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class GetTwitterEmbed(APIView):
+    def post(self, request):
+        source = request.data.get("source")
+        if not source: return Response(status=status.HTTP_400_BAD_REQUEST)
+        serializer = TwitterEmbedSerializer(
+            TwitterOEmbedData(
+                source=source,
+                oembed=get_twitter_embed_data(source)
+            )
+        )
+        return Response(serializer.data, status=status.HTTP_200_OK)
