@@ -1,5 +1,6 @@
 import datetime
 import os
+import requests
 
 from django.utils.timezone import utc
 from rest_framework import serializers
@@ -73,3 +74,8 @@ def is_recent_report_present(reports):
             break
         diff = None
     return most_recent_report_found, diff
+
+
+def get_twitter_embed_data(source):
+    response = requests.get('https://publish.twitter.com/oembed?url={}'.format(source))
+    return response.json()
