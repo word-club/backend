@@ -111,7 +111,7 @@ class PublishPublicationView(APIView):
             return Response(
                 {"title": "This field is required."}, status=status.HTTP_400_BAD_REQUEST
             )
-        if publication.type is 'editor' and not publication.content:
+        if publication.type is "editor" and not publication.content:
             return Response(
                 {"content": "This field is required."},
                 status=status.HTTP_400_BAD_REQUEST,
@@ -123,7 +123,9 @@ class PublishPublicationView(APIView):
         publication.is_published = True
         publication.published_at = timezone.now()
         publication.save()
-        return Response(PublicationSerializer(publication).data, status=status.HTTP_200_OK)
+        return Response(
+            PublicationSerializer(publication).data, status=status.HTTP_200_OK
+        )
 
 
 class AddPublicationImageView(APIView):
@@ -362,11 +364,9 @@ class EditOrRemovePublicationLink(APIView):
 class GetTwitterEmbed(APIView):
     def post(self, request):
         source = request.data.get("source")
-        if not source: return Response(status=status.HTTP_400_BAD_REQUEST)
+        if not source:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
         serializer = TwitterEmbedSerializer(
-            TwitterOEmbedData(
-                source=source,
-                oembed=get_twitter_embed_data(source)
-            )
+            TwitterOEmbedData(source=source, oembed=get_twitter_embed_data(source))
         )
         return Response(serializer.data, status=status.HTTP_200_OK)

@@ -23,27 +23,51 @@ class PublicationLinkSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         validated_data["publication"] = self.context["publication"]
-        page = metadata_parser.MetadataParser(
-            url=validated_data.get("link")
+        page = metadata_parser.MetadataParser(url=validated_data.get("link"))
+        image = page.get_metadata_link("image", allow_encoded_uri=True)
+        page_title = page.get_metadatas(
+            "title",
+            strategy=[
+                "page",
+                "og",
+                "dc",
+            ],
         )
-        image = page.get_metadata_link('image', allow_encoded_uri=True)
-        page_title = page.get_metadatas('title', strategy=['page', 'og', 'dc',])
-        page_desc = page.get_metadatas('description', strategy=['page', 'og', 'dc',])
-        validated_data['image'] = image
-        validated_data['title'] = page_title[0] if page_title else None
-        validated_data['description'] = page_desc[0] if page_desc else None
+        page_desc = page.get_metadatas(
+            "description",
+            strategy=[
+                "page",
+                "og",
+                "dc",
+            ],
+        )
+        validated_data["image"] = image
+        validated_data["title"] = page_title[0] if page_title else None
+        validated_data["description"] = page_desc[0] if page_desc else None
         return super().create(validated_data)
 
     def update(self, instance, validated_data):
-        page = metadata_parser.MetadataParser(
-            url=validated_data.get("link")
+        page = metadata_parser.MetadataParser(url=validated_data.get("link"))
+        image = page.get_metadata_link("image", allow_encoded_uri=True)
+        page_title = page.get_metadatas(
+            "title",
+            strategy=[
+                "page",
+                "og",
+                "dc",
+            ],
         )
-        image = page.get_metadata_link('image', allow_encoded_uri=True)
-        page_title = page.get_metadatas('title', strategy=['page', 'og', 'dc', ])
-        page_desc = page.get_metadatas('description', strategy=['page', 'og', 'dc', ])
-        validated_data['image'] = image
-        validated_data['title'] = page_title[0] if page_title else None
-        validated_data['description'] = page_desc[0] if page_desc else None
+        page_desc = page.get_metadatas(
+            "description",
+            strategy=[
+                "page",
+                "og",
+                "dc",
+            ],
+        )
+        validated_data["image"] = image
+        validated_data["title"] = page_title[0] if page_title else None
+        validated_data["description"] = page_desc[0] if page_desc else None
         return super().update(instance, validated_data)
 
 
@@ -91,7 +115,7 @@ class PublicationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Publication
         fields = "__all__"
-        depth=2
+        depth = 2
 
     def create(self, validated_data):
         validated_data["created_by"] = self.context["request"].user
@@ -104,6 +128,7 @@ class BookmarkedPublicationsSerializers(serializers.ModelSerializer):
     class Meta:
         model = PublicationBookmark
         fields = "__all__"
+
 
 class TwitterOEmbedData:
     def __init__(self, source, oembed):

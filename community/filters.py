@@ -14,8 +14,12 @@ class SubscribedCommunityFilter(APIView):
                 is_approved=True,
                 is_banned=False,
                 subscriber=request.user,
-                community__name__contains=search
+                community__name__contains=search,
             )
-        else: items = CommunitySubscription.objects.filter(is_approved=True, is_banned=False, subscriber=request.user)
-        return Response(SubscribeCommunitySerializer(items).data, status=status.HTTP_200_OK)
-
+        else:
+            items = CommunitySubscription.objects.filter(
+                is_approved=True, is_banned=False, subscriber=request.user
+            )
+        return Response(
+            SubscribeCommunitySerializer(items).data, status=status.HTTP_200_OK
+        )

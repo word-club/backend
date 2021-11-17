@@ -29,5 +29,5 @@ PUBLICATION_TYPE_CHOICES = (
     ("editor", "Editor"),
     ("media", "Media"),
     ("link", "Link"),
-    ("poll", "Poll")
+    ("poll", "Poll"),
 )

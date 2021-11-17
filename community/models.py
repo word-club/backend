@@ -22,18 +22,19 @@ def upload_cover_to(instance, filename):
     filename = str(random.getrandbits(64)) + file_extension
     return f"communities/{instance.community.pk}/cover/{filename}"
 
+
 def validate_unique_id(value):
     items_to_ignore = ["\\", " ", "#", "?", "/", "&", "^", "%", "@", "!"]
     for item in items_to_ignore:
         if item in value:
-            raise ValidationError(
-                ", ".join(items_to_ignore) + " are not allowed."
-            )
+            raise ValidationError(", ".join(items_to_ignore) + " are not allowed.")
 
 
 class Community(models.Model):
 
-    unique_id = models.CharField(max_length=64, unique=True, validators=[validate_unique_id])
+    unique_id = models.CharField(
+        max_length=64, unique=True, validators=[validate_unique_id]
+    )
     name = models.CharField(max_length=64, unique=True)
     description = models.CharField(max_length=256)
     email = models.EmailField(unique=True, null=True, blank=True)

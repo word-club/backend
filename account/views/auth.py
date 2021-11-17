@@ -68,10 +68,6 @@ class LogoutView(APIView):
         token = Token.objects.get(user=user)
         token.delete()
         return Response(
-            {
-                "detail": "User '{}' logged out successfully.".format(
-                    user.username
-                )
-            },
+            {"detail": "User '{}' logged out successfully.".format(user.username)},
             status=status.HTTP_204_NO_CONTENT,
         )

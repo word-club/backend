@@ -14,8 +14,10 @@ def check_models(user, community):
 class IsCommunityAdministrator(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
         user = request.user
-        try: community = obj.community
-        except AttributeError: community = obj
+        try:
+            community = obj.community
+        except AttributeError:
+            community = obj
         if not check_models(user, community):
             return False
 

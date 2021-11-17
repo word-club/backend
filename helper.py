@@ -77,5 +77,5 @@ def is_recent_report_present(reports):
 
 
 def get_twitter_embed_data(source):
-    response = requests.get('https://publish.twitter.com/oembed?url={}'.format(source))
+    response = requests.get("https://publish.twitter.com/oembed?url={}".format(source))
     return response.json()

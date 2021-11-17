@@ -82,7 +82,6 @@ class CommunityHashtagSerializer(serializers.ModelSerializer):
     def get_name(obj):
         return obj.tag.tag
 
-
     class Meta:
         model = CommunityHashtag
         fields = "__all__"
@@ -92,7 +91,7 @@ class CommunityHashtagPostSerializer(serializers.Serializer):
     tags = serializers.ListField(
         child=serializers.PrimaryKeyRelatedField(queryset=Hashtag.objects.all()),
         required=True,
-        max_length=16
+        max_length=16,
     )
 
 

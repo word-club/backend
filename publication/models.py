@@ -40,9 +40,7 @@ class Publication(models.Model):
     tags = models.CharField(max_length=16, null=True, blank=True)
 
     type = models.CharField(
-        max_length=32,
-        choices=PUBLICATION_TYPE_CHOICES,
-        default="editor"
+        max_length=32, choices=PUBLICATION_TYPE_CHOICES, default="editor"
     )
 
     community = models.ForeignKey(
