@@ -1,7 +1,6 @@
 from django.urls import path
 from rest_framework.routers import DefaultRouter
 
-from community.filters import SubscribedCommunityFilter
 from publication.views import (
     PublicationListRetrieveView,
     AddPublicationImageView,
@@ -23,7 +22,7 @@ from publication.views import (
     PublishPublicationView,
     EditOrRemovePublicationLink,
     AddPublicationLinkView,
-    GetTwitterEmbed,
+    GetTwitterEmbed, ShareAPublicationView, RemoveMyShareForPublication,
 )
 
 router = DefaultRouter()
@@ -54,5 +53,6 @@ urlpatterns += [
     path("publication/<int:pk>/link/", AddPublicationLinkView.as_view()),
     path("publication-link/<int:pk>/", EditOrRemovePublicationLink.as_view()),
     path("get-twitter-embed/", GetTwitterEmbed.as_view()),
-    path("subscribed-community/filter/", SubscribedCommunityFilter.as_view()),
+    path("publication/<int:pk>/share/", ShareAPublicationView.as_view()),
+    path("publication-share/<int:pk>/", RemoveMyShareForPublication.as_view())
 ]

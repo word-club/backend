@@ -1,5 +1,6 @@
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.utils import timezone
 
 from choices import PROGRESS_STATES
 from community.models import (
@@ -13,7 +14,12 @@ from community.models import (
 
 def set_admin_and_subscriber(instance, writer):
     CommunityAdmin.objects.create(user=writer, created_by=writer, community=instance)
-    CommunitySubscription.objects.create(subscriber=writer, community=instance)
+    CommunitySubscription.objects.create(
+        subscriber=writer,
+        community=instance,
+        is_approved=True,
+        approved_at=timezone.now()
+    )
 
 
 def init_progress_states(instance):

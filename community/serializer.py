@@ -2,7 +2,6 @@ from django.utils import timezone
 from rest_framework import serializers
 
 from community.models import *
-from publication.serializers import PublicationSerializer
 
 
 class CommunityAvatarSerializer(serializers.ModelSerializer):
@@ -47,21 +46,6 @@ class ReportCommunitySerializer(serializers.ModelSerializer):
         validated_data["created_by"] = self.context["request"].user
         validated_data["community"] = self.context["community"]
         return super().create(validated_data)
-
-
-class SubscribeCommunitySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = CommunitySubscription
-        fields = "__all__"
-
-    def create(self, validated_data):
-        community = self.context["community"]
-        validated_data["subscriber"] = self.context["request"].user
-        validated_data["community"] = community
-        if community.type == "public":
-            validated_data["is_approved"] = True
-            validated_data["approved_at"] = timezone.now()
-        return CommunitySubscription.objects.create(**validated_data)
 
 
 class DisableNotificationSerializer(serializers.ModelSerializer):
@@ -129,13 +113,9 @@ class CreateProgressSerializer(serializers.ModelSerializer):
 
 class CommunitySerializer(serializers.ModelSerializer):
     hashtags = CommunityHashtagSerializer(many=True, read_only=True)
-    admins = CommunityAdminSerializer(many=True, read_only=True)
     rules = CommunityRuleSerializer(many=True, read_only=True)
     avatar = CommunityAvatarSerializer(many=False, read_only=True)
     cover = CommunityCoverSerializer(many=False, read_only=True)
-    reports = ReportCommunitySerializer(many=True, read_only=True)
-    subscribers = SubscribeCommunitySerializer(many=True, read_only=True)
-    publications = PublicationSerializer(many=True, read_only=True)
     create_progress = CreateProgressSerializer(many=True, read_only=True)
     theme = CommunityThemeSerializer(read_only=True)
 
@@ -152,14 +132,18 @@ class CommunitySerializer(serializers.ModelSerializer):
         return Community.objects.create(**validated_data)
 
 
-class CommunityGlobalSerializer(serializers.ModelSerializer):
-    avatar = serializers.SerializerMethodField(allow_null=True)
-
-    @staticmethod
-    def get_avatar(obj):
-        avatar = CommunityAvatar.objects.filter(community=obj, is_active=True)
-        return avatar[0].image if len(avatar) > 0 else None
-
+class SubscribeCommunitySerializer(serializers.ModelSerializer):
+    community = CommunitySerializer(read_only=True)
     class Meta:
-        model = Community
-        fields = ["id", "name", "avatar"]
+        model = CommunitySubscription
+        fields = "__all__"
+        depth = 2
+
+    def create(self, validated_data):
+        community = self.context["community"]
+        validated_data["subscriber"] = self.context["request"].user
+        validated_data["community"] = community
+        if community.type == "public":
+            validated_data["is_approved"] = True
+            validated_data["approved_at"] = timezone.now()
+        return CommunitySubscription.objects.create(**validated_data)

@@ -1,8 +1,9 @@
 import metadata_parser
 from rest_framework import serializers
 
+from comment.models import Comment
 from comment.serializers import CommentSerializer
-from helper import get_twitter_embed_data
+from globals import CommunityGlobalSerializer, UserGlobalSerializer
 from publication.models import *
 
 
@@ -104,21 +105,108 @@ class PublicationReportSerializer(serializers.ModelSerializer):
         return super().create(validated_data)
 
 
+class PublicationShareSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PublicationShare
+        fields = "__all__"
+
+    def create(self, validated_data):
+        validated_data["created_by"] = self.context["request"].user
+        validated_data["publication"] = self.context["publication"]
+        return super().create(validated_data)
+
+
+class HidePublicationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = HidePublication
+        fields = "__all__"
+
+
+class PublicationBookmarkSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PublicationBookmark
+        fields = "__all__"
+
+
 class PublicationSerializer(serializers.ModelSerializer):
+    community = CommunityGlobalSerializer(read_only=True)
+    reactions = serializers.SerializerMethodField()
+    up_vote = serializers.SerializerMethodField()
+    down_vote = serializers.SerializerMethodField()
+    share_status = serializers.SerializerMethodField()
+    hidden_status = serializers.SerializerMethodField()
+    bookmark_status = serializers.SerializerMethodField()
+    comments = CommentSerializer(read_only=True, many=True)
     link = PublicationLinkSerializer(read_only=True)
     images = PublicationImageSerializer(read_only=True, many=True)
     image_urls = PublicationImageUrlSerializer(read_only=True, many=True)
-    up_votes = PublicationUpVoteSerializer(read_only=True, many=True)
-    down_votes = PublicationDownVoteSerializer(read_only=True, many=True)
-    comments = CommentSerializer(read_only=True, many=True)
+    created_by = UserGlobalSerializer(read_only=True)
+
+    @staticmethod
+    def get_reactions(obj):
+        up_votes = PublicationUpVote.objects.filter(publication=obj).count()
+        down_votes = PublicationDownVote.objects.filter(publication=obj).count()
+        shares = PublicationShare.objects.filter(publication=obj).count()
+        comments = Comment.objects.filter(publication=obj).count()
+
+        return up_votes + down_votes + shares + comments
+
+    def get_up_vote(self, obj):
+        user = self.context["user"]
+        if type(user) != get_user_model(): return False
+        try:
+            up_vote = PublicationUpVote.objects.get(created_by=user, publication=obj)
+            return PublicationUpVoteSerializer(up_vote).data
+        except PublicationUpVote.DoesNotExist:
+            return False
+
+    def get_down_vote(self, obj):
+        user = self.context["user"]
+        if type(user) != get_user_model(): return False
+        try:
+            down_vote = PublicationDownVote.objects.get(created_by=user, publication=obj)
+            return PublicationDownVoteSerializer(down_vote).data
+        except PublicationDownVote.DoesNotExist:
+            return False
+
+    def get_share_status(self, obj):
+        user = self.context["user"]
+        if type(user) != get_user_model(): return False
+        try:
+            share = PublicationShare.objects.get(created_by=user, publication=obj)
+            return PublicationShareSerializer(share).data
+        except PublicationShare.DoesNotExist:
+            return False
+
+    def get_hidden_status(self, obj):
+        user = self.context["user"]
+        if type(user) != get_user_model(): return False
+        try:
+            instance = HidePublication.objects.get(created_by=user, publication=obj)
+            return HidePublicationSerializer(instance).data
+        except HidePublication.DoesNotExist:
+            return False
+
+    def get_bookmark_status(self, obj):
+        user = self.context["user"]
+        if type(user) != get_user_model(): return False
+        try:
+            bookmark = PublicationBookmark.objects.get(created_by=user, publication=obj)
+            return PublicationBookmarkSerializer(bookmark).data
+        except PublicationBookmark.DoesNotExist:
+            return False
+
 
     class Meta:
         model = Publication
         fields = "__all__"
-        depth = 2
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.Meta.depth = self.context.get("depth", 0)
 
     def create(self, validated_data):
-        validated_data["created_by"] = self.context["request"].user
+        validated_data["created_by"] = self.context["user"]
         return super().create(validated_data)
 
 

@@ -1,13 +1,35 @@
-from rest_framework import status
+from rest_framework import status, viewsets
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+import helper
 from account.permissions import IsOwner
 from comment.serializers import *
 from publication.permissions import IsPublicationAuthor
+
+
+class CommentViewSet(viewsets.ModelViewSet):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAdminUser]
+    filterset_fields = ["publication", "reply"]
+    search_fields = ["comment"]
+    serializer_class = CommentSerializer
+
+    def get_queryset(self):
+        return Comment.objects.filter(reply=None)
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context["user"] = self.request.user
+        return context
+
+    def retrieve(self, request, pk=None):
+        comment = get_object_or_404(Comment, pk=pk)
+        serializer = CommentSerializer(comment, context={"user": self.request.user})
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class AddPublicationComment(APIView):
@@ -58,10 +80,8 @@ class UpVoteACommentView(APIView):
         up_vote, created = CommentUpVote.objects.get_or_create(
             created_by=request.user, comment=comment
         )
-        if created:
-            Response(status=status.HTTP_201_CREATED)
-        else:
-            Response(status=status.HTTP_200_OK)
+        if created: return Response(status=status.HTTP_201_CREATED)
+        else: return Response(status=status.HTTP_200_OK)
 
 
 class DownVoteACommentView(APIView):
@@ -73,10 +93,10 @@ class DownVoteACommentView(APIView):
         down_vote, created = CommentDownVote.objects.get_or_create(
             created_by=request.user, comment=comment
         )
+        serializer = CommentDownVoteSerializer(down_vote)
         if created:
-            Response(status=status.HTTP_201_CREATED)
-        else:
-            Response(status=status.HTTP_200_OK)
+            return Response(serializer.data,status=status.HTTP_201_CREATED)
+        else: return Response(status=status.HTTP_200_OK)
 
 
 class ReportACommentView(APIView):
@@ -136,17 +156,6 @@ class RemoveCommentImageUrlView(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class RemoveCommentVideoUrlView(APIView):
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsOwner]
-
-    def delete(self, request, pk):
-        comment_video_url = get_object_or_404(CommentVideoUrl, pk=pk)
-        self.check_object_permissions(request, comment_video_url.comment)
-        comment_video_url.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
-
 class RemoveUpVoteForACommentView(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsOwner]
@@ -166,4 +175,78 @@ class RemoveDownVoteForACommentView(APIView):
         down_vote = get_object_or_404(CommentDownVote, pk=pk)
         self.check_object_permissions(request, down_vote)
         down_vote.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class ReplyCommentView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, pk):
+        comment = get_object_or_404(Comment, pk=pk)
+        context = {"comment": comment, "user": request.user}
+        serializer = ReplyPostSerializer(data=request.data, context=context)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class HideCommentForMe(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    def post(self, request, pk):
+        instance = get_object_or_404(Comment, pk=pk)
+        hidden_status, created = HideComment.objects.get_or_create(comment=instance, created_by=request.user)
+        if created: return Response(HideCommentSerializer(hidden_status).data, status=status.HTTP_201_CREATED)
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class BookmarkComment(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    def post(self, request, pk):
+        instance = get_object_or_404(Comment, pk=pk)
+        bookmark, created = CommentBookmark.objects.get_or_create(comment=instance, created_by=request.user)
+        if created: return Response(CommentBookmarkSerializer(bookmark).data, status=status.HTTP_201_CREATED)
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class ShareComment(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    def post(self, request, pk):
+        instance = get_object_or_404(Comment, pk=pk)
+        share, created = CommentShare.objects.get_or_create(comment=instance, created_by=request.user)
+        if created: return Response(CommentShareSerializer(share).data, status=status.HTTP_201_CREATED)
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class RemoveHiddenStatus(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsOwner]
+
+    def delete(self, request, pk):
+        instance = get_object_or_404(HideComment, pk=pk)
+        self.check_object_permissions(request, instance)
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class RemoveCommentBookmark(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsOwner]
+
+    def delete(self, request, pk):
+        instance = get_object_or_404(CommentBookmark, pk=pk)
+        self.check_object_permissions(request, instance)
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class RemoveCommentShare(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsOwner]
+
+    def delete(self, request, pk):
+        instance = get_object_or_404(CommentShare, pk=pk)
+        self.check_object_permissions(request, instance)
         return Response(status=status.HTTP_204_NO_CONTENT)

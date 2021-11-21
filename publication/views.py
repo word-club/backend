@@ -11,10 +11,11 @@ from account.permissions import IsOwner
 from community.models import CommunitySubscription
 from community.permissions import IsCommunityAdministrator, IsSubscriber
 from publication.serializers import *
+from rest_framework.authtoken.models import Token
 
 
 class PublicationListRetrieveView(
-    mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet
+    mixins.ListModelMixin, viewsets.GenericViewSet
 ):
     queryset = Publication.objects.all()
     serializer_class = PublicationSerializer
@@ -25,12 +26,16 @@ class PublicationListRetrieveView(
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
+
         depth = 0
+        try: depth = int(self.request.query_params.get("depth", 0))
+        except ValueError: pass
         try:
-            depth = int(self.request.query_params.get("depth", 0))
-        # Ignore non-numeric parameters and keep default 0 depth
-        except ValueError:
-            pass
+            auth_header = self.request.headers.get('Authorization')
+            token = auth_header.split(" ")[1]
+            token_instance = Token.objects.get(key=token)
+            context["user"] = token_instance.user
+        except ValueError: pass
         context["depth"] = depth
         return context
 
@@ -38,7 +43,7 @@ class PublicationListRetrieveView(
 def check_community_law(community, user):
     if community:
         try:
-            subscriber = CommunitySubscription.objects.get(subscriber=user)
+            subscriber = CommunitySubscription.objects.get(subscriber=user, community=community)
             if subscriber.is_banned:
                 return True, {
                     "detail": "Subscriber is banned for the selected community."
@@ -46,6 +51,7 @@ def check_community_law(community, user):
             if community.type != "public":
                 if not subscriber.is_approved:
                     return True, {"detail": "Subscriber is not approved yet."}
+            return False, None
         except CommunitySubscription.DoesNotExist:
             return True, {
                 "detail": "Please subscribe the community first to add publication."
@@ -57,7 +63,7 @@ class AddPublicationView(APIView):
 
     @staticmethod
     def post(request):
-        context = {"request": request}
+        context = {"user": request.user}
         serializer = PublicationSerializer(data=request.data, context=context)
         if serializer.is_valid():
             community = serializer.validated_data.get("community")
@@ -74,14 +80,28 @@ class UpdatePublicationView(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsOwner | IsCommunityAdministrator]
 
+    def get(self, request, pk):
+        publication = get_object_or_404(Publication, pk=pk)
+        if publication.is_published:
+            publication.view_count += 1
+            publication.save()
+        return Response(
+            PublicationSerializer(publication, context={"user": request.user, "depth": 2}).data,
+            status=status.HTTP_200_OK
+        )
+
     def patch(self, request, pk):
         publication = get_object_or_404(Publication, pk=pk)
         self.check_object_permissions(request, publication)
-        serializer = PublicationSerializer(publication, data=request.data, partial=True)
+        serializer = PublicationSerializer(
+            publication, data=request.data,
+            partial=True, context={"user": request.user}
+        )
         if serializer.is_valid():
             community = serializer.validated_data.get("community")
             if community:
                 do_break, detail = check_community_law(community, request.user)
+                print(do_break, detail)
                 if do_break:
                     return Response(detail, status=status.HTTP_403_FORBIDDEN)
             serializer.save()
@@ -111,7 +131,7 @@ class PublishPublicationView(APIView):
             return Response(
                 {"title": "This field is required."}, status=status.HTTP_400_BAD_REQUEST
             )
-        if publication.type is "editor" and not publication.content:
+        if publication.type == "editor" and not publication.content:
             return Response(
                 {"content": "This field is required."},
                 status=status.HTTP_400_BAD_REQUEST,
@@ -124,7 +144,7 @@ class PublishPublicationView(APIView):
         publication.published_at = timezone.now()
         publication.save()
         return Response(
-            PublicationSerializer(publication).data, status=status.HTTP_200_OK
+            PublicationSerializer(publication, context={"user": request.user}).data, status=status.HTTP_200_OK
         )
 
 
@@ -192,9 +212,15 @@ class UpVoteAPublicationView(APIView):
             created_by=request.user, publication=publication
         )
         if created:
-            Response(status=status.HTTP_201_CREATED)
+            return Response(
+                PublicationSerializer(
+                    publication,
+                    context={'user': request.user}
+                ).data,
+                status=status.HTTP_201_CREATED
+            )
         else:
-            Response(status=status.HTTP_200_OK)
+            return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class RemovePublicationUpVote(APIView):
@@ -219,9 +245,15 @@ class DownVoteAPublication(APIView):
             created_by=request.user, publication=publication
         )
         if created:
-            Response(status=status.HTTP_201_CREATED)
+            return Response(
+                PublicationSerializer(publication, context={"user": request.user}).data,
+                status=status.HTTP_201_CREATED
+            )
         else:
-            Response(status=status.HTTP_200_OK)
+            return Response(
+                PublicationDownVoteSerializer(down_vote).data,
+                status=status.HTTP_200_OK
+            )
 
 
 class RemovePublicationDownVote(APIView):
@@ -246,9 +278,9 @@ class BookmarkAPublicationView(APIView):
             created_by=request.user, publication=publication
         )
         if created:
-            Response(status=status.HTTP_201_CREATED)
+            return Response(PublicationSerializer(publication ,context={"user": request.user}).data, status=status.HTTP_201_CREATED)
         else:
-            Response(status=status.HTTP_200_OK)
+            return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class RemovePublicationBookmarkView(APIView):
@@ -269,13 +301,13 @@ class HideAPublicationView(APIView):
     @staticmethod
     def post(request, pk):
         publication = get_object_or_404(Publication, pk=pk)
-        up_vote, created = HidePublication.objects.get_or_create(
+        instance, created = HidePublication.objects.get_or_create(
             created_by=request.user, publication=publication
         )
         if created:
-            Response(status=status.HTTP_201_CREATED)
+            return Response(PublicationSerializer(publication ,context={"user": request.user}).data, status=status.HTTP_201_CREATED)
         else:
-            Response(status=status.HTTP_200_OK)
+            return Response(HidePublicationSerializer(instance).data, status=status.HTTP_204_NO_CONTENT)
 
 
 class RemovePublicationHiddenStateView(APIView):
@@ -311,7 +343,7 @@ class ReportAPublicationView(APIView):
         serializer = PublicationReportSerializer(data=request.data, context=context)
         if serializer.is_valid():
             serializer.save()
-            return Response(status=status.HTTP_201_CREATED)
+            return Response(PublicationSerializer(publication ,context={"user": request.user}).data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -362,11 +394,41 @@ class EditOrRemovePublicationLink(APIView):
 
 
 class GetTwitterEmbed(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
     def post(self, request):
         source = request.data.get("source")
         if not source:
             return Response(status=status.HTTP_400_BAD_REQUEST)
         serializer = TwitterEmbedSerializer(
-            TwitterOEmbedData(source=source, oembed=get_twitter_embed_data(source))
+            TwitterOEmbedData(source=source, oembed=helper.get_twitter_embed_data(source))
         )
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class ShareAPublicationView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    @staticmethod
+    def post(request, pk):
+        publication = get_object_or_404(Publication, pk=pk)
+        context = {"publication": publication, "request": request}
+        serializer = PublicationShareSerializer(data=request.data, context=context)
+        if serializer.is_valid():
+            serializer.save()
+            publication.timestamp = timezone.now()
+            publication.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class RemoveMyShareForPublication(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsOwner]
+
+    @staticmethod
+    def delete(request, pk):
+        share = get_object_or_404(PublicationShare, pk=pk)
+        share.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)

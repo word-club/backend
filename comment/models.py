@@ -16,6 +16,13 @@ def upload_comment_image_to(instance, filename):
     return f"comments/{instance.comment.pk}/{filename}"
 
 
+def upload_reply_image_to(instance, filename):
+    _, file_extension = os.path.splitext(filename)
+    filename = str(random.getrandbits(64)) + file_extension
+    return f"replies/{instance.reply.pk}/{filename}"
+
+
+
 class Comment(models.Model):
     id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
     comment = models.TextField()
@@ -24,6 +31,7 @@ class Comment(models.Model):
         related_name="comments",
         on_delete=models.CASCADE,
         editable=False,
+        null=True, blank=True
     )
     created_by = models.ForeignKey(
         get_user_model(),
@@ -33,26 +41,10 @@ class Comment(models.Model):
     )
     timestamp = models.DateTimeField(auto_now=True)
 
-    class Meta:
-        ordering = ["-timestamp"]
-
-
-class CommentReply(models.Model):
-    id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
-    reply = models.TextField()
-    created_by = models.ForeignKey(
-        get_user_model(),
-        on_delete=models.CASCADE,
-        related_name="replied_comments",
-        editable=False,
+    reply = models.ForeignKey(
+        "self", null=True, on_delete=models.CASCADE,
+        blank=True, related_name="replies"
     )
-    comment = models.ForeignKey(
-        "Comment",
-        related_name="replies",
-        on_delete=models.CASCADE,
-        editable=False,
-    )
-    timestamp = models.DateTimeField(auto_now=True)
 
     class Meta:
         ordering = ["-timestamp"]
@@ -95,19 +87,20 @@ class CommentImageUrl(models.Model):
         ordering = ["-timestamp"]
 
 
-class CommentVideoUrl(models.Model):
-    id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
-    url = models.URLField()
-    comment = models.ForeignKey(
-        "Comment",
-        related_name="video_urls",
-        on_delete=models.CASCADE,
-        editable=False,
+
+class CommentLink(models.Model):
+    link = models.URLField()
+    title = models.CharField(max_length=512, editable=False, null=True)
+    image = models.URLField(editable=False, null=True)
+    description = models.TextField(editable=False, null=True)
+    comment = models.OneToOneField(
+        "Comment", on_delete=models.CASCADE, related_name="link", editable=False
     )
     timestamp = models.DateTimeField(auto_now=True)
 
     class Meta:
         ordering = ["-timestamp"]
+        unique_together = [["comment", "link"]]
 
 
 class CommentUpVote(models.Model):
@@ -168,3 +161,65 @@ class ReportComment(models.Model):
 
     class Meta:
         ordering = ["-timestamp"]
+
+
+class HideComment(models.Model):
+    comment = models.ForeignKey(
+        "Comment",
+        on_delete=models.CASCADE,
+        related_name="hides",
+        editable=False
+    )
+    created_by = models.ForeignKey(
+        get_user_model(),
+        on_delete=models.CASCADE,
+        related_name="comment_hidden_status",
+        editable=False,
+    )
+    timestamp = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["-timestamp"]
+        unique_together = [["comment", "created_by"]]
+
+
+class CommentShare(models.Model):
+    title = models.CharField(max_length=128)
+    comment = models.ForeignKey(
+        "Comment",
+        on_delete=models.CASCADE,
+        related_name="shares",
+        editable=False
+    )
+    created_by = models.ForeignKey(
+        get_user_model(),
+        on_delete=models.CASCADE,
+        related_name="comment_share",
+        editable=False,
+    )
+    tags = models.CharField(max_length=16, null=True, blank=True)
+    timestamp = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["-timestamp"]
+        unique_together = [["comment", "created_by"]]
+
+
+class CommentBookmark(models.Model):
+    comment = models.ForeignKey(
+        "Comment",
+        related_name="bookmarks",
+        on_delete=models.CASCADE,
+        editable=False,
+    )
+    created_by = models.ForeignKey(
+        get_user_model(),
+        on_delete=models.CASCADE,
+        related_name="comment",
+        editable=False,
+    )
+    timestamp = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["-timestamp"]
+        unique_together = [["comment", "created_by"]]

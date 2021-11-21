@@ -57,6 +57,8 @@ class Community(models.Model):
 
     timestamp = models.DateTimeField(auto_now=True)
 
+    quote = models.TextField(null=True, blank=True)
+
     class Meta:
         ordering = ["-timestamp"]
 
@@ -219,7 +221,8 @@ class CommunityHashtag(models.Model):
 
 
 class CommunityAdmin(models.Model):
-
+    is_accepted = models.BooleanField(default=False, editable=False)
+    accepted_at = models.DateTimeField(null=True, blank=True, editable=False)
     community = models.ForeignKey(
         "Community", on_delete=models.CASCADE, related_name="admins"
     )
