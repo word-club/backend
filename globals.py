@@ -76,7 +76,9 @@ class UserGlobalSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def get_name(obj):
-        return "{} {}".format(obj.first_name, obj.last_name)
+        if obj.first_name and obj.last_name:
+            return "{} {}".format(obj.first_name, obj.last_name)
+        else: return False
 
     @staticmethod
     def get_bio(obj):

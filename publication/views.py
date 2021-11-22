@@ -21,7 +21,7 @@ class PublicationListRetrieveView(
     serializer_class = PublicationSerializer
     authentication_classes = []
     permission_classes = []
-    filterset_fields = ["created_by", "is_published", "timestamp", "type"]
+    filterset_fields = ["created_by", "is_published", "timestamp", "type", "community"]
     search_fields = ["title", "content"]
 
     def get_serializer_context(self):
@@ -64,7 +64,7 @@ class AddPublicationView(APIView):
     @staticmethod
     def post(request):
         context = {"user": request.user}
-        serializer = PublicationSerializer(data=request.data, context=context)
+        serializer = PublicationFormSerializer(data=request.data, context=context)
         if serializer.is_valid():
             community = serializer.validated_data.get("community")
             if community:
@@ -93,7 +93,7 @@ class UpdatePublicationView(APIView):
     def patch(self, request, pk):
         publication = get_object_or_404(Publication, pk=pk)
         self.check_object_permissions(request, publication)
-        serializer = PublicationSerializer(
+        serializer = PublicationFormSerializer(
             publication, data=request.data,
             partial=True, context={"user": request.user}
         )

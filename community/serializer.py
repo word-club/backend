@@ -7,7 +7,7 @@ from community.models import *
 class CommunityAvatarSerializer(serializers.ModelSerializer):
     class Meta:
         model = CommunityAvatar
-        fields = "__all__"
+        exclude = ["community"]
 
     def create(self, validated_data):
         validated_data["created_by"] = self.context["request"].user
@@ -18,7 +18,7 @@ class CommunityAvatarSerializer(serializers.ModelSerializer):
 class CommunityCoverSerializer(serializers.ModelSerializer):
     class Meta:
         model = CommunityCover
-        fields = "__all__"
+        exclude = ["community"]
 
     def create(self, validated_data):
         validated_data["created_by"] = self.context["request"].user
@@ -29,7 +29,7 @@ class CommunityCoverSerializer(serializers.ModelSerializer):
 class CommunityRuleSerializer(serializers.ModelSerializer):
     class Meta:
         model = CommunityRule
-        fields = "__all__"
+        exclude = ["community"]
 
     def create(self, validated_data):
         validated_data["created_by"] = self.context["request"].user
@@ -48,17 +48,6 @@ class ReportCommunitySerializer(serializers.ModelSerializer):
         return super().create(validated_data)
 
 
-class DisableNotificationSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = CommunityDisableNotifications
-        fields = "__all__"
-
-    def create(self, validated_data):
-        validated_data["created_by"] = self.context["request"].user
-        validated_data["community"] = self.context["community"]
-        return super().create(**validated_data)
-
-
 class CommunityHashtagSerializer(serializers.ModelSerializer):
     name = serializers.SerializerMethodField()
 
@@ -68,7 +57,7 @@ class CommunityHashtagSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CommunityHashtag
-        fields = "__all__"
+        exclude = ["community"]
 
 
 class CommunityHashtagPostSerializer(serializers.Serializer):
@@ -82,7 +71,8 @@ class CommunityHashtagPostSerializer(serializers.Serializer):
 class CommunityAdminSerializer(serializers.ModelSerializer):
     class Meta:
         model = CommunityAdmin
-        fields = "__all__"
+        exclude = ["community"]
+        depth = 1
 
     def create(self, validated_data):
         validated_data["created_by"] = self.context["request"].user
@@ -90,10 +80,23 @@ class CommunityAdminSerializer(serializers.ModelSerializer):
         return super().create(validated_data)
 
 
+class CommunitySubAdminSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CommunitySubAdmin
+        exclude = ["community"]
+        depth = 1
+
+    def create(self, validated_data):
+        validated_data["created_by"] = self.context["request"].user
+        validated_data["community"] = self.context["community"]
+        return super().create(validated_data)
+
+
+
 class CommunityThemeSerializer(serializers.ModelSerializer):
     class Meta:
         model = CommunityTheme
-        fields = "__all__"
+        exclude = ["community"]
 
     def create(self, validated_data):
         validated_data["created_by"] = self.context["request"].user
@@ -108,7 +111,7 @@ class CommunityThemeSerializer(serializers.ModelSerializer):
 class CreateProgressSerializer(serializers.ModelSerializer):
     class Meta:
         model = CommunityCreateProgress
-        fields = "__all__"
+        exclude = ["community"]
 
 
 class CommunitySerializer(serializers.ModelSerializer):
@@ -132,8 +135,15 @@ class CommunitySerializer(serializers.ModelSerializer):
         return Community.objects.create(**validated_data)
 
 
+class CommunitySubscriptionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CommunitySubscription
+        exclude = ["community"]
+
+
 class SubscribeCommunitySerializer(serializers.ModelSerializer):
     community = CommunitySerializer(read_only=True)
+
     class Meta:
         model = CommunitySubscription
         fields = "__all__"
@@ -147,3 +157,39 @@ class SubscribeCommunitySerializer(serializers.ModelSerializer):
             validated_data["is_approved"] = True
             validated_data["approved_at"] = timezone.now()
         return CommunitySubscription.objects.create(**validated_data)
+
+
+class CommunityRetrieveSerializer(serializers.ModelSerializer):
+    theme = CommunityThemeSerializer(read_only=True)
+    rules = CommunityRuleSerializer(many=True, read_only=True)
+    cover = CommunityCoverSerializer(many=False, read_only=True)
+    avatar = CommunityAvatarSerializer(many=False, read_only=True)
+    hashtags = CommunityHashtagSerializer(many=True, read_only=True)
+    create_progress = CreateProgressSerializer(many=True, read_only=True)
+    subscriptions = serializers.SerializerMethodField()
+    admins = CommunityAdminSerializer(many=True, read_only=True)
+    sub_admins = CommunitySubAdminSerializer(many=True, read_only=True)
+    my_status = serializers.SerializerMethodField()
+
+
+    def get_subscriptions(self, obj):
+        subscribers = CommunitySubscription.objects.filter(community=obj)
+        notification_disables = CommunitySubscription.objects.filter(community=obj, disable_notification=True)
+        return {
+            "subscribers": subscribers.count(),
+            "notification_disables": notification_disables.count()
+        }
+
+    def get_my_status(self, obj):
+        user = self.context["user"]
+        if type(user) == get_user_model():
+            try: subscription = CommunitySubscription.objects.get(subscriber=user, community=obj)
+            except CommunitySubscription.DoesNotExist: subscription = None
+            if subscription: return CommunitySubscriptionSerializer(subscription).data
+            return False
+
+
+    class Meta:
+        model = Community
+        fields = "__all__"
+

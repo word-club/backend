@@ -7,6 +7,7 @@ class IsOwner(permissions.BasePermission):
     # models has owner in different forms:
     # profile -> for profile related models
     # user -> for profile model
+    # subscriber -> for subscription model
     # created_by -> every other model
 
     def has_object_permission(self, request, view, obj):
@@ -16,6 +17,8 @@ class IsOwner(permissions.BasePermission):
             return obj.user == request.user
         elif obj.profile:
             return obj.profile.user == request.user
+        elif obj.subscriber:
+            return obj.subscriber == request.user
         else:
             return False
 

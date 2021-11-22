@@ -13,7 +13,13 @@ from community.models import (
 
 
 def set_admin_and_subscriber(instance, writer):
-    CommunityAdmin.objects.create(user=writer, created_by=writer, community=instance)
+    CommunityAdmin.objects.create(
+        user=writer,
+        created_by=writer,
+        community=instance,
+        is_accepted=True,
+        accepted_at=timezone.now()
+    )
     CommunitySubscription.objects.create(
         subscriber=writer,
         community=instance,

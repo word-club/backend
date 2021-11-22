@@ -74,7 +74,9 @@ class ReplyPostSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
     def create(self, validated_data):
-        validated_data["reply"] = self.context["comment"]
+        comment = self.context["comment"]
+        validated_data["reply"] = comment
+        validated_data["publication"] = comment.publication
         validated_data["created_by"] = self.context["user"]
         return super().create(validated_data)
 
@@ -114,9 +116,9 @@ class ReplySerializer(serializers.ModelSerializer):
         up_votes = CommentUpVote.objects.filter(comment=obj).count()
         down_votes = CommentDownVote.objects.filter(comment=obj).count()
         shares = CommentShare.objects.filter(comment=obj).count()
-        comments = Comment.objects.filter(comment=obj).count()
+        replies = Comment.objects.filter(reply=obj).count()
 
-        return up_votes + down_votes + shares + comments
+        return up_votes + down_votes + shares + replies
 
     def get_up_vote(self, obj):
         user = self.context["user"]
@@ -184,7 +186,7 @@ class CommentSerializer(serializers.ModelSerializer):
 
 
     def get_replies(self, obj):
-        replies = Comment.objects.filter(reply=obj.id)
+        replies = Comment.objects.filter(reply=obj)
         return ReplySerializer(
             replies, many=True,
             context={"user": self.context["user"]}
@@ -196,7 +198,7 @@ class CommentSerializer(serializers.ModelSerializer):
         up_votes = CommentUpVote.objects.filter(comment=obj).count()
         down_votes = CommentDownVote.objects.filter(comment=obj).count()
         shares = CommentShare.objects.filter(comment=obj).count()
-        comments = Comment.objects.filter(comment=obj).count()
+        comments = Comment.objects.filter(reply=obj).count()
 
         return up_votes + down_votes + shares + comments
 

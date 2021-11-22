@@ -1,7 +1,7 @@
 from django.urls import path
 from rest_framework.routers import DefaultRouter
 
-from community.filters import SubscribedCommunityFilter
+from community.filters import SubscribedCommunityFilter, CommunitySubscribersFilter
 from community.views import *
 
 router = DefaultRouter()
@@ -93,5 +93,5 @@ urlpatterns += [
         "community/<int:pk>/complete-registration", CompleteRegistrationSteps.as_view()
     ),
     path("subscribed-community/filter/", SubscribedCommunityFilter.as_view()),
-
+    path("community/<int:pk>/subscriber-filter/", CommunitySubscribersFilter.as_view())
 ]

@@ -128,8 +128,18 @@ class PublicationBookmarkSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
+class PublicationFormSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Publication
+        fields = "__all__"
+
+    def create(self, validated_data):
+        validated_data["created_by"] = self.context["user"]
+        return super().create(validated_data)
+
+
 class PublicationSerializer(serializers.ModelSerializer):
-    community = CommunityGlobalSerializer(read_only=True)
+    community = CommunityGlobalSerializer()
     reactions = serializers.SerializerMethodField()
     up_vote = serializers.SerializerMethodField()
     down_vote = serializers.SerializerMethodField()
@@ -148,8 +158,15 @@ class PublicationSerializer(serializers.ModelSerializer):
         down_votes = PublicationDownVote.objects.filter(publication=obj).count()
         shares = PublicationShare.objects.filter(publication=obj).count()
         comments = Comment.objects.filter(publication=obj).count()
+        total =  up_votes + down_votes + shares + comments
 
-        return up_votes + down_votes + shares + comments
+        return {
+            "up_votes": up_votes,
+            "down_votes": down_votes,
+            "shares": shares,
+            "comments": comments,
+            "total": total
+        }
 
     def get_up_vote(self, obj):
         user = self.context["user"]
@@ -205,9 +222,7 @@ class PublicationSerializer(serializers.ModelSerializer):
         super().__init__(*args, **kwargs)
         self.Meta.depth = self.context.get("depth", 0)
 
-    def create(self, validated_data):
-        validated_data["created_by"] = self.context["user"]
-        return super().create(validated_data)
+
 
 
 class BookmarkedPublicationsSerializers(serializers.ModelSerializer):

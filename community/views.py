@@ -39,11 +39,8 @@ class CommunityViewSet(
     def get_serializer_context(self):
         context = super().get_serializer_context()
         depth = 0
-        try:
-            depth = int(self.request.query_params.get("depth", 0))
-        # Ignore non-numeric parameters and keep default 0 depth
-        except ValueError:
-            pass
+        try: depth = int(self.request.query_params.get("depth", 0))
+        except ValueError: pass
         context["depth"] = depth
         return context
 
@@ -57,6 +54,11 @@ class CommunityViewSet(
 class PatchDeleteCommunity(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsCommunityAdministrator]
+
+    def get(self, request, pk=None):
+        community = get_object_or_404(Community, pk=pk)
+        serializer = CommunityRetrieveSerializer(community, context={"depth": 2, "user": request.user})
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     def patch(self, request, pk):
         community = get_object_or_404(Community, pk=pk)
@@ -81,10 +83,13 @@ class RemoveCommunityDisableNotification(APIView):
     permission_classes = [IsOwner]
 
     def delete(self, request, pk):
-        item = get_object_or_404(CommunityDisableNotifications, pk=pk)
-        self.check_object_permissions(request, item)
-        item.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        subscription = get_object_or_404(CommunitySubscription, pk=pk)
+        self.check_object_permissions(request, subscription)
+        if not subscription.disable_notification:
+            return Response(status=status.HTTP_200_OK)
+        subscription.disable_notification = False
+        subscription.save()
+        return Response(status=status.HTTP_201_CREATED)
 
 
 class DeleteCommunityRule(APIView):
@@ -185,14 +190,14 @@ class DisableNotificationsForACommunity(APIView):
     permission_classes = [IsSubscriber]
 
     def post(self, request, pk):
-        community = get_object_or_404(Community, pk=pk)
-        self.check_object_permissions(request, community)
-        context = {"community": community, "request": request}
-        serializer = DisableNotificationSerializer(data=request.data, context=context)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        subscription = get_object_or_404(CommunitySubscription, pk=pk)
+        self.check_object_permissions(request, subscription.community)
+
+        if subscription.disable_notification:
+            return Response(status=status.HTTP_200_OK)
+        subscription.disable_notification = True
+        subscription.save()
+        return Response(status=status.HTTP_201_CREATED)
 
 
 class AddCommunityAvatar(APIView):
@@ -311,6 +316,9 @@ class RemoveCommunityAdmin(APIView):
         self.check_object_permissions(request, community_admin)
         community_admin.delete()
         return Response(status=status.HTTP_200_OK)
+
+
+
 
 
 class RequestCommunityAuthorization(APIView):

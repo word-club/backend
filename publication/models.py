@@ -107,6 +107,7 @@ class PublicationBookmark(models.Model):
         related_name="bookmark",
         editable=False,
     )
+    created_at = models.DateTimeField(auto_now_add=True)
     timestamp = models.DateTimeField(auto_now=True)
 
     class Meta:
