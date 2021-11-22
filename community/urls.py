@@ -44,7 +44,7 @@ urlpatterns += [
     ),
     path(
         "community-rule/<int:pk>/",
-        DeleteCommunityRule.as_view(),
+        PatchDeleteCommunityRule.as_view(),
     ),
     path(
         "community-cover/<int:pk>/",

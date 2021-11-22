@@ -92,9 +92,18 @@ class RemoveCommunityDisableNotification(APIView):
         return Response(status=status.HTTP_201_CREATED)
 
 
-class DeleteCommunityRule(APIView):
+class PatchDeleteCommunityRule(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsCommunityAdministrator]
+
+    def patch(self, request, pk):
+        rule = get_object_or_404(CommunityRule, pk=pk)
+        self.check_object_permissions(request, rule)
+        serializer = CommunityRuleSerializer(instance=rule, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, pk):
         rule = get_object_or_404(CommunityRule, pk=pk)
