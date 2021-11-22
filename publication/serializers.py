@@ -146,7 +146,7 @@ class PublicationSerializer(serializers.ModelSerializer):
     share_status = serializers.SerializerMethodField()
     hidden_status = serializers.SerializerMethodField()
     bookmark_status = serializers.SerializerMethodField()
-    comments = CommentSerializer(read_only=True, many=True)
+    comments = serializers.SerializerMethodField()
     link = PublicationLinkSerializer(read_only=True)
     images = PublicationImageSerializer(read_only=True, many=True)
     image_urls = PublicationImageUrlSerializer(read_only=True, many=True)
@@ -213,6 +213,10 @@ class PublicationSerializer(serializers.ModelSerializer):
         except PublicationBookmark.DoesNotExist:
             return False
 
+    def get_comments(self, obj):
+        context = {"user": self.context["user"]}
+        comments = Comment.objects.filter(publication=obj, reply=None)
+        return CommentSerializer(comments, read_only=True, many=True, context=context).data
 
     class Meta:
         model = Publication
