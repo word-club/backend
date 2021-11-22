@@ -32,9 +32,11 @@ class PublicationListRetrieveView(
         except ValueError: pass
         try:
             auth_header = self.request.headers.get('Authorization')
-            token = auth_header.split(" ")[1]
-            token_instance = Token.objects.get(key=token)
-            context["user"] = token_instance.user
+            if auth_header != "null":
+                token = auth_header.split(" ")[1]
+                token_instance = Token.objects.get(key=token)
+                context["user"] = token_instance.user
+            else: context["user"] = None
         except ValueError: pass
         context["depth"] = depth
         return context
@@ -394,8 +396,8 @@ class EditOrRemovePublicationLink(APIView):
 
 
 class GetTwitterEmbed(APIView):
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
+    authentication_classes = []
+
     def post(self, request):
         source = request.data.get("source")
         if not source:
