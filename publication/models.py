@@ -3,8 +3,11 @@ import random
 
 from django.contrib.auth import get_user_model
 from django.core.validators import FileExtensionValidator
+from rest_framework.exceptions import ValidationError
 from django.db import models
+from django.utils import timezone
 
+from administration.models import Administration
 from backend.settings import ALLOWED_IMAGES_EXTENSIONS
 from choices import PUBLICATION_TYPE_CHOICES
 from community.models import Community
@@ -53,6 +56,18 @@ class Publication(models.Model):
 
     class Meta:
         ordering = ["-timestamp"]
+
+
+    def save(self, *args, **kwargs):
+        now = timezone.now()
+        diff = now - self.created_at
+        limit = Administration.objects.first()
+        if diff.days > limit.publication_update_limit:
+            raise ValidationError({
+                "detail":
+                    "Sorry, you cannot update the publication after {} days.".format(limit.publication_update_limit)
+            })
+        return super().save(*args, **kwargs)
 
     def is_draft(self):
         return not self.is_published

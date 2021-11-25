@@ -4,8 +4,11 @@ import uuid
 
 from django.contrib.auth import get_user_model
 from django.core.validators import FileExtensionValidator
+from rest_framework.exceptions import ValidationError
 from django.db import models
+from django.utils import timezone
 
+from administration.models import Administration
 from backend.settings import ALLOWED_IMAGES_EXTENSIONS
 from publication.models import Publication
 
@@ -42,6 +45,7 @@ class Comment(models.Model):
 
     is_pinned = models.BooleanField(default=False, editable=False)
 
+    created_at = models.DateTimeField(auto_now_add=True)
     timestamp = models.DateTimeField(auto_now=True)
 
     reply = models.ForeignKey(
@@ -50,6 +54,18 @@ class Comment(models.Model):
 
     class Meta:
         ordering = ["-timestamp"]
+
+    def save(self, *args, **kwargs):
+        now = timezone.now()
+        diff = now - self.created_at
+        limit = Administration.objects.first()
+        if diff.days > limit.comment_update_limit:
+            raise ValidationError({
+                "detail":
+                    "Sorry, you cannot update the comment after {} days.".format(limit.comment_update_limit)
+            })
+        return super().save(*args, **kwargs)
+
 
 
 class CommentImage(models.Model):
