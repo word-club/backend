@@ -56,6 +56,7 @@ LOCAL_APPS = [
     "publication",
     "comment",
     "notification",
+    "administration",
 ]
 
 INSTALLED_APPS = INTERNAL_APPS + EXTERNAL_APPS + LOCAL_APPS
