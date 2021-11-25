@@ -26,11 +26,18 @@ class Profile(models.Model):
     user = models.OneToOneField(
         get_user_model(), on_delete=models.CASCADE, editable=False
     )
-    bio = models.TextField(null=True, blank=True)
-    birth_date = models.DateField(null=True, blank=True)
+    bio = models.TextField(null=True)
+    birth_date = models.DateField(null=True)
 
     is_authorized = models.BooleanField(default=False, editable=False)
-    authorized_at = models.DateTimeField(null=True, blank=True, editable=False)
+    authorized_at = models.DateTimeField(null=True, editable=False)
+
+    display_name = models.CharField(max_length=30, null=True)
+
+    allow_follow = models.BooleanField(default=True)
+    adult_content = models.BooleanField(default=True)
+    content_visibility = models.BooleanField(default=True)
+    communities_visibility = models.BooleanField(default=True)
 
     timestamp = models.DateTimeField(auto_now=True)
 
