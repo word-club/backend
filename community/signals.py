@@ -18,13 +18,13 @@ def set_admin_and_subscriber(instance, writer):
         created_by=writer,
         community=instance,
         is_accepted=True,
-        accepted_at=timezone.now()
+        accepted_at=timezone.now(),
     )
     CommunitySubscription.objects.create(
         subscriber=writer,
         community=instance,
         is_approved=True,
-        approved_at=timezone.now()
+        approved_at=timezone.now(),
     )
 
 

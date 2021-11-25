@@ -39,8 +39,10 @@ class CommunityViewSet(
     def get_serializer_context(self):
         context = super().get_serializer_context()
         depth = 0
-        try: depth = int(self.request.query_params.get("depth", 0))
-        except ValueError: pass
+        try:
+            depth = int(self.request.query_params.get("depth", 0))
+        except ValueError:
+            pass
         context["depth"] = depth
         return context
 
@@ -57,7 +59,9 @@ class PatchDeleteCommunity(APIView):
 
     def get(self, request, pk=None):
         community = get_object_or_404(Community, pk=pk)
-        serializer = CommunityRetrieveSerializer(community, context={"depth": 2, "user": request.user})
+        serializer = CommunityRetrieveSerializer(
+            community, context={"depth": 2, "user": request.user}
+        )
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def patch(self, request, pk):
@@ -99,7 +103,9 @@ class PatchDeleteCommunityRule(APIView):
     def patch(self, request, pk):
         rule = get_object_or_404(CommunityRule, pk=pk)
         self.check_object_permissions(request, rule)
-        serializer = CommunityRuleSerializer(instance=rule, data=request.data, partial=True)
+        serializer = CommunityRuleSerializer(
+            instance=rule, data=request.data, partial=True
+        )
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -325,9 +331,6 @@ class RemoveCommunityAdmin(APIView):
         self.check_object_permissions(request, community_admin)
         community_admin.delete()
         return Response(status=status.HTTP_200_OK)
-
-
-
 
 
 class RequestCommunityAuthorization(APIView):

@@ -22,7 +22,6 @@ def upload_reply_image_to(instance, filename):
     return f"replies/{instance.reply.pk}/{filename}"
 
 
-
 class Comment(models.Model):
     id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
     comment = models.TextField()
@@ -31,7 +30,8 @@ class Comment(models.Model):
         related_name="comments",
         on_delete=models.CASCADE,
         editable=False,
-        null=True, blank=True
+        null=True,
+        blank=True,
     )
     created_by = models.ForeignKey(
         get_user_model(),
@@ -42,8 +42,7 @@ class Comment(models.Model):
     timestamp = models.DateTimeField(auto_now=True)
 
     reply = models.ForeignKey(
-        "self", null=True, on_delete=models.CASCADE,
-        blank=True, related_name="replies"
+        "self", null=True, on_delete=models.CASCADE, blank=True, related_name="replies"
     )
 
     class Meta:
@@ -85,7 +84,6 @@ class CommentImageUrl(models.Model):
 
     class Meta:
         ordering = ["-timestamp"]
-
 
 
 class CommentLink(models.Model):
@@ -165,15 +163,12 @@ class ReportComment(models.Model):
 
 class HideComment(models.Model):
     comment = models.ForeignKey(
-        "Comment",
-        on_delete=models.CASCADE,
-        related_name="hides",
-        editable=False
+        "Comment", on_delete=models.CASCADE, related_name="hides", editable=False
     )
     created_by = models.ForeignKey(
         get_user_model(),
         on_delete=models.CASCADE,
-        related_name="comment_hidden_status",
+        related_name="hidden_comments",
         editable=False,
     )
     timestamp = models.DateTimeField(auto_now=True)
@@ -186,15 +181,12 @@ class HideComment(models.Model):
 class CommentShare(models.Model):
     title = models.CharField(max_length=128)
     comment = models.ForeignKey(
-        "Comment",
-        on_delete=models.CASCADE,
-        related_name="shares",
-        editable=False
+        "Comment", on_delete=models.CASCADE, related_name="shares", editable=False
     )
     created_by = models.ForeignKey(
         get_user_model(),
         on_delete=models.CASCADE,
-        related_name="comment_share",
+        related_name="shared_comments",
         editable=False,
     )
     tags = models.CharField(max_length=16, null=True, blank=True)
@@ -215,7 +207,7 @@ class CommentBookmark(models.Model):
     created_by = models.ForeignKey(
         get_user_model(),
         on_delete=models.CASCADE,
-        related_name="comment",
+        related_name="saved_comments",
         editable=False,
     )
     timestamp = models.DateTimeField(auto_now=True)

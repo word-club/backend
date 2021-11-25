@@ -80,8 +80,10 @@ class UpVoteACommentView(APIView):
         up_vote, created = CommentUpVote.objects.get_or_create(
             created_by=request.user, comment=comment
         )
-        if created: return Response(status=status.HTTP_201_CREATED)
-        else: return Response(status=status.HTTP_200_OK)
+        if created:
+            return Response(status=status.HTTP_201_CREATED)
+        else:
+            return Response(status=status.HTTP_200_OK)
 
 
 class DownVoteACommentView(APIView):
@@ -95,8 +97,9 @@ class DownVoteACommentView(APIView):
         )
         serializer = CommentDownVoteSerializer(down_vote)
         if created:
-            return Response(serializer.data,status=status.HTTP_201_CREATED)
-        else: return Response(status=status.HTTP_200_OK)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(status=status.HTTP_200_OK)
 
 
 class ReportACommentView(APIView):
@@ -195,30 +198,49 @@ class ReplyCommentView(APIView):
 class HideCommentForMe(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
+
     def post(self, request, pk):
         instance = get_object_or_404(Comment, pk=pk)
-        hidden_status, created = HideComment.objects.get_or_create(comment=instance, created_by=request.user)
-        if created: return Response(HideCommentSerializer(hidden_status).data, status=status.HTTP_201_CREATED)
+        hidden_status, created = HideComment.objects.get_or_create(
+            comment=instance, created_by=request.user
+        )
+        if created:
+            return Response(
+                HideCommentSerializer(hidden_status).data,
+                status=status.HTTP_201_CREATED,
+            )
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class BookmarkComment(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
+
     def post(self, request, pk):
         instance = get_object_or_404(Comment, pk=pk)
-        bookmark, created = CommentBookmark.objects.get_or_create(comment=instance, created_by=request.user)
-        if created: return Response(CommentBookmarkSerializer(bookmark).data, status=status.HTTP_201_CREATED)
+        bookmark, created = CommentBookmark.objects.get_or_create(
+            comment=instance, created_by=request.user
+        )
+        if created:
+            return Response(
+                CommentBookmarkSerializer(bookmark).data, status=status.HTTP_201_CREATED
+            )
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class ShareComment(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
+
     def post(self, request, pk):
         instance = get_object_or_404(Comment, pk=pk)
-        share, created = CommentShare.objects.get_or_create(comment=instance, created_by=request.user)
-        if created: return Response(CommentShareSerializer(share).data, status=status.HTTP_201_CREATED)
+        share, created = CommentShare.objects.get_or_create(
+            comment=instance, created_by=request.user
+        )
+        if created:
+            return Response(
+                CommentShareSerializer(share).data, status=status.HTTP_201_CREATED
+            )
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 

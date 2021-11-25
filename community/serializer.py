@@ -92,7 +92,6 @@ class CommunitySubAdminSerializer(serializers.ModelSerializer):
         return super().create(validated_data)
 
 
-
 class CommunityThemeSerializer(serializers.ModelSerializer):
     class Meta:
         model = CommunityTheme
@@ -171,25 +170,29 @@ class CommunityRetrieveSerializer(serializers.ModelSerializer):
     sub_admins = CommunitySubAdminSerializer(many=True, read_only=True)
     my_status = serializers.SerializerMethodField()
 
-
     def get_subscriptions(self, obj):
         subscribers = CommunitySubscription.objects.filter(community=obj)
-        notification_disables = CommunitySubscription.objects.filter(community=obj, disable_notification=True)
+        notification_disables = CommunitySubscription.objects.filter(
+            community=obj, disable_notification=True
+        )
         return {
             "subscribers": subscribers.count(),
-            "notification_disables": notification_disables.count()
+            "notification_disables": notification_disables.count(),
         }
 
     def get_my_status(self, obj):
         user = self.context["user"]
         if type(user) == get_user_model():
-            try: subscription = CommunitySubscription.objects.get(subscriber=user, community=obj)
-            except CommunitySubscription.DoesNotExist: subscription = None
-            if subscription: return CommunitySubscriptionSerializer(subscription).data
+            try:
+                subscription = CommunitySubscription.objects.get(
+                    subscriber=user, community=obj
+                )
+            except CommunitySubscription.DoesNotExist:
+                subscription = None
+            if subscription:
+                return CommunitySubscriptionSerializer(subscription).data
             return False
-
 
     class Meta:
         model = Community
         fields = "__all__"
-

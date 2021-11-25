@@ -3,8 +3,19 @@ from django.contrib.auth import get_user_model
 
 from account.models import ProfileCover, ProfileAvatar
 from comment.models import Comment
-from community.models import Community, CommunityAvatar, CommunityTheme, CommunityCover, CommunitySubscription
-from publication.models import Publication, PublicationUpVote, PublicationShare, PublicationDownVote
+from community.models import (
+    Community,
+    CommunityAvatar,
+    CommunityTheme,
+    CommunityCover,
+    CommunitySubscription,
+)
+from publication.models import (
+    Publication,
+    PublicationUpVote,
+    PublicationShare,
+    PublicationDownVote,
+)
 
 
 class CommunityGlobalSerializer(serializers.ModelSerializer):
@@ -14,20 +25,21 @@ class CommunityGlobalSerializer(serializers.ModelSerializer):
     reactions = serializers.SerializerMethodField()
     subscribers = serializers.SerializerMethodField()
 
-
     @staticmethod
     def get_avatar(obj):
         try:
             avatar = CommunityAvatar.objects.get(community=obj)
             return avatar.image.url
-        except CommunityAvatar.DoesNotExist: return None
+        except CommunityAvatar.DoesNotExist:
+            return None
 
     @staticmethod
     def get_cover(obj):
         try:
             cover = CommunityCover.objects.get(community=obj)
             return cover.image.url
-        except CommunityCover.DoesNotExist: return None
+        except CommunityCover.DoesNotExist:
+            return None
 
     @staticmethod
     def get_theme(obj):
@@ -36,10 +48,10 @@ class CommunityGlobalSerializer(serializers.ModelSerializer):
             return {
                 "color": theme.color,
                 "to_call_subscriber": theme.to_call_subscriber,
-                "state_after_subscription": theme.state_after_subscription
+                "state_after_subscription": theme.state_after_subscription,
             }
-        except CommunityTheme.DoesNotExist: return "primary"
-
+        except CommunityTheme.DoesNotExist:
+            return "primary"
 
     def get_reactions(self, obj):
         publications = Publication.objects.filter(community=obj).count()
@@ -48,7 +60,6 @@ class CommunityGlobalSerializer(serializers.ModelSerializer):
     def get_subscribers(self, obj):
         subscribers = CommunitySubscription.objects.filter(community=obj).count()
         return subscribers
-
 
     class Meta:
         model = Community
@@ -62,7 +73,7 @@ class CommunityGlobalSerializer(serializers.ModelSerializer):
             "cover",
             "theme",
             "reactions",
-            "subscribers"
+            "subscribers",
         ]
 
 
@@ -78,7 +89,8 @@ class UserGlobalSerializer(serializers.ModelSerializer):
     def get_name(obj):
         if obj.first_name and obj.last_name:
             return "{} {}".format(obj.first_name, obj.last_name)
-        else: return False
+        else:
+            return False
 
     @staticmethod
     def get_bio(obj):
@@ -93,14 +105,16 @@ class UserGlobalSerializer(serializers.ModelSerializer):
         try:
             cover = ProfileAvatar.objects.get(profile=obj.profile)
             return cover.image.url
-        except ProfileAvatar.DoesNotExist: return None
+        except ProfileAvatar.DoesNotExist:
+            return None
 
     @staticmethod
     def get_cover(obj):
         try:
             cover = ProfileCover.objects.get(profile=obj.profile)
             return cover.image.url
-        except ProfileCover.DoesNotExist: return None
+        except ProfileCover.DoesNotExist:
+            return None
 
     @staticmethod
     def get_reactions(obj):
@@ -112,7 +126,7 @@ class UserGlobalSerializer(serializers.ModelSerializer):
             up_votes = PublicationUpVote.objects.filter(publication=pub).count()
             down_votes = PublicationDownVote.objects.filter(publication=pub).count()
             shares = PublicationShare.objects.filter(publication=pub).count()
-            count += (comments + up_votes + down_votes + shares)
+            count += comments + up_votes + down_votes + shares
         return count
 
     class Meta:
@@ -128,3 +142,12 @@ class UserGlobalSerializer(serializers.ModelSerializer):
             "cover",
             "reactions",
         ]
+
+
+class PublicationForUserCommentSerializer(serializers.ModelSerializer):
+    community = CommunityGlobalSerializer()
+    created_by = UserGlobalSerializer()
+
+    class Meta:
+        model = Publication
+        fields = "__all__"

@@ -31,8 +31,9 @@ class SubscribedCommunityFilter(APIView):
         return Response(
             {
                 "count": items.count(),
-                "results": SubscribeCommunitySerializer(items, many=True).data
-            }, status=status.HTTP_200_OK
+                "results": SubscribeCommunitySerializer(items, many=True).data,
+            },
+            status=status.HTTP_200_OK,
         )
 
 
@@ -44,18 +45,19 @@ class CommunitySubscribersFilter(APIView):
     def get(request, pk):
         community = get_object_or_404(Community, pk=pk)
         search = request.GET.get("search")
-        if not search: valid_subscriptions = CommunitySubscription.objects.filter(
+        if not search:
+            valid_subscriptions = CommunitySubscription.objects.filter(
+                community=community, is_approved=True, is_banned=False
+            )
+        else:
+            valid_subscriptions = CommunitySubscription.objects.filter(
                 community=community,
                 is_approved=True,
-                is_banned=False
+                is_banned=False,
+                subscriber__username__contains=search,
             )
-        else: valid_subscriptions = CommunitySubscription.objects.filter(
-            community=community,
-            is_approved=True,
-            is_banned=False,
-            subscriber__username__contains=search
-        )
         users = []
         [users.append(subscription.subscriber) for subscription in valid_subscriptions]
-        return Response(UserGlobalSerializer(users, many=True).data, status=status.HTTP_200_OK)
-
+        return Response(
+            UserGlobalSerializer(users, many=True).data, status=status.HTTP_200_OK
+        )

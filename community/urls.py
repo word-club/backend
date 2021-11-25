@@ -93,5 +93,5 @@ urlpatterns += [
         "community/<int:pk>/complete-registration", CompleteRegistrationSteps.as_view()
     ),
     path("subscribed-community/filter/", SubscribedCommunityFilter.as_view()),
-    path("community/<int:pk>/subscriber-filter/", CommunitySubscribersFilter.as_view())
+    path("community/<int:pk>/subscriber-filter/", CommunitySubscribersFilter.as_view()),
 ]

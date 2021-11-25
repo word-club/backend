@@ -126,10 +126,7 @@ class CommunityRule(models.Model):
     title = models.CharField(max_length=64)
     description = models.TextField()
     community = models.ForeignKey(
-        "Community",
-        on_delete=models.CASCADE,
-        related_name="rules",
-        editable=False
+        "Community", on_delete=models.CASCADE, related_name="rules", editable=False
     )
     created_by = models.ForeignKey(
         get_user_model(),
@@ -184,28 +181,21 @@ class CommunityReport(models.Model):
         editable=False,
     )
     community = models.ForeignKey(
-        "Community",
-        on_delete=models.CASCADE,
-        related_name="reports",
-        editable=False
+        "Community", on_delete=models.CASCADE, related_name="reports", editable=False
     )
     timestamp = models.DateTimeField(auto_now=True)
 
     class Meta:
         ordering = ["-timestamp"]
 
+
 class CommunityHashtag(models.Model):
 
     tag = models.ForeignKey(
-        Hashtag,
-        related_name="communities",
-        on_delete=models.CASCADE
+        Hashtag, related_name="communities", on_delete=models.CASCADE
     )
     community = models.ForeignKey(
-        "Community",
-        related_name="hashtags",
-        on_delete=models.CASCADE,
-        editable=False
+        "Community", related_name="hashtags", on_delete=models.CASCADE, editable=False
     )
 
     class Meta:
@@ -216,15 +206,10 @@ class CommunityAdmin(models.Model):
     is_accepted = models.BooleanField(default=False, editable=False)
     accepted_at = models.DateTimeField(null=True, editable=False)
     community = models.ForeignKey(
-        "Community",
-        on_delete=models.CASCADE,
-        related_name="admins",
-        editable=False
+        "Community", on_delete=models.CASCADE, related_name="admins", editable=False
     )
     user = models.ForeignKey(
-        get_user_model(),
-        on_delete=models.CASCADE,
-        related_name="managed_communities"
+        get_user_model(), on_delete=models.CASCADE, related_name="managed_communities"
     )
     created_by = models.ForeignKey(
         get_user_model(),
@@ -242,10 +227,7 @@ class CommunityAdmin(models.Model):
 class CommunitySubAdmin(models.Model):
 
     community = models.ForeignKey(
-        "Community",
-        on_delete=models.CASCADE,
-        related_name="sub_admins",
-        editable=False
+        "Community", on_delete=models.CASCADE, related_name="sub_admins", editable=False
     )
     user = models.ForeignKey(
         get_user_model(),
