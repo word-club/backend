@@ -3,11 +3,38 @@ from rest_framework import serializers
 
 from account.models import *
 from account.serializers.follow import FollowUserSerializer
-from community.serializer import SubscribeCommunitySerializer
+from comment.models import (
+    CommentUpVote,
+    CommentDownVote,
+    HideComment,
+    CommentBookmark,
+    Comment,
+)
+from comment.serializers import (
+    CommentSerializer,
+    CommentShareSerializer,
+    CommentReportSerializer,
+    CommentForProfileSerializer,
+)
+from community.models import CommunitySubscription
+from community.serializer import (
+    CommunitySerializer,
+    ReportCommunitySerializer,
+    CommunityAdminSerializer,
+    CommunitySubAdminSerializer,
+)
 from notification.serializers import NotificationReceiverSerializer
+from publication.models import (
+    Publication,
+    PublicationBookmark,
+    PublicationUpVote,
+    PublicationDownVote,
+    HidePublication,
+)
 from publication.serializers import (
     PublicationSerializer,
-    BookmarkedPublicationsSerializers,
+    PublicationReportSerializer,
+    PublicationShareSerializer,
 )
 
 
@@ -44,6 +71,10 @@ class UserPostSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         profile = instance.profile
         profile_data = validated_data.pop("profile")
+        email = validated_data.get("email")
+        if email:
+            profile.is_authorized = False
+            profile.authorized_at = None
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
         instance.save()
@@ -90,14 +121,154 @@ class UserSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
+class UserRetrieveSerializer(serializers.ModelSerializer):
+    profile = ProfileSerializer(read_only=True)
+
+    class Meta:
+        model = get_user_model()
+        fields = "__all__"
+
+
 class UserInfoSerializer(serializers.ModelSerializer):
     profile = ProfileSerializer(read_only=True)
     followers = FollowUserSerializer(many=True, read_only=True)
     following = FollowUserSerializer(many=True, read_only=True)
-    subscribed_communities = SubscribeCommunitySerializer(many=True, read_only=True)
-    created_publications = PublicationSerializer(many=True, read_only=True)
+
+    published_publications = serializers.SerializerMethodField()
+    drafts = serializers.SerializerMethodField()
+    saved_publications = serializers.SerializerMethodField()
+    up_voted_publications = serializers.SerializerMethodField()
+    down_voted_publications = serializers.SerializerMethodField()
+    hidden_publications = serializers.SerializerMethodField()
+    reported_publications = PublicationReportSerializer(many=True, read_only=True)
+    # TODO: add serializer with publication instance
+    shared_publications = PublicationShareSerializer(many=True, read_only=True)
+
+    comments = serializers.SerializerMethodField()
+    up_voted_comments = serializers.SerializerMethodField()
+    down_voted_comments = serializers.SerializerMethodField()
+    reported_comments = CommentReportSerializer(many=True, read_only=True)
+    hidden_comments = serializers.SerializerMethodField()
+    saved_comments = serializers.SerializerMethodField()
+    shared_comments = CommentShareSerializer(many=True, read_only=True)
+
+    created_communities = CommunitySerializer(many=True, read_only=True)
+    subscribed_communities = serializers.SerializerMethodField()
+    reported_communities = ReportCommunitySerializer(many=True, read_only=True)
+    managed_communities = CommunityAdminSerializer(many=True, read_only=True)
+    sub_managed_communities = CommunitySubAdminSerializer(many=True, read_only=True)
+
     received_notifications = NotificationReceiverSerializer(many=True, read_only=True)
-    bookmarks = BookmarkedPublicationsSerializers(many=True, read_only=True)
+
+    @staticmethod
+    def get_published_publications(obj):
+        return PublicationSerializer(
+            Publication.objects.filter(created_by=obj, is_published=True),
+            many=True,
+            read_only=True,
+            context={"user": obj},
+        ).data
+
+    @staticmethod
+    def get_drafts(obj):
+        return PublicationSerializer(
+            Publication.objects.filter(created_by=obj, is_published=False),
+            many=True,
+            read_only=True,
+            context={"user": obj},
+        ).data
+
+    @staticmethod
+    def get_saved_publications(obj):
+        bookmarks = PublicationBookmark.objects.filter(created_by=obj)
+        publications = []
+        [publications.append(bookmark.publication) for bookmark in bookmarks]
+        return PublicationSerializer(
+            publications, many=True, read_only=True, context={"user": obj}
+        ).data
+
+    @staticmethod
+    def get_up_voted_publications(obj):
+        items = PublicationUpVote.objects.filter(created_by=obj)
+        publications = []
+        [publications.append(item.publication) for item in items]
+        return PublicationSerializer(
+            publications, read_only=True, many=True, context={"user": obj}
+        ).data
+
+    @staticmethod
+    def get_down_voted_publications(obj):
+        items = PublicationDownVote.objects.filter(created_by=obj)
+        publications = []
+        [publications.append(item.publication) for item in items]
+        return PublicationSerializer(
+            publications, read_only=True, many=True, context={"user": obj}
+        ).data
+
+    @staticmethod
+    def get_hidden_publications(obj):
+        items = HidePublication.objects.filter(created_by=obj)
+        publications = []
+        [publications.append(item.publication) for item in items]
+        return PublicationSerializer(
+            publications, read_only=True, many=True, context={"user": obj}
+        ).data
+
+    @staticmethod
+    def get_comments(obj):
+        return CommentForProfileSerializer(
+            Comment.objects.filter(created_by=obj),
+            many=True,
+            read_only=True,
+            context={"user": obj},
+        ).data
+
+    @staticmethod
+    def get_up_voted_comments(obj):
+        items = CommentUpVote.objects.filter(created_by=obj)
+        comments = []
+        [comments.append(item.comment) for item in items]
+        return CommentSerializer(
+            comments, many=True, read_only=True, context={"user": obj}
+        ).data
+
+    @staticmethod
+    def get_down_voted_comments(obj):
+        items = CommentDownVote.objects.filter(created_by=obj)
+        comments = []
+        [comments.append(item.comment) for item in items]
+        return CommentSerializer(
+            comments, many=True, read_only=True, context={"user": obj}
+        ).data
+
+    @staticmethod
+    def get_hidden_comments(obj):
+        items = HideComment.objects.filter(created_by=obj)
+        comments = []
+        [comments.append(item.comment) for item in items]
+        return CommentSerializer(
+            comments, many=True, read_only=True, context={"user": obj}
+        ).data
+
+    @staticmethod
+    def get_saved_comments(obj):
+        items = CommentBookmark.objects.filter(created_by=obj)
+        comments = []
+        [comments.append(item.comment) for item in items]
+        return CommentSerializer(
+            comments, many=True, read_only=True, context={"user": obj}
+        ).data
+
+    @staticmethod
+    def get_subscribed_communities(obj):
+        items = CommunitySubscription.objects.filter(subscriber=obj)
+        communities = []
+        [communities.append(item.community) for item in items]
+        return CommunitySerializer(
+            communities,
+            many=True,
+            read_only=True,
+        ).data
 
     class Meta:
         model = get_user_model()

@@ -34,7 +34,7 @@ class LoginView(APIView):
                 user.last_login = timezone.now()
                 if not user.is_active:
                     user.is_active = True
-                    user.save()
+                user.save()
                 serializer = UserInfoSerializer(user, context={"request": request})
                 token, created = Token.objects.get_or_create(user=user)
                 return Response(
