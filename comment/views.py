@@ -14,7 +14,7 @@ from publication.permissions import IsPublicationAuthor
 class CommentViewSet(viewsets.ModelViewSet):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAdminUser]
-    filterset_fields = ["publication", "reply"]
+    filterset_fields = ["publication", "reply", "is_pinned", "created_by"]
     search_fields = ["comment"]
     serializer_class = CommentSerializer
 
@@ -49,7 +49,7 @@ class AddPublicationComment(APIView):
 
 class UpdateDestroyCommentView(APIView):
     authentication_classes = [TokenAuthentication]
-    permission_classes = [IsOwner, IsPublicationAuthor]
+    permission_classes = [IsOwner|IsPublicationAuthor]
 
     def patch(self, request, pk):
         comment = get_object_or_404(Comment, pk=pk)
@@ -272,3 +272,26 @@ class RemoveCommentShare(APIView):
         instance = get_object_or_404(CommentShare, pk=pk)
         self.check_object_permissions(request, instance)
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class CommentPinView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsPublicationAuthor]
+
+    def patch(self, request, pk=None):
+        comment = get_object_or_404(Comment, pk=pk)
+        self.check_object_permissions(request, comment)
+        if comment.is_pinned:
+            return Response(status=status.HTTP_200_OK)
+        comment.is_pinned = True
+        comment.save()
+        return Response(status=status.HTTP_201_CREATED)
+
+    def delete(self, request, pk=None):
+        comment = get_object_or_404(Comment, pk=pk)
+        self.check_object_permissions(request, comment)
+        if comment.is_pinned:
+            comment.is_pinned = False
+            comment.save()
+            return Response(status=status.HTTP_201_CREATED)
+        return Response(status=status.HTTP_200_OK)

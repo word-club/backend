@@ -19,7 +19,7 @@ class PublicationListRetrieveView(mixins.ListModelMixin, viewsets.GenericViewSet
     serializer_class = PublicationSerializer
     authentication_classes = []
     permission_classes = []
-    filterset_fields = ["created_by", "is_published", "timestamp", "type", "community"]
+    filterset_fields = ["created_by", "is_published", "timestamp", "type", "community", "is_pinned"]
     search_fields = ["title", "content"]
 
     def get_serializer_context(self):
@@ -449,3 +449,26 @@ class RemoveMyShareForPublication(APIView):
         share = get_object_or_404(PublicationShare, pk=pk)
         share.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class PublicationPinView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsOwner|IsCommunityAdministrator]
+
+    def patch(self, request, pk=None):
+        publication = get_object_or_404(Publication, pk=pk)
+        self.check_object_permissions(request, publication)
+        if publication.is_pinned:
+            return Response(status=status.HTTP_200_OK)
+        publication.is_pinned = True
+        publication.save()
+        return Response(status=status.HTTP_201_CREATED)
+
+    def delete(self, request, pk=None):
+        publication = get_object_or_404(Publication, pk=pk)
+        self.check_object_permissions(request, publication)
+        if publication.is_pinned:
+            publication.is_pinned = False
+            publication.save()
+            return Response(status=status.HTTP_201_CREATED)
+        return Response(status=status.HTTP_200_OK)

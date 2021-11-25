@@ -24,7 +24,7 @@ from publication.views import (
     AddPublicationLinkView,
     GetTwitterEmbed,
     ShareAPublicationView,
-    RemoveMyShareForPublication,
+    RemoveMyShareForPublication, PublicationPinView,
 )
 
 router = DefaultRouter()
@@ -57,4 +57,5 @@ urlpatterns += [
     path("get-twitter-embed/", GetTwitterEmbed.as_view()),
     path("publication/<int:pk>/share/", ShareAPublicationView.as_view()),
     path("publication-share/<int:pk>/", RemoveMyShareForPublication.as_view()),
+    path("publication/<int:pk>/pin/", PublicationPinView.as_view())
 ]

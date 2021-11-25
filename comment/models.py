@@ -39,6 +39,9 @@ class Comment(models.Model):
         related_name="comments",
         editable=False,
     )
+
+    is_pinned = models.BooleanField(default=False, editable=False)
+
     timestamp = models.DateTimeField(auto_now=True)
 
     reply = models.ForeignKey(

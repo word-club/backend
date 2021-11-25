@@ -18,7 +18,7 @@ from comment.views import (
     RemoveHiddenStatus,
     RemoveCommentBookmark,
     RemoveCommentShare,
-    CommentViewSet,
+    CommentViewSet, CommentPinView,
 )
 
 from rest_framework.routers import DefaultRouter
@@ -49,5 +49,6 @@ urlpatterns += [
     path("comment-hide/<str:pk>/", RemoveHiddenStatus.as_view()),
     path("comment-bookmark/<str:pk>/", RemoveCommentBookmark.as_view()),
     path("comment-share/<str:pk>/", RemoveCommentShare.as_view()),
-    path("comment/<str:pk>/reply", ReplyCommentView.as_view()),
+    path("comment/<str:pk>/reply/", ReplyCommentView.as_view()),
+    path("comment/<str:pk>/pin/", CommentPinView.as_view()),
 ]
