@@ -9,8 +9,6 @@ from account.views.password import (
     ConfirmResetPassword,
 )
 from account.views.profile import (
-    ProfileAvatarViewSet,
-    ProfileCoverViewSet,
     AddProfileCoverView,
     AddProfileAvatarView,
 )
@@ -21,17 +19,17 @@ from account.views.user import (
     BlockAUser,
     ReportAUser,
     UnBlockAUser,
+    GetMeView,
 )
 
 router = DefaultRouter()
 router.register(r"user", UserViewSet, basename="user")
-router.register(r"profile-avatar", ProfileAvatarViewSet, basename="profile-avatar")
-router.register(r"profile-cover", ProfileCoverViewSet, basename="profile-cover")
 router.register(r"follower", FollowUserViewSet, basename="follower")
 
 urlpatterns = router.urls
 
 urlpatterns += [
+    path("me/", GetMeView.as_view()),
     path("register/", RegisterUserView.as_view()),
     path("login/", LoginView.as_view(), name="user-login"),
     path("logout/", LogoutView.as_view(), name="user-logout"),
@@ -46,8 +44,8 @@ urlpatterns += [
         ConfirmResetPassword.as_view(),
         name="confirm-reset-password",
     ),
-    path("profile/<int:pk>/cover/", AddProfileCoverView.as_view()),
-    path("profile/<int:pk>/avatar/", AddProfileAvatarView.as_view()),
+    path("profile/add-cover/", AddProfileCoverView.as_view()),
+    path("profile/add-avatar/", AddProfileAvatarView.as_view()),
     path("user/<int:pk>/follow/", FollowAUserView.as_view()),
     path("follower/<int:pk>/", UnFollowAUserView.as_view()),
     path("user/<int:pk>/report/", ReportAUser.as_view()),

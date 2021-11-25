@@ -1,7 +1,7 @@
 from rest_framework import status, viewsets
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.generics import get_object_or_404
-from rest_framework.permissions import IsAdminUser
+from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -17,9 +17,19 @@ class UserViewSet(viewsets.ModelViewSet):
         if self.action in ["list", "delete"]:
             return UserSerializer
         elif self.action == "retrieve":
-            return UserInfoSerializer
+            return UserRetrieveSerializer
         elif self.action in ["create", "update", "partial_update"]:
             return UserPostSerializer
+
+
+class GetMeView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    @staticmethod
+    def get(request):
+        me = request.user
+        return Response(UserInfoSerializer(me).data, status=status.HTTP_200_OK)
 
 
 class RegisterUserView(APIView):
