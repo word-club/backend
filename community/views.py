@@ -538,3 +538,36 @@ class CompleteRegistrationSteps(APIView):
         community.completed_registration_steps = True
         community.save()
         return Response(CommunitySerializer(community).data, status=status.HTTP_200_OK)
+
+
+class BlockACommunity(APIView):
+    @staticmethod
+    def post(request, pk):
+        community = get_object_or_404(Community, pk=pk)
+        context = {"community": community, "request": request}
+        serializer = CommunityBlockSerializer(data=request.data, context=context)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class UnBlockACommunity(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsOwner]
+
+    def delete(self, request, pk):
+        block = get_object_or_404(BlockCommunity, pk=pk)
+        self.check_object_permissions(request, block)
+        block.delete()
+        return Response(status=status.HTTP_200_OK)
+
+
+class TopCommunitiesList(APIView):
+    authentication_classes = []
+    permission_classes = []
+
+    def get(self, request):
+        communities = []
+        serializer = CommunitySerializer(communities, many=True, read_only=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)

@@ -23,6 +23,7 @@ from community.serializer import (
     CommunityAdminSerializer,
     CommunitySubAdminSerializer,
 )
+from globals import UserGlobalSerializer
 from notification.serializers import NotificationReceiverSerializer
 from publication.models import (
     Publication,
@@ -131,8 +132,8 @@ class UserRetrieveSerializer(serializers.ModelSerializer):
 
 class UserInfoSerializer(serializers.ModelSerializer):
     profile = ProfileSerializer(read_only=True)
-    followers = FollowUserSerializer(many=True, read_only=True)
-    following = FollowUserSerializer(many=True, read_only=True)
+    followers = serializers.SerializerMethodField()
+    following = serializers.SerializerMethodField()
 
     published_publications = serializers.SerializerMethodField()
     drafts = serializers.SerializerMethodField()
@@ -269,6 +270,34 @@ class UserInfoSerializer(serializers.ModelSerializer):
             many=True,
             read_only=True,
         ).data
+
+    @staticmethod
+    def get_followers(obj):
+        followers = FollowUser.objects.filter(to_follow=obj)
+        users = []
+        [users.append(item.user) for item in followers]
+        return UserGlobalSerializer(
+            users, many=True, read_only=True
+        ).data
+
+    @staticmethod
+    def get_following(obj):
+        follows = FollowUser.objects.filter(user=obj)
+        users = []
+        [users.append(item.to_follow) for item in follows]
+        return UserGlobalSerializer(
+            users, many=True, read_only=True
+        ).data
+
+    @staticmethod
+    def get_blocked_users(obj):
+        blocks = BlockUser.objects.filter(user=obj)
+        users = []
+        [users.append(item.to_block) for item in blocks]
+        return UserGlobalSerializer(
+            users, many=True, read_only=True
+        ).data
+
 
     class Meta:
         model = get_user_model()

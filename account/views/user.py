@@ -5,6 +5,7 @@ from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from account.permissions import IsOwner
 from account.serializers.user import *
 
 
@@ -49,8 +50,7 @@ class ReportAUser(APIView):
         report, created = ReportUser.objects.get_or_create(
             to_report=user, user=request.user
         )
-        if created:
-            return Response(status=status.HTTP_201_CREATED)
+        if created: return Response(status=status.HTTP_201_CREATED)
         return Response(
             {"detail": "Cannot report already reported user."},
             status=status.HTTP_403_FORBIDDEN,
@@ -62,34 +62,30 @@ class BlockAUser(APIView):
     def post(request, pk):
         user = get_object_or_404(get_user_model(), pk=pk)
         block, created = BlockUser.objects.get_or_create(
-            to_block=user, user=request.user
+            user=user, created_by=request.user
         )
-        if created:
-            return Response(status=status.HTTP_201_CREATED)
-        return Response(
-            {"detail": "Cannot block already blocked user."},
-            status=status.HTTP_403_FORBIDDEN,
-        )
+        if created: code = status.HTTP_201_CREATED
+        else: code = status.HTTP_200_OK
+        return Response(status=code)
 
 
 class UnBlockAUser(APIView):
-    @staticmethod
-    def delete(request, pk):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsOwner]
+
+    def delete(self, request, pk):
         block = get_object_or_404(BlockUser, pk=pk)
-        if not block.user == request.user:
-            return Response(status=status.HTTP_403_FORBIDDEN)
+        self.check_object_permissions(request, block)
         block.delete()
         return Response(status=status.HTTP_200_OK)
 
 
 class DeleteReport(APIView):
-    @staticmethod
-    def delete(request, pk):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsOwner]
+
+    def delete(self, request, pk):
         report = get_object_or_404(ReportUser, pk=pk)
-        # either report creator can delete
-        if not report.user == request.user:
-            # or the superuser can delete it
-            if not request.user.is_superuser:
-                return Response(status=status.HTTP_403_FORBIDDEN)
+        self.check_object_permissions(request, report)
         report.delete()
         return Response(status=status.HTTP_200_OK)

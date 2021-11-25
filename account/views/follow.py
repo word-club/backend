@@ -17,7 +17,7 @@ class FollowUserViewSet(
     queryset = FollowUser.objects.all()
     authentication_classes = [TokenAuthentication]
     serializer_class = FollowUserSerializer
-    filterset_fields = ["to_follow", "user"]
+    filterset_fields = ["user", "created_by"]
 
     def get_permissions(self):
         return [IsOwner] if self.action == "delete" else [IsAuthenticated]
@@ -25,12 +25,16 @@ class FollowUserViewSet(
 
 class FollowAUserView(APIView):
     authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
 
     @staticmethod
     def post(request, pk):
         to_follow = get_object_or_404(get_user_model(), pk=pk)
-        FollowUser.objects.create(to_follow=to_follow, user=request.user)
-        return Response(status=status.HTTP_201_CREATED)
+        follow = FollowUser.objects.create(user=to_follow, created_by=request.user)
+        return Response(
+            FollowUserSerializer(follow).data,
+            status=status.HTTP_201_CREATED
+        )
 
 
 class UnFollowAUserView(APIView):

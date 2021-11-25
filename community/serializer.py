@@ -196,3 +196,14 @@ class CommunityRetrieveSerializer(serializers.ModelSerializer):
     class Meta:
         model = Community
         fields = "__all__"
+
+
+class CommunityBlockSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BlockCommunity
+        fields = "__all__"
+
+    def create(self, validated_data):
+        validated_data["community"] = self.context["community"]
+        validated_data["created_by"] = self.context["request"].user
+        return super().create(validated_data)

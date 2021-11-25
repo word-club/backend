@@ -88,34 +88,35 @@ class ResetPasswordCode(models.Model):
 
 
 class FollowUser(models.Model):
-
-    to_follow = models.ForeignKey(
-        get_user_model(),
-        on_delete=models.CASCADE,
-        related_name="following",
-        editable=False,
-    )
     user = models.ForeignKey(
         get_user_model(),
         on_delete=models.CASCADE,
         related_name="followers",
         editable=False,
     )
+    created_by = models.ForeignKey(
+        get_user_model(),
+        on_delete=models.CASCADE,
+        related_name="following",
+        editable=False,
+    )
     timestamp = models.DateTimeField(auto_now=True)
 
     class Meta:
         ordering = ["-timestamp"]
-        unique_together = [["to_follow", "user"]]
+        unique_together = [["created_by", "user"]]
 
 
 class ReportUser(models.Model):
-    to_report = models.ForeignKey(
+    title = models.CharField(max_length=256)
+    report = models.TextField()
+    user = models.ForeignKey(
         get_user_model(),
         on_delete=models.CASCADE,
         related_name="reported_by",
         editable=False,
     )
-    user = models.ForeignKey(
+    created_by = models.ForeignKey(
         get_user_model(),
         on_delete=models.CASCADE,
         related_name="reported_users",
@@ -125,17 +126,17 @@ class ReportUser(models.Model):
 
     class Meta:
         ordering = ["-timestamp"]
-        unique_together = [["to_report", "user"]]
+        unique_together = [["created_by", "user"]]
 
 
 class BlockUser(models.Model):
-    to_block = models.ForeignKey(
+    user = models.ForeignKey(
         get_user_model(),
         on_delete=models.CASCADE,
         related_name="blocked_by",
         editable=False,
     )
-    user = models.ForeignKey(
+    created_by = models.ForeignKey(
         get_user_model(),
         on_delete=models.CASCADE,
         related_name="blocked_users",
@@ -145,4 +146,4 @@ class BlockUser(models.Model):
 
     class Meta:
         ordering = ["-timestamp"]
-        unique_together = [["to_block", "user"]]
+        unique_together = [["created_by", "user"]]
