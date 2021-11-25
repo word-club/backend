@@ -13,9 +13,7 @@ class AdministrationSerializer(serializers.ModelSerializer):
 
 
 class AdministrationViewSet(
-    mixins.ListModelMixin,
-    mixins.CreateModelMixin,
-    viewsets.GenericViewSet
+    mixins.ListModelMixin, mixins.CreateModelMixin, viewsets.GenericViewSet
 ):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsSuperUser]
@@ -27,18 +25,16 @@ class AdministrationViewSet(
         if not administration:
             administration = Administration.objects.create()
         return Response(
-            AdministrationSerializer(administration).data,
-            status=status.HTTP_200_OK
+            AdministrationSerializer(administration).data, status=status.HTTP_200_OK
         )
 
     def create(self, request, *args, **kwargs):
         administration = Administration.objects.first()
-        if not administration: administration = Administration.objects.create()
+        if not administration:
+            administration = Administration.objects.create()
 
         serializer = AdministrationSerializer(
-            administration,
-            data=request.data,
-            partial=True
+            administration, data=request.data, partial=True
         )
         if serializer.is_valid():
             serializer.save()
@@ -54,9 +50,7 @@ class PageViewSerializer(serializers.ModelSerializer):
 
 
 class PageViewViewSet(
-    mixins.ListModelMixin,
-    mixins.UpdateModelMixin,
-    viewsets.GenericViewSet
+    mixins.ListModelMixin, mixins.UpdateModelMixin, viewsets.GenericViewSet
 ):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsSuperUser]
@@ -67,43 +61,46 @@ class PageViewViewSet(
         page_view = PageView.objects.first()
         if not page_view:
             page_view = PageView.objects.create()
-        return Response(
-            PageViewSerializer(page_view).data,
-            status=status.HTTP_200_OK
-        )
+        return Response(PageViewSerializer(page_view).data, status=status.HTTP_200_OK)
 
     @staticmethod
     def create(request, *args, **kwargs):
         # instance check
         page_view = PageView.objects.first()
-        if not page_view: page_view = PageView.objects.create()
+        if not page_view:
+            page_view = PageView.objects.create()
 
         # validate query param count
         if len(request.query_params) > 1:
-            return Response({
-                "detail": "Only single query parameter is allowed."
-            }, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"detail": "Only single query parameter is allowed."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         # fetch query param
-        homepage = request.query_params.get('homepage')
-        publications = request.query_params.get('publications')
-        community = request.query_params.get('community')
-        profile = request.query_params.get('profile')
-        settings = request.query_params.get('settings')
-        administration = request.query_params.get('administration')
+        homepage = request.query_params.get("homepage")
+        publications = request.query_params.get("publications")
+        community = request.query_params.get("community")
+        profile = request.query_params.get("profile")
+        settings = request.query_params.get("settings")
+        administration = request.query_params.get("administration")
 
         # if query param is available and true when parsed to integer then add count
-        if homepage and bool(int(homepage)): page_view.homepage += 1
-        elif publications and bool(int(publications)): page_view.publications += 1
-        elif community and bool(int(community)): page_view.community += 1
-        elif profile and bool(int(profile)): page_view.profile += 1
-        elif settings and bool(int(settings)): page_view.settings += 1
-        elif administration and bool(int(administration)): page_view.administration += 1
-        else: pass
+        if homepage and bool(int(homepage)):
+            page_view.homepage += 1
+        elif publications and bool(int(publications)):
+            page_view.publications += 1
+        elif community and bool(int(community)):
+            page_view.community += 1
+        elif profile and bool(int(profile)):
+            page_view.profile += 1
+        elif settings and bool(int(settings)):
+            page_view.settings += 1
+        elif administration and bool(int(administration)):
+            page_view.administration += 1
+        else:
+            pass
 
         page_view.save()
 
-        return Response(
-            PageViewSerializer(page_view).data,
-            status=status.HTTP_200_OK
-        )
+        return Response(PageViewSerializer(page_view).data, status=status.HTTP_200_OK)

@@ -1,6 +1,7 @@
 from django.db import models
 from django.core.exceptions import ValidationError
 
+
 class Administration(models.Model):
     publication_update_limit = models.PositiveIntegerField(
         default=30, help_text="in days"
