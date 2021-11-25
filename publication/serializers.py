@@ -3,6 +3,7 @@ from rest_framework import serializers
 
 from comment.models import Comment
 from comment.serializers import CommentSerializer
+from community.models import CommunityHashtag
 from globals import CommunityGlobalSerializer, UserGlobalSerializer
 from publication.models import *
 
@@ -10,7 +11,7 @@ from publication.models import *
 class PublicationImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = PublicationImage
-        fields = "__all__"
+        exclude = ["publication"]
 
     def create(self, validated_data):
         validated_data["publication"] = self.context["publication"]
@@ -20,7 +21,7 @@ class PublicationImageSerializer(serializers.ModelSerializer):
 class PublicationLinkSerializer(serializers.ModelSerializer):
     class Meta:
         model = PublicationLink
-        fields = "__all__"
+        exclude = ["publication"]
 
     def create(self, validated_data):
         validated_data["publication"] = self.context["publication"]
@@ -75,7 +76,7 @@ class PublicationLinkSerializer(serializers.ModelSerializer):
 class PublicationImageUrlSerializer(serializers.ModelSerializer):
     class Meta:
         model = PublicationImageUrl
-        fields = "__all__"
+        exclude = ["publication"]
 
     def create(self, validated_data):
         validated_data["publication"] = self.context["publication"]
@@ -85,19 +86,19 @@ class PublicationImageUrlSerializer(serializers.ModelSerializer):
 class PublicationUpVoteSerializer(serializers.ModelSerializer):
     class Meta:
         model = PublicationUpVote
-        fields = "__all__"
+        exclude = ["publication"]
 
 
 class PublicationDownVoteSerializer(serializers.ModelSerializer):
     class Meta:
         model = PublicationDownVote
-        fields = "__all__"
+        exclude = ["publication"]
 
 
 class PublicationReportSerializer(serializers.ModelSerializer):
     class Meta:
         model = ReportPublication
-        fields = "__all__"
+        exclude = ["publication"]
 
     def create(self, validated_data):
         validated_data["publication"] = self.context["publication"]
@@ -108,7 +109,7 @@ class PublicationReportSerializer(serializers.ModelSerializer):
 class PublicationShareSerializer(serializers.ModelSerializer):
     class Meta:
         model = PublicationShare
-        fields = "__all__"
+        exclude = ["publication"]
 
     def create(self, validated_data):
         validated_data["created_by"] = self.context["request"].user
@@ -119,27 +120,82 @@ class PublicationShareSerializer(serializers.ModelSerializer):
 class HidePublicationSerializer(serializers.ModelSerializer):
     class Meta:
         model = HidePublication
-        fields = "__all__"
+        exclude = ["publication"]
 
 
 class PublicationBookmarkSerializer(serializers.ModelSerializer):
     class Meta:
         model = PublicationBookmark
-        fields = "__all__"
+        exclude = ["publication"]
+
+
+class PublicationHashtags(serializers.ModelSerializer):
+    hashtag = serializers.SerializerMethodField()
+
+    def get_hashtag(self, obj):
+        return {"id": obj.hashtag.id, "tag": obj.hashtag.tag}
+
+    class Meta:
+        model = PublicationHashtag
+        exclude = ["publication"]
 
 
 class PublicationFormSerializer(serializers.ModelSerializer):
+    hash_tags = serializers.ListField(
+        child=serializers.PrimaryKeyRelatedField(queryset=Hashtag.objects.all()),
+        max_length=2,
+        required=False,
+        allow_null=True,
+        write_only=True,
+    )
+
     class Meta:
         model = Publication
         fields = "__all__"
 
+    def validate(self, validated_data):
+        tag_not_found = []
+        hashtags = validated_data.get("hash_tags")
+        community = validated_data.get("community")
+        if hashtags and community:
+            for hashtag in hashtags:
+                try:
+                    CommunityHashtag.objects.get(tag=hashtag, community=community)
+                except CommunityHashtag.DoesNotExist:
+                    tag_not_found.append(
+                        {"tag": hashtag.tag, "id": hashtag.id, "detail": "Not allowed."}
+                    )
+            raise serializers.ValidationError({"hashtags": tag_not_found})
+        return validated_data
+
     def create(self, validated_data):
         validated_data["created_by"] = self.context["user"]
-        return super().create(validated_data)
+        hashtags = None
+        if validated_data.get("hash_tags"):
+            hashtags = validated_data.pop("hash_tags")
+        publication = Publication.objects.create(validated_data)
+        if hashtags:
+            for hashtag in hashtags:
+                PublicationHashtag.objects.create(
+                    hashtag=hashtag, publication=publication
+                )
+        return publication
+
+    def update(self, instance, validated_data):
+        hashtags = None
+        if validated_data.get("hash_tags"):
+            hashtags = validated_data.pop("hash_tags")
+        if hashtags:
+            for hashtag in hashtags:
+                PublicationHashtag.objects.get_or_create(
+                    hashtag=hashtag, publication=instance
+                )
+        return super().update(instance, validated_data)
 
 
 class PublicationSerializer(serializers.ModelSerializer):
     community = CommunityGlobalSerializer()
+    hashtags = PublicationHashtags(many=True, read_only=True)
     reactions = serializers.SerializerMethodField()
     up_vote = serializers.SerializerMethodField()
     down_vote = serializers.SerializerMethodField()
@@ -158,19 +214,20 @@ class PublicationSerializer(serializers.ModelSerializer):
         down_votes = PublicationDownVote.objects.filter(publication=obj).count()
         shares = PublicationShare.objects.filter(publication=obj).count()
         comments = Comment.objects.filter(publication=obj).count()
-        total =  up_votes + down_votes + shares + comments
+        total = up_votes + down_votes + shares + comments
 
         return {
             "up_votes": up_votes,
             "down_votes": down_votes,
             "shares": shares,
             "comments": comments,
-            "total": total
+            "total": total,
         }
 
     def get_up_vote(self, obj):
         user = self.context["user"]
-        if type(user) != get_user_model(): return False
+        if type(user) != get_user_model():
+            return False
         try:
             up_vote = PublicationUpVote.objects.get(created_by=user, publication=obj)
             return PublicationUpVoteSerializer(up_vote).data
@@ -179,16 +236,20 @@ class PublicationSerializer(serializers.ModelSerializer):
 
     def get_down_vote(self, obj):
         user = self.context["user"]
-        if type(user) != get_user_model(): return False
+        if type(user) != get_user_model():
+            return False
         try:
-            down_vote = PublicationDownVote.objects.get(created_by=user, publication=obj)
+            down_vote = PublicationDownVote.objects.get(
+                created_by=user, publication=obj
+            )
             return PublicationDownVoteSerializer(down_vote).data
         except PublicationDownVote.DoesNotExist:
             return False
 
     def get_share_status(self, obj):
         user = self.context["user"]
-        if type(user) != get_user_model(): return False
+        if type(user) != get_user_model():
+            return False
         try:
             share = PublicationShare.objects.get(created_by=user, publication=obj)
             return PublicationShareSerializer(share).data
@@ -197,7 +258,8 @@ class PublicationSerializer(serializers.ModelSerializer):
 
     def get_hidden_status(self, obj):
         user = self.context["user"]
-        if type(user) != get_user_model(): return False
+        if type(user) != get_user_model():
+            return False
         try:
             instance = HidePublication.objects.get(created_by=user, publication=obj)
             return HidePublicationSerializer(instance).data
@@ -206,7 +268,8 @@ class PublicationSerializer(serializers.ModelSerializer):
 
     def get_bookmark_status(self, obj):
         user = self.context["user"]
-        if type(user) != get_user_model(): return False
+        if type(user) != get_user_model():
+            return False
         try:
             bookmark = PublicationBookmark.objects.get(created_by=user, publication=obj)
             return PublicationBookmarkSerializer(bookmark).data
@@ -216,7 +279,9 @@ class PublicationSerializer(serializers.ModelSerializer):
     def get_comments(self, obj):
         context = {"user": self.context["user"]}
         comments = Comment.objects.filter(publication=obj, reply=None)
-        return CommentSerializer(comments, read_only=True, many=True, context=context).data
+        return CommentSerializer(
+            comments, read_only=True, many=True, context=context
+        ).data
 
     class Meta:
         model = Publication
@@ -225,16 +290,6 @@ class PublicationSerializer(serializers.ModelSerializer):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.Meta.depth = self.context.get("depth", 0)
-
-
-
-
-class BookmarkedPublicationsSerializers(serializers.ModelSerializer):
-    publication = PublicationSerializer(read_only=True)
-
-    class Meta:
-        model = PublicationBookmark
-        fields = "__all__"
 
 
 class TwitterOEmbedData:

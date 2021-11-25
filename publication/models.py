@@ -8,6 +8,7 @@ from django.db import models
 from backend.settings import ALLOWED_IMAGES_EXTENSIONS
 from choices import PUBLICATION_TYPE_CHOICES
 from community.models import Community
+from hashtag.models import Hashtag
 
 
 def upload_publication_image_to(instance, filename):
@@ -104,7 +105,7 @@ class PublicationBookmark(models.Model):
     created_by = models.ForeignKey(
         get_user_model(),
         on_delete=models.CASCADE,
-        related_name="bookmark",
+        related_name="saved_publications",
         editable=False,
     )
     created_at = models.DateTimeField(auto_now_add=True)
@@ -123,7 +124,7 @@ class PublicationUpVote(models.Model):
     created_by = models.ForeignKey(
         get_user_model(),
         on_delete=models.CASCADE,
-        related_name="up_vote",
+        related_name="up_voted_publications",
         editable=False,
     )
     timestamp = models.DateTimeField(auto_now=True)
@@ -144,7 +145,7 @@ class PublicationDownVote(models.Model):
     created_by = models.ForeignKey(
         get_user_model(),
         on_delete=models.CASCADE,
-        related_name="down_vote",
+        related_name="down_voted_publications",
         editable=False,
     )
     timestamp = models.DateTimeField(auto_now=True)
@@ -157,15 +158,12 @@ class PublicationDownVote(models.Model):
 class HidePublication(models.Model):
 
     publication = models.ForeignKey(
-        "Publication",
-        on_delete=models.CASCADE,
-        related_name="hides",
-        editable=False
+        "Publication", on_delete=models.CASCADE, related_name="hides", editable=False
     )
     created_by = models.ForeignKey(
         get_user_model(),
         on_delete=models.CASCADE,
-        related_name="hidden_status",
+        related_name="hidden_publications",
         editable=False,
     )
     timestamp = models.DateTimeField(auto_now=True)
@@ -185,7 +183,7 @@ class ReportPublication(models.Model):
     created_by = models.ForeignKey(
         get_user_model(),
         on_delete=models.CASCADE,
-        related_name="report",
+        related_name="reported_publications",
         editable=False,
     )
     timestamp = models.DateTimeField(auto_now=True)
@@ -213,15 +211,12 @@ class PublicationLink(models.Model):
 class PublicationShare(models.Model):
     title = models.CharField(max_length=128)
     publication = models.ForeignKey(
-        "Publication",
-        on_delete=models.CASCADE,
-        related_name="shares",
-        editable=False
+        "Publication", on_delete=models.CASCADE, related_name="shares", editable=False
     )
     created_by = models.ForeignKey(
         get_user_model(),
         on_delete=models.CASCADE,
-        related_name="share",
+        related_name="shared_publications",
         editable=False,
     )
     tags = models.CharField(max_length=16, null=True, blank=True)
@@ -230,3 +225,20 @@ class PublicationShare(models.Model):
     class Meta:
         ordering = ["-timestamp"]
         unique_together = [["publication", "created_by"]]
+
+
+class PublicationHashtag(models.Model):
+    hashtag = models.ForeignKey(
+        Hashtag, on_delete=models.CASCADE, related_name="publications", editable=False
+    )
+    publication = models.ForeignKey(
+        "Publication",
+        on_delete=models.CASCADE,
+        related_name="hashtags",
+        editable=False,
+    )
+    timestamp = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["-timestamp"]
+        unique_together = [["publication", "hashtag"]]

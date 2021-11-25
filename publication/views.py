@@ -14,9 +14,7 @@ from publication.serializers import *
 from rest_framework.authtoken.models import Token
 
 
-class PublicationListRetrieveView(
-    mixins.ListModelMixin, viewsets.GenericViewSet
-):
+class PublicationListRetrieveView(mixins.ListModelMixin, viewsets.GenericViewSet):
     queryset = Publication.objects.all()
     serializer_class = PublicationSerializer
     authentication_classes = []
@@ -28,16 +26,20 @@ class PublicationListRetrieveView(
         context = super().get_serializer_context()
 
         depth = 0
-        try: depth = int(self.request.query_params.get("depth", 0))
-        except ValueError: pass
         try:
-            auth_header = self.request.headers.get('Authorization')
-            if auth_header != "null":
+            depth = int(self.request.query_params.get("depth", 0))
+        except ValueError:
+            pass
+        try:
+            auth_header = self.request.headers.get("Authorization")
+            if auth_header != "null" and auth_header:
                 token = auth_header.split(" ")[1]
                 token_instance = Token.objects.get(key=token)
                 context["user"] = token_instance.user
-            else: context["user"] = None
-        except ValueError: pass
+            else:
+                context["user"] = None
+        except ValueError:
+            pass
         context["depth"] = depth
         return context
 
@@ -45,7 +47,9 @@ class PublicationListRetrieveView(
 def check_community_law(community, user):
     if community:
         try:
-            subscriber = CommunitySubscription.objects.get(subscriber=user, community=community)
+            subscriber = CommunitySubscription.objects.get(
+                subscriber=user, community=community
+            )
             if subscriber.is_banned:
                 return True, {
                     "detail": "Subscriber is banned for the selected community."
@@ -88,22 +92,22 @@ class UpdatePublicationView(APIView):
             publication.view_count += 1
             publication.save()
         return Response(
-            PublicationSerializer(publication, context={"user": request.user, "depth": 2}).data,
-            status=status.HTTP_200_OK
+            PublicationSerializer(
+                publication, context={"user": request.user, "depth": 2}
+            ).data,
+            status=status.HTTP_200_OK,
         )
 
     def patch(self, request, pk):
         publication = get_object_or_404(Publication, pk=pk)
         self.check_object_permissions(request, publication)
         serializer = PublicationFormSerializer(
-            publication, data=request.data,
-            partial=True, context={"user": request.user}
+            publication, data=request.data, partial=True, context={"user": request.user}
         )
         if serializer.is_valid():
             community = serializer.validated_data.get("community")
             if community:
                 do_break, detail = check_community_law(community, request.user)
-                print(do_break, detail)
                 if do_break:
                     return Response(detail, status=status.HTTP_403_FORBIDDEN)
             serializer.save()
@@ -146,7 +150,8 @@ class PublishPublicationView(APIView):
         publication.published_at = timezone.now()
         publication.save()
         return Response(
-            PublicationSerializer(publication, context={"user": request.user}).data, status=status.HTTP_200_OK
+            PublicationSerializer(publication, context={"user": request.user}).data,
+            status=status.HTTP_200_OK,
         )
 
 
@@ -215,11 +220,8 @@ class UpVoteAPublicationView(APIView):
         )
         if created:
             return Response(
-                PublicationSerializer(
-                    publication,
-                    context={'user': request.user}
-                ).data,
-                status=status.HTTP_201_CREATED
+                PublicationSerializer(publication, context={"user": request.user}).data,
+                status=status.HTTP_201_CREATED,
             )
         else:
             return Response(status=status.HTTP_204_NO_CONTENT)
@@ -249,12 +251,11 @@ class DownVoteAPublication(APIView):
         if created:
             return Response(
                 PublicationSerializer(publication, context={"user": request.user}).data,
-                status=status.HTTP_201_CREATED
+                status=status.HTTP_201_CREATED,
             )
         else:
             return Response(
-                PublicationDownVoteSerializer(down_vote).data,
-                status=status.HTTP_200_OK
+                PublicationDownVoteSerializer(down_vote).data, status=status.HTTP_200_OK
             )
 
 
@@ -280,7 +281,10 @@ class BookmarkAPublicationView(APIView):
             created_by=request.user, publication=publication
         )
         if created:
-            return Response(PublicationSerializer(publication ,context={"user": request.user}).data, status=status.HTTP_201_CREATED)
+            return Response(
+                PublicationSerializer(publication, context={"user": request.user}).data,
+                status=status.HTTP_201_CREATED,
+            )
         else:
             return Response(status=status.HTTP_204_NO_CONTENT)
 
@@ -307,9 +311,15 @@ class HideAPublicationView(APIView):
             created_by=request.user, publication=publication
         )
         if created:
-            return Response(PublicationSerializer(publication ,context={"user": request.user}).data, status=status.HTTP_201_CREATED)
+            return Response(
+                PublicationSerializer(publication, context={"user": request.user}).data,
+                status=status.HTTP_201_CREATED,
+            )
         else:
-            return Response(HidePublicationSerializer(instance).data, status=status.HTTP_204_NO_CONTENT)
+            return Response(
+                HidePublicationSerializer(instance).data,
+                status=status.HTTP_204_NO_CONTENT,
+            )
 
 
 class RemovePublicationHiddenStateView(APIView):
@@ -345,7 +355,10 @@ class ReportAPublicationView(APIView):
         serializer = PublicationReportSerializer(data=request.data, context=context)
         if serializer.is_valid():
             serializer.save()
-            return Response(PublicationSerializer(publication ,context={"user": request.user}).data, status=status.HTTP_201_CREATED)
+            return Response(
+                PublicationSerializer(publication, context={"user": request.user}).data,
+                status=status.HTTP_201_CREATED,
+            )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -403,7 +416,9 @@ class GetTwitterEmbed(APIView):
         if not source:
             return Response(status=status.HTTP_400_BAD_REQUEST)
         serializer = TwitterEmbedSerializer(
-            TwitterOEmbedData(source=source, oembed=helper.get_twitter_embed_data(source))
+            TwitterOEmbedData(
+                source=source, oembed=helper.get_twitter_embed_data(source)
+            )
         )
         return Response(serializer.data, status=status.HTTP_200_OK)
 
