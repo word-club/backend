@@ -123,7 +123,7 @@ class UpdatePublicationView(APIView):
 
 class PublishPublicationView(APIView):
     authentication_classes = [TokenAuthentication]
-    permission_classes = [IsOwner]
+    permission_classes = [IsOwner|IsCommunityAdministrator]
 
     def post(self, request, pk):
         publication = get_object_or_404(Publication, pk=pk)
@@ -154,6 +154,15 @@ class PublishPublicationView(APIView):
             status=status.HTTP_200_OK,
         )
 
+    def delete(self, request, pk=None):
+        publication = get_object_or_404(Publication, pk=pk)
+        self.check_object_permissions(request, publication)
+        if publication.is_draft():
+            return Response(status=status.HTTP_200_OK)
+        publication.is_published = False
+        publication.published_at = None
+        publication.save()
+        return Response(status=status.HTTP_201_CREATED)
 
 class AddPublicationImageView(APIView):
     authentication_classes = [TokenAuthentication]
