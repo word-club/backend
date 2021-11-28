@@ -96,5 +96,5 @@ urlpatterns += [
     path("community/<int:pk>/subscriber-filter/", CommunitySubscribersFilter.as_view()),
     path("community/<int:pk>/block/", BlockACommunity.as_view()),
     path("community-block/<int:pk>/", UnBlockACommunity.as_view()),
-    path("top-communities/", TopCommunitiesList.as_view())
+    path("top-communities/", TopCommunitiesList.as_view()),
 ]

@@ -2,7 +2,6 @@ from django.contrib.auth.password_validation import validate_password
 from rest_framework import serializers
 
 from account.models import *
-from account.serializers.follow import FollowUserSerializer
 from comment.models import (
     CommentUpVote,
     CommentDownVote,
@@ -111,7 +110,7 @@ class ProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Profile
-        fields = "__all__"
+        exclude = ["user"]
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -273,31 +272,24 @@ class UserInfoSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def get_followers(obj):
-        followers = FollowUser.objects.filter(to_follow=obj)
+        followers = FollowUser.objects.filter(user=obj)
         users = []
         [users.append(item.user) for item in followers]
-        return UserGlobalSerializer(
-            users, many=True, read_only=True
-        ).data
+        return UserGlobalSerializer(users, many=True, read_only=True).data
 
     @staticmethod
     def get_following(obj):
         follows = FollowUser.objects.filter(user=obj)
         users = []
         [users.append(item.to_follow) for item in follows]
-        return UserGlobalSerializer(
-            users, many=True, read_only=True
-        ).data
+        return UserGlobalSerializer(users, many=True, read_only=True).data
 
     @staticmethod
     def get_blocked_users(obj):
         blocks = BlockUser.objects.filter(user=obj)
         users = []
         [users.append(item.to_block) for item in blocks]
-        return UserGlobalSerializer(
-            users, many=True, read_only=True
-        ).data
-
+        return UserGlobalSerializer(users, many=True, read_only=True).data
 
     class Meta:
         model = get_user_model()

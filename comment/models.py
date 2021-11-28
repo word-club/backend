@@ -34,7 +34,6 @@ class Comment(models.Model):
         on_delete=models.CASCADE,
         editable=False,
         null=True,
-        blank=True,
     )
     created_by = models.ForeignKey(
         get_user_model(),
@@ -43,13 +42,19 @@ class Comment(models.Model):
         editable=False,
     )
 
+    reactions = models.PositiveBigIntegerField(default=0, editable=False)
+    popularity = models.PositiveBigIntegerField(default=0, editable=False)
+    dislikes = models.PositiveBigIntegerField(default=0, editable=False)
+    supports = models.PositiveBigIntegerField(default=0, editable=False)
+    discussions = models.PositiveBigIntegerField(default=0, editable=False)
+
     is_pinned = models.BooleanField(default=False, editable=False)
 
     created_at = models.DateTimeField(auto_now_add=True)
     timestamp = models.DateTimeField(auto_now=True)
 
     reply = models.ForeignKey(
-        "self", null=True, on_delete=models.CASCADE, blank=True, related_name="replies"
+        "self", null=True, on_delete=models.CASCADE, related_name="replies"
     )
 
     class Meta:
@@ -60,12 +65,14 @@ class Comment(models.Model):
         diff = now - self.created_at
         limit = Administration.objects.first()
         if diff.days > limit.comment_update_limit:
-            raise ValidationError({
-                "detail":
-                    "Sorry, you cannot update the comment after {} days.".format(limit.comment_update_limit)
-            })
+            raise ValidationError(
+                {
+                    "detail": "Sorry, you cannot update the comment after {} days.".format(
+                        limit.comment_update_limit
+                    )
+                }
+            )
         return super().save(*args, **kwargs)
-
 
 
 class CommentImage(models.Model):

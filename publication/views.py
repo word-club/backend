@@ -1,4 +1,3 @@
-from django.utils import timezone
 from rest_framework import viewsets, mixins, status
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.generics import get_object_or_404
@@ -8,18 +7,25 @@ from rest_framework.views import APIView
 
 import helper
 from account.permissions import IsOwner
-from community.models import CommunitySubscription
-from community.permissions import IsCommunityAdministrator, IsSubscriber
+from community.helper import check_community_law
+from community.permissions import IsCommunityAdministrator
 from publication.serializers import *
 from rest_framework.authtoken.models import Token
 
 
-class PublicationListRetrieveView(mixins.ListModelMixin, viewsets.GenericViewSet):
+class PublicationListView(mixins.ListModelMixin, viewsets.GenericViewSet):
     queryset = Publication.objects.all()
-    serializer_class = PublicationSerializer
+    serializer_class = PublicationFormSerializer
     authentication_classes = []
     permission_classes = []
-    filterset_fields = ["created_by", "is_published", "timestamp", "type", "community", "is_pinned"]
+    filterset_fields = [
+        "created_by",
+        "is_published",
+        "timestamp",
+        "type",
+        "community",
+        "is_pinned",
+    ]
     search_fields = ["title", "content"]
 
     def get_serializer_context(self):
@@ -44,26 +50,6 @@ class PublicationListRetrieveView(mixins.ListModelMixin, viewsets.GenericViewSet
         return context
 
 
-def check_community_law(community, user):
-    if community:
-        try:
-            subscriber = CommunitySubscription.objects.get(
-                subscriber=user, community=community
-            )
-            if subscriber.is_banned:
-                return True, {
-                    "detail": "Subscriber is banned for the selected community."
-                }
-            if community.type != "public":
-                if not subscriber.is_approved:
-                    return True, {"detail": "Subscriber is not approved yet."}
-            return False, None
-        except CommunitySubscription.DoesNotExist:
-            return True, {
-                "detail": "Please subscribe the community first to add publication."
-            }
-
-
 class AddPublicationView(APIView):
     authentication_classes = [TokenAuthentication]
 
@@ -82,19 +68,16 @@ class AddPublicationView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class UpdatePublicationView(APIView):
+class RetrieveUpdatePublicationView(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsOwner | IsCommunityAdministrator]
 
-    def get(self, request, pk):
+    @staticmethod
+    def get(request, pk):
         publication = get_object_or_404(Publication, pk=pk)
-        if publication.is_published:
-            publication.view_count += 1
-            publication.save()
+        context = {"user": request.user, "depth": 2}
         return Response(
-            PublicationSerializer(
-                publication, context={"user": request.user, "depth": 2}
-            ).data,
+            PublicationSerializer(publication, context=context).data,
             status=status.HTTP_200_OK,
         )
 
@@ -123,7 +106,7 @@ class UpdatePublicationView(APIView):
 
 class PublishPublicationView(APIView):
     authentication_classes = [TokenAuthentication]
-    permission_classes = [IsOwner|IsCommunityAdministrator]
+    permission_classes = [IsOwner | IsCommunityAdministrator]
 
     def post(self, request, pk):
         publication = get_object_or_404(Publication, pk=pk)
@@ -163,6 +146,7 @@ class PublishPublicationView(APIView):
         publication.published_at = None
         publication.save()
         return Response(status=status.HTTP_201_CREATED)
+
 
 class AddPublicationImageView(APIView):
     authentication_classes = [TokenAuthentication]
@@ -462,7 +446,7 @@ class RemoveMyShareForPublication(APIView):
 
 class PublicationPinView(APIView):
     authentication_classes = [TokenAuthentication]
-    permission_classes = [IsOwner|IsCommunityAdministrator]
+    permission_classes = [IsOwner | IsCommunityAdministrator]
 
     def patch(self, request, pk=None):
         publication = get_object_or_404(Publication, pk=pk)

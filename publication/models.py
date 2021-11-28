@@ -24,15 +24,9 @@ class Publication(models.Model):
 
     title = models.CharField(max_length=128)
     content = models.TextField(null=True, blank=True)
-    created_by = models.ForeignKey(
-        get_user_model(),
-        on_delete=models.CASCADE,
-        related_name="publications",
-        editable=False,
-    )
 
     is_published = models.BooleanField(default=False, editable=False)
-    published_at = models.DateTimeField(null=True, blank=True, editable=False)
+    published_at = models.DateTimeField(null=True, editable=False)
 
     is_pinned = models.BooleanField(default=False, editable=False)
 
@@ -40,7 +34,7 @@ class Publication(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
     timestamp = models.DateTimeField(auto_now=True)
-    tags = models.CharField(max_length=16, null=True, blank=True)
+    tags = models.CharField(max_length=16, null=True)
 
     type = models.CharField(
         max_length=32, choices=PUBLICATION_TYPE_CHOICES, default="editor"
@@ -49,24 +43,36 @@ class Publication(models.Model):
     community = models.ForeignKey(
         Community,
         null=True,
-        blank=True,
         on_delete=models.CASCADE,
         related_name="publications",
     )
+    created_by = models.ForeignKey(
+        get_user_model(),
+        on_delete=models.CASCADE,
+        related_name="publications",
+        editable=False,
+    )
+
+    popularity = models.PositiveBigIntegerField(default=0, editable=False)
+    dislikes = models.PositiveBigIntegerField(default=0, editable=False)
+    supports = models.PositiveBigIntegerField(default=0, editable=False)
+    discussions = models.PositiveBigIntegerField(default=0, editable=False)
 
     class Meta:
         ordering = ["-timestamp"]
-
 
     def save(self, *args, **kwargs):
         now = timezone.now()
         diff = now - self.created_at
         limit = Administration.objects.first()
         if diff.days > limit.publication_update_limit:
-            raise ValidationError({
-                "detail":
-                    "Sorry, you cannot update the publication after {} days.".format(limit.publication_update_limit)
-            })
+            raise ValidationError(
+                {
+                    "detail": "Sorry, you cannot update the publication after {} days.".format(
+                        limit.publication_update_limit
+                    )
+                }
+            )
         return super().save(*args, **kwargs)
 
     def is_draft(self):
