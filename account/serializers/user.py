@@ -275,28 +275,21 @@ class UserInfoSerializer(serializers.ModelSerializer):
         followers = FollowUser.objects.filter(user=obj)
         users = []
         [users.append(item.user) for item in followers]
-        return UserGlobalSerializer(
-            users, many=True, read_only=True
-        ).data
+        return UserGlobalSerializer(users, many=True, read_only=True).data
 
     @staticmethod
     def get_following(obj):
         follows = FollowUser.objects.filter(user=obj)
         users = []
         [users.append(item.to_follow) for item in follows]
-        return UserGlobalSerializer(
-            users, many=True, read_only=True
-        ).data
+        return UserGlobalSerializer(users, many=True, read_only=True).data
 
     @staticmethod
     def get_blocked_users(obj):
         blocks = BlockUser.objects.filter(user=obj)
         users = []
         [users.append(item.to_block) for item in blocks]
-        return UserGlobalSerializer(
-            users, many=True, read_only=True
-        ).data
-
+        return UserGlobalSerializer(users, many=True, read_only=True).data
 
     class Meta:
         model = get_user_model()

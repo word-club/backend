@@ -50,7 +50,8 @@ class ReportAUser(APIView):
         report, created = ReportUser.objects.get_or_create(
             to_report=user, user=request.user
         )
-        if created: return Response(status=status.HTTP_201_CREATED)
+        if created:
+            return Response(status=status.HTTP_201_CREATED)
         return Response(
             {"detail": "Cannot report already reported user."},
             status=status.HTTP_403_FORBIDDEN,
@@ -64,8 +65,10 @@ class BlockAUser(APIView):
         block, created = BlockUser.objects.get_or_create(
             user=user, created_by=request.user
         )
-        if created: code = status.HTTP_201_CREATED
-        else: code = status.HTTP_200_OK
+        if created:
+            code = status.HTTP_201_CREATED
+        else:
+            code = status.HTTP_200_OK
         return Response(status=code)
 
 

@@ -18,7 +18,14 @@ class PublicationListView(mixins.ListModelMixin, viewsets.GenericViewSet):
     serializer_class = PublicationFormSerializer
     authentication_classes = []
     permission_classes = []
-    filterset_fields = ["created_by", "is_published", "timestamp", "type", "community", "is_pinned"]
+    filterset_fields = [
+        "created_by",
+        "is_published",
+        "timestamp",
+        "type",
+        "community",
+        "is_pinned",
+    ]
     search_fields = ["title", "content"]
 
     def get_serializer_context(self):
@@ -70,9 +77,7 @@ class RetrieveUpdatePublicationView(APIView):
         publication = get_object_or_404(Publication, pk=pk)
         context = {"user": request.user, "depth": 2}
         return Response(
-            PublicationSerializer(
-                publication, context=context
-            ).data,
+            PublicationSerializer(publication, context=context).data,
             status=status.HTTP_200_OK,
         )
 
@@ -101,7 +106,7 @@ class RetrieveUpdatePublicationView(APIView):
 
 class PublishPublicationView(APIView):
     authentication_classes = [TokenAuthentication]
-    permission_classes = [IsOwner|IsCommunityAdministrator]
+    permission_classes = [IsOwner | IsCommunityAdministrator]
 
     def post(self, request, pk):
         publication = get_object_or_404(Publication, pk=pk)
@@ -141,6 +146,7 @@ class PublishPublicationView(APIView):
         publication.published_at = None
         publication.save()
         return Response(status=status.HTTP_201_CREATED)
+
 
 class AddPublicationImageView(APIView):
     authentication_classes = [TokenAuthentication]
@@ -440,7 +446,7 @@ class RemoveMyShareForPublication(APIView):
 
 class PublicationPinView(APIView):
     authentication_classes = [TokenAuthentication]
-    permission_classes = [IsOwner|IsCommunityAdministrator]
+    permission_classes = [IsOwner | IsCommunityAdministrator]
 
     def patch(self, request, pk=None):
         publication = get_object_or_404(Publication, pk=pk)

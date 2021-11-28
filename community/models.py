@@ -289,9 +289,7 @@ class CommunityTheme(models.Model):
 class BlockCommunity(models.Model):
     reason = models.TextField()
     community = models.ForeignKey(
-        "Community", related_name="blocked_by",
-        on_delete=models.CASCADE,
-        editable=False
+        "Community", related_name="blocked_by", on_delete=models.CASCADE, editable=False
     )
     created_by = models.ForeignKey(
         get_user_model(),

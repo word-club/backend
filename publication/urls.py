@@ -25,13 +25,12 @@ from publication.views import (
     AddPublicationLinkView,
     GetTwitterEmbed,
     ShareAPublicationView,
-    RemoveMyShareForPublication, PublicationPinView,
+    RemoveMyShareForPublication,
+    PublicationPinView,
 )
 
 router = DefaultRouter()
-router.register(
-    r"s/publication", PublicationListView, basename="publication-list"
-)
+router.register(r"s/publication", PublicationListView, basename="publication-list")
 
 urlpatterns = router.urls
 
@@ -59,5 +58,5 @@ urlpatterns += [
     path("publication/<int:pk>/share/", ShareAPublicationView.as_view()),
     path("publication-share/<int:pk>/", RemoveMyShareForPublication.as_view()),
     path("publication/<int:pk>/pin/", PublicationPinView.as_view()),
-    path("publication/filter/", PublicationFilter.as_view())
+    path("publication/filter/", PublicationFilter.as_view()),
 ]

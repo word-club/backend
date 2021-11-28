@@ -32,8 +32,7 @@ class FollowAUserView(APIView):
         to_follow = get_object_or_404(get_user_model(), pk=pk)
         follow = FollowUser.objects.create(user=to_follow, created_by=request.user)
         return Response(
-            FollowUserSerializer(follow).data,
-            status=status.HTTP_201_CREATED
+            FollowUserSerializer(follow).data, status=status.HTTP_201_CREATED
         )
 
 

@@ -193,6 +193,7 @@ class PublicationFormSerializer(serializers.ModelSerializer):
                 )
         return super().update(instance, validated_data)
 
+
 def get_publication_reactions(publication):
     up_votes = PublicationUpVote.objects.filter(publication=publication).count()
     down_votes = PublicationDownVote.objects.filter(publication=publication).count()

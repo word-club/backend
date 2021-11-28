@@ -49,7 +49,7 @@ class AddPublicationComment(APIView):
 
 class UpdateDestroyCommentView(APIView):
     authentication_classes = [TokenAuthentication]
-    permission_classes = [IsOwner|IsPublicationAuthor]
+    permission_classes = [IsOwner | IsPublicationAuthor]
 
     def patch(self, request, pk):
         comment = get_object_or_404(Comment, pk=pk)
