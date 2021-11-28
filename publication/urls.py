@@ -1,8 +1,9 @@
 from django.urls import path
 from rest_framework.routers import DefaultRouter
 
+from publication.filter import PublicationFilter
 from publication.views import (
-    PublicationListRetrieveView,
+    PublicationListView,
     AddPublicationImageView,
     RemovePublicationImageView,
     AddPublicationImageUrlView,
@@ -18,7 +19,7 @@ from publication.views import (
     ReportAPublicationView,
     RemovePublicationReportView,
     AddPublicationView,
-    UpdatePublicationView,
+    RetrieveUpdatePublicationView,
     PublishPublicationView,
     EditOrRemovePublicationLink,
     AddPublicationLinkView,
@@ -29,14 +30,14 @@ from publication.views import (
 
 router = DefaultRouter()
 router.register(
-    r"s/publication", PublicationListRetrieveView, basename="publication-list-retrieve"
+    r"s/publication", PublicationListView, basename="publication-list"
 )
 
 urlpatterns = router.urls
 
 urlpatterns += [
     path("publication/", AddPublicationView.as_view()),
-    path("publication/<int:pk>/", UpdatePublicationView.as_view()),
+    path("publication/<int:pk>/", RetrieveUpdatePublicationView.as_view()),
     path("publication/<int:pk>/publish/", PublishPublicationView.as_view()),
     path("publication/<int:pk>/image/", AddPublicationImageView.as_view()),
     path("publication-image/<int:pk>/", RemovePublicationImageView.as_view()),
@@ -57,5 +58,6 @@ urlpatterns += [
     path("get-twitter-embed/", GetTwitterEmbed.as_view()),
     path("publication/<int:pk>/share/", ShareAPublicationView.as_view()),
     path("publication-share/<int:pk>/", RemoveMyShareForPublication.as_view()),
-    path("publication/<int:pk>/pin/", PublicationPinView.as_view())
+    path("publication/<int:pk>/pin/", PublicationPinView.as_view()),
+    path("publication/filter/", PublicationFilter.as_view())
 ]

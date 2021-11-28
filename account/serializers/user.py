@@ -2,7 +2,6 @@ from django.contrib.auth.password_validation import validate_password
 from rest_framework import serializers
 
 from account.models import *
-from account.serializers.follow import FollowUserSerializer
 from comment.models import (
     CommentUpVote,
     CommentDownVote,
@@ -111,7 +110,7 @@ class ProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Profile
-        fields = "__all__"
+        exclude = ["user"]
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -273,7 +272,7 @@ class UserInfoSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def get_followers(obj):
-        followers = FollowUser.objects.filter(to_follow=obj)
+        followers = FollowUser.objects.filter(user=obj)
         users = []
         [users.append(item.user) for item in followers]
         return UserGlobalSerializer(

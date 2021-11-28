@@ -1,11 +1,31 @@
 import datetime
 import os
 import requests
-
+from django.utils import timezone
 from django.utils.timezone import utc
 from rest_framework import serializers
 
 from backend.settings import ALLOWED_IMAGES_EXTENSIONS, MAX_UPLOAD_IMAGE_SIZE
+
+
+now = timezone.now()
+
+today_first_clock = timezone.now() \
+    .replace(hour=0, minute=0, second=0, microsecond=0)
+
+before_three_days = timezone.now() \
+    .replace(day=now.day-3,hour=0, minute=0, second=0, microsecond=0)
+
+first_day_of_week = \
+    datetime.datetime.today() - \
+    datetime.timedelta(days=datetime.datetime.today().isoweekday() % 7)
+
+first_day_of_week = now.replace(
+    year=first_day_of_week.year,
+    month=first_day_of_week.month,
+    day=first_day_of_week.day,
+    hour=0, minute=0, second=0, microsecond=0
+)
 
 
 def generate_url_for_media_resource(media_url):
@@ -79,3 +99,106 @@ def is_recent_report_present(reports):
 def get_twitter_embed_data(source):
     response = requests.get("https://publish.twitter.com/oembed?url={}".format(source))
     return response.json()
+
+
+def validate_date_string(value, upto_month=False, year_only=False, to=False):
+    if not year_only:
+        if '/' in value: value = value.split('/')
+        elif '-' in value: value = value.split('-')
+        else: return False, "Please use / or - as the separators."
+        if upto_month:
+            if len(value) != 2: return False, "Please use year then month order for date string in format YYYY-MM. Ex: 2020-02"
+            value = now.replace(year=int(value[0]), month=int(value[1]), day=1, hour=0, minute=0, second=0,
+                microsecond=0)
+        else:
+            if len(value) != 3: return False, "Please user year, month and month order for date string in format YYYY-MM-DD. Ex: 2020-02-20"
+            if not to:
+                value = now.replace(year=int(value[0]), month=int(value[1]), day=int(value[2]), hour=0, minute=0, second=0,
+                    microsecond=0)
+            else:
+                value = now.replace(year=int(value[0]), month=int(value[1]), day=int(value[2]), hour=23, minute=59,
+                    second=59,
+                    microsecond=999999)
+    else:
+        import re
+        regexp = re.compile(r'^\d{4}$')
+        if not regexp.search(value): return False, "Please use 4 digit year string in format YYYY. Ex: 2020"
+        else: value = now.replace(year=int(value), month=1, day=1, hour=0, minute=0, second=0, microsecond=0)
+
+    if value > now: return False, "Please use past dates only for filtration."
+    return value, None
+
+
+def check_sort_by_query(sort_by):
+    if not sort_by: return "support"
+    else:
+        if sort_by in ["support", "popularity", "discussions", "unix"]:
+            return "support"
+        return sort_by
+
+
+def check_bool_query(value):
+    return bool(int(value)) if value else False
+
+
+def fetch_query(request):
+    publication = request.query_params.get("publication") # expects pk
+    all_time = check_bool_query(request.query_params.get("all_time"))  # expects 0|1
+    today = check_bool_query(request.query_params.get("today"))  # expects 0|1
+    this_week = check_bool_query(request.query_params.get("this_week"))  # expects 0|1
+
+    from_query = request.query_params.get("from") # expects date string
+    to_query = request.query_params.get("to") # expects date string
+    year = request.query_params.get("year") # expects year
+    month = request.query_params.get("month") # expects month number
+    day = request.query_params.get("day") # expects day number
+
+    search = request.query_params.get("search") # expects plain string
+
+    return {
+        "publication": publication,
+        "all_time": all_time,
+        "today": today,
+        "this_week": this_week,
+        "from_query": from_query,
+        "to_query": to_query,
+        "year": year,
+        "month": month,
+        "day": day,
+        "search": search if search else False
+    }
+
+
+def get_filter_range(params):
+    from_query = params["from_query"]
+    to_query = params["to_query"]
+    year = params["year"]
+    month = params["month"]
+    day = params["day"]
+    today = params["today"]
+    this_week = params["this_week"]
+
+
+    if from_query and to_query:
+        from_date, err = validate_date_string(from_query)
+        if err: return None, err
+        to_date, err = validate_date_string(to_query, to=True)
+        if err: return None, err
+        timestamp_range = [from_date, to_date]
+
+    elif year and month and day:
+        date, err = validate_date_string("{}/{}/{}".format(year, month, day))
+        if err: return None, err
+        timestamp_range = [date, now]
+    elif year and month:
+        date, err = validate_date_string("{}/{}".format(year, month), upto_month=True)
+        if err: return None, err
+        timestamp_range = [date, now]
+    elif year:
+        date, err = validate_date_string("{}".format(year), year_only=True)
+        if err: return None, err
+        timestamp_range = [date, now]
+    elif today: timestamp_range = [today_first_clock, now]
+    elif this_week: timestamp_range = [first_day_of_week, now]
+    else: timestamp_range = [before_three_days, now]
+    return timestamp_range, None

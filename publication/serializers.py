@@ -132,7 +132,8 @@ class PublicationBookmarkSerializer(serializers.ModelSerializer):
 class PublicationHashtags(serializers.ModelSerializer):
     hashtag = serializers.SerializerMethodField()
 
-    def get_hashtag(self, obj):
+    @staticmethod
+    def get_hashtag(obj):
         return {"id": obj.hashtag.id, "tag": obj.hashtag.tag}
 
     class Meta:
@@ -192,11 +193,25 @@ class PublicationFormSerializer(serializers.ModelSerializer):
                 )
         return super().update(instance, validated_data)
 
+def get_publication_reactions(publication):
+    up_votes = PublicationUpVote.objects.filter(publication=publication).count()
+    down_votes = PublicationDownVote.objects.filter(publication=publication).count()
+    shares = PublicationShare.objects.filter(publication=publication).count()
+    comments = Comment.objects.filter(publication=publication).count()
+    total = up_votes + down_votes + shares + comments
+
+    return {
+        "up_votes": up_votes,
+        "down_votes": down_votes,
+        "shares": shares,
+        "comments": comments,
+        "total": total,
+    }
+
 
 class PublicationSerializer(serializers.ModelSerializer):
     community = CommunityGlobalSerializer()
     hashtags = PublicationHashtags(many=True, read_only=True)
-    reactions = serializers.SerializerMethodField()
     up_vote = serializers.SerializerMethodField()
     down_vote = serializers.SerializerMethodField()
     share_status = serializers.SerializerMethodField()
@@ -207,22 +222,6 @@ class PublicationSerializer(serializers.ModelSerializer):
     images = PublicationImageSerializer(read_only=True, many=True)
     image_urls = PublicationImageUrlSerializer(read_only=True, many=True)
     created_by = UserGlobalSerializer(read_only=True)
-
-    @staticmethod
-    def get_reactions(obj):
-        up_votes = PublicationUpVote.objects.filter(publication=obj).count()
-        down_votes = PublicationDownVote.objects.filter(publication=obj).count()
-        shares = PublicationShare.objects.filter(publication=obj).count()
-        comments = Comment.objects.filter(publication=obj).count()
-        total = up_votes + down_votes + shares + comments
-
-        return {
-            "up_votes": up_votes,
-            "down_votes": down_votes,
-            "shares": shares,
-            "comments": comments,
-            "total": total,
-        }
 
     def get_up_vote(self, obj):
         user = self.context["user"]

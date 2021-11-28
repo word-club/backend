@@ -58,16 +58,16 @@ class ReplyPostSerializer(serializers.ModelSerializer):
 
 
 class ReplySerializer(serializers.ModelSerializer):
-    reactions = serializers.SerializerMethodField()
+    # reactions = serializers.SerializerMethodField()
     up_vote = serializers.SerializerMethodField()
     down_vote = serializers.SerializerMethodField()
     share_status = serializers.SerializerMethodField()
     hidden_status = serializers.SerializerMethodField()
     bookmark_status = serializers.SerializerMethodField()
 
-    @staticmethod
-    def get_reactions(obj):
-        return get_comment_reactions(obj)
+    # @staticmethod
+    # def get_reactions(obj):
+    #     return get_comment_reactions(obj)
 
     def get_up_vote(self, obj):
         user = self.context["user"]

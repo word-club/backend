@@ -1,5 +1,6 @@
 from django.urls import path
 
+from comment.filter import CommentFilter
 from comment.views import (
     AddPublicationComment,
     UpdateDestroyCommentView,
@@ -51,4 +52,5 @@ urlpatterns += [
     path("comment-share/<str:pk>/", RemoveCommentShare.as_view()),
     path("comment/<str:pk>/reply/", ReplyCommentView.as_view()),
     path("comment/<str:pk>/pin/", CommentPinView.as_view()),
+    path("comment-filter/", CommentFilter.as_view())
 ]
