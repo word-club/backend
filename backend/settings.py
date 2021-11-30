@@ -45,7 +45,7 @@ INTERNAL_APPS = [
 ]
 
 EXTERNAL_APPS = [
-    "channels",
+    # "channels",
     "rest_framework",
     "rest_framework.authtoken",
     "phonenumber_field",
@@ -210,7 +210,7 @@ MAX_UPLOAD_IMAGE_SIZE = 70000
 
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 
-ASGI_APPLICATION = "backend.asgi.application"
+# ASGI_APPLICATION = "backend.asgi.application"
 
 # Channels Configuration
 # https://channels.readthedocs.io/en/stable/
