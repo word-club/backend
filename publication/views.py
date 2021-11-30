@@ -29,36 +29,10 @@ class PublicationListView(mixins.ListModelMixin, viewsets.GenericViewSet):
     ]
 
     def get_queryset(self):
-        pt = Administration.objects.first().popularity_threshold
-        sort_by = self.request.query_params.get("sort_by")
-        asc = self.request.query_params.get("asc")
-        asc = helper.check_bool_query(asc)
-        filterset = OrderedDict()
-        for item in self.filterset_fields:
-            value = self.request.query_params.get(item)
-            if value:
-                if value == "true": value = True
-                if value == "false": value = False
-                if item in ["community", "created_by"]: value = int(value)
-                filterset[item] = value
-        sort_string = "-published_at"
-        if sort_by in ['popularity', 'supports', 'discussions']:
-            # only view items with reactions more than administration limit
-            filterset["{}__gte".format(sort_by)] = 1 # TODO: replace with pt here
-            sort_string = "{}{}".format(
-                "-" if not asc else '',
-                sort_by
-            )
-        # for fresh item sort, only show items with popularity less than administration limit
-        if sort_by in ["published_at"]:
-            filterset["popularity__lt"] = 1 # TODO: replace with pt here
-
-        search = self.request.query_params.get("search")
-        search_by = self.request.query_params.get("search_by")
-        if search and search_by:
-            filterset["{}__contains".format(search_by)] = search
-        return Publication.objects.filter(**filterset)\
-            .order_by(sort_string)
+        filterset, sort_string = helper.get_viewset_filterset(
+            self.request, self.filterset_fields, "published_at"
+        )
+        return Publication.objects.filter(**filterset).order_by(sort_string)
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
@@ -107,6 +81,9 @@ class RetrieveUpdatePublicationView(APIView):
     @staticmethod
     def get(request, pk):
         publication = get_object_or_404(Publication, pk=pk)
+        if request.user != publication.created_by:
+            publication.views += 1
+            publication.save()
         context = {"user": request.user, "depth": 2}
         return Response(
             PublicationSerializer(publication, context=context).data,
@@ -127,7 +104,10 @@ class RetrieveUpdatePublicationView(APIView):
                 if do_break:
                     return Response(detail, status=status.HTTP_403_FORBIDDEN)
             publication = serializer.save()
-            return Response(PublicationSerializer(publication, context=context).data, status=status.HTTP_200_OK)
+            return Response(
+                PublicationSerializer(publication, context=context).data,
+                status=status.HTTP_200_OK,
+            )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, pk):
@@ -498,3 +478,17 @@ class PublicationPinView(APIView):
             publication.save()
             return Response(status=status.HTTP_201_CREATED)
         return Response(status=status.HTTP_200_OK)
+
+
+class ViewAPublication(APIView):
+    authentication_classes = []
+    permission_classes = []
+
+    @staticmethod
+    def post(request, pk=None):
+        publication = get_object_or_404(Publication, pk=pk)
+        publication.views += 1
+        publication.save()
+        context = {"user": request.user}
+        serializer = PublicationSerializer(publication, read_only=True, context=context)
+        return Response(serializer.data, status=status.HTTP_200_OK)

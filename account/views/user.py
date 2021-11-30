@@ -1,10 +1,11 @@
-from rest_framework import status, viewsets
+from rest_framework import status, viewsets, mixins
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+import helper
 from account.permissions import IsOwner
 from account.serializers.user import *
 
@@ -21,6 +22,18 @@ class UserViewSet(viewsets.ModelViewSet):
             return UserRetrieveSerializer
         elif self.action in ["create", "update", "partial_update"]:
             return UserPostSerializer
+
+
+class ProfileListView(mixins.ListModelMixin, viewsets.GenericViewSet):
+    filterset_fields = []
+    search_fields = ["first_name", "last_name", "username"]
+    serializer_class = UserSerializer
+
+    def get_queryset(self):
+        filterset, sort_string = helper.get_viewset_filterset(
+            self.request, self.filterset_fields, "created_at"
+        )
+        return Profile.objects.filter(**filterset).order_by(sort_string)
 
 
 class GetMeView(APIView):

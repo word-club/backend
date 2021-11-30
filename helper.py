@@ -1,10 +1,14 @@
 import datetime
 import os
+import uuid
+from collections import OrderedDict
+
 import requests
 from django.utils import timezone
 from django.utils.timezone import utc
 from rest_framework import serializers
 
+from administration.models import Administration
 from backend.settings import ALLOWED_IMAGES_EXTENSIONS, MAX_UPLOAD_IMAGE_SIZE
 
 
@@ -259,3 +263,38 @@ def get_filter_range(params):
     else:
         timestamp_range = [before_three_days, now]
     return timestamp_range, None
+
+
+def get_viewset_filterset(request, filterset_fields, default_field):
+    pt = Administration.objects.first().popularity_threshold
+    sort_by = request.query_params.get("sort_by")
+    asc = request.query_params.get("asc")
+    asc = check_bool_query(asc)
+    filterset = OrderedDict()
+    for item in filterset_fields:
+        value = request.query_params.get(item)
+        if value:
+            if value == "true":
+                value = True
+            if value == "false":
+                value = False
+            if item in ["publication", "created_by", "community"]:
+                value = int(value)
+            if item in ["reply"]:
+                value = uuid.UUID(value)
+            filterset[item] = value
+    sort_string = "-{}".format(default_field)
+    if sort_by in ["popularity", "supports", "discussions", "views"]:
+        # only view items with reactions more than administration limit
+        filterset["{}__gte".format(sort_by)] = 1  # TODO: replace with pt here
+        sort_string = "{}{}".format("-" if not asc else "", sort_by)
+    # for fresh item sort, only show items with popularity less than administration limit
+    if sort_by in ["{}".format(default_field)]:
+        filterset["popularity__lt"] = 1  # TODO: replace with pt here
+
+    search = request.query_params.get("search")
+    search_by = request.query_params.get("search_by")
+    if search and search_by:
+        filterset["{}__contains".format(search_by)] = search
+
+    return filterset, sort_string

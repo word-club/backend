@@ -22,7 +22,6 @@ def upload_cover_image_to(instance, filename):
 
 
 class Profile(models.Model):
-
     user = models.OneToOneField(
         get_user_model(), on_delete=models.CASCADE, editable=False
     )
@@ -39,7 +38,13 @@ class Profile(models.Model):
     content_visibility = models.BooleanField(default=True)
     communities_visibility = models.BooleanField(default=True)
 
+    created_at = models.DateTimeField(auto_now_add=True)
     timestamp = models.DateTimeField(auto_now=True)
+
+    popularity = models.PositiveIntegerField(default=0, editable=False)
+    dislikes = models.PositiveIntegerField(default=0, editable=False)
+    discussions = models.PositiveIntegerField(default=0, editable=False)
+    supports = models.PositiveBigIntegerField(default=0, editable=False)
 
     class Meta:
         ordering = ["-timestamp"]

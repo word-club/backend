@@ -60,6 +60,15 @@ class Community(models.Model):
     quote = models.TextField(null=True)
     welcome_text = models.TextField(null=True)
 
+    popularity = models.PositiveIntegerField(default=0, editable=False)
+    dislikes = models.PositiveIntegerField(default=0, editable=False)
+    discussions = models.PositiveIntegerField(default=0, editable=False)
+    supports = models.PositiveBigIntegerField(default=0, editable=False)
+
+    views = models.PositiveBigIntegerField(default=0, editable=False)
+
+    view_globally = models.BooleanField(default=True)
+
     class Meta:
         ordering = ["-timestamp"]
 

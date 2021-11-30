@@ -168,7 +168,8 @@ class CommunityRetrieveSerializer(serializers.ModelSerializer):
     subscriptions = serializers.SerializerMethodField()
     admins = CommunityAdminSerializer(many=True, read_only=True)
     sub_admins = CommunitySubAdminSerializer(many=True, read_only=True)
-    my_status = serializers.SerializerMethodField()
+    subscription = serializers.SerializerMethodField()
+    is_blocked = serializers.SerializerMethodField()
 
     def get_subscriptions(self, obj):
         subscribers = CommunitySubscription.objects.filter(community=obj)
@@ -180,18 +181,25 @@ class CommunityRetrieveSerializer(serializers.ModelSerializer):
             "notification_disables": notification_disables.count(),
         }
 
-    def get_my_status(self, obj):
+    def get_subscription(self, obj):
         user = self.context["user"]
         if type(user) == get_user_model():
             try:
                 subscription = CommunitySubscription.objects.get(
                     subscriber=user, community=obj
                 )
-            except CommunitySubscription.DoesNotExist:
-                subscription = None
-            if subscription:
                 return CommunitySubscriptionSerializer(subscription).data
-            return False
+            except CommunitySubscription.DoesNotExist:
+                return False
+
+    def get_is_blocked(self, obj):
+        user = self.context["user"]
+        if type(user) == get_user_model():
+            try:
+                block = BlockCommunity.objects.get(created_by=user, community=obj)
+                return CommunityBlockSerializer(block).data
+            except BlockCommunity.DoesNotExist:
+                return False
 
     class Meta:
         model = Community

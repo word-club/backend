@@ -2,6 +2,7 @@ from django.contrib.auth.password_validation import validate_password
 from rest_framework import serializers
 
 from account.models import *
+from account.serializers.follow import FollowUserSerializer
 from comment.models import (
     CommentUpVote,
     CommentDownVote,
@@ -121,8 +122,34 @@ class UserSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
+class BlockUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BlockUser
+        fields = "__all__"
+
+
 class UserRetrieveSerializer(serializers.ModelSerializer):
     profile = ProfileSerializer(read_only=True)
+    is_followed = serializers.SerializerMethodField()
+    is_blocked = serializers.SerializerMethodField()
+
+    def get_is_followed(self, obj):
+        user = self.context["user"]
+        if type(user) == get_user_model():
+            try:
+                follow = FollowUser.objects.get(created_by=user, user=obj)
+                return FollowUserSerializer(follow).data
+            except FollowUser.DoesNotExist:
+                return False
+
+    def get_is_blocked(self, obj):
+        user = self.context["user"]
+        if type(user) == get_user_model():
+            try:
+                block = BlockUser.objects.get(created_by=user, user=obj)
+                return BlockUserSerializer(block).data
+            except BlockUser.DoesNotExist:
+                return False
 
     class Meta:
         model = get_user_model()

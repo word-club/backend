@@ -1,3 +1,6 @@
+from collections import OrderedDict
+from django.db.models import Q
+
 from django.conf import settings
 from django.db.utils import IntegrityError
 from django.contrib.sites.shortcuts import get_current_site
@@ -10,6 +13,7 @@ from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+import helper
 from account.permissions import IsOwner
 from community.permissions import (
     IsCommunityAdministrator,
@@ -26,7 +30,6 @@ class CommunityViewSet(
     viewsets.GenericViewSet,
 ):
     authentication_classes = [TokenAuthentication]
-    queryset = Community.objects.all()
     serializer_class = CommunitySerializer
     search_fields = ["name"]
     filterset_fields = [
@@ -35,6 +38,15 @@ class CommunityViewSet(
         "contains_adult_content",
         "completed_registration_steps",
     ]
+
+    def get_queryset(self):
+        filterset, sort_string = helper.get_viewset_filterset(
+            self.request, self.filterset_fields, "date_of_registration"
+        )
+        return Community.objects.filter(
+            ~Q(type__exact="private"),
+            **filterset,
+        ).order_by(sort_string)
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
@@ -53,7 +65,7 @@ class CommunityViewSet(
             return []
 
 
-class PatchDeleteCommunity(APIView):
+class CommunityDetail(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsCommunityAdministrator]
 
@@ -570,4 +582,17 @@ class TopCommunitiesList(APIView):
     def get(self, request):
         communities = []
         serializer = CommunitySerializer(communities, many=True, read_only=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class ViewACommunity(APIView):
+    authentication_classes = []
+    permission_classes = []
+
+    @staticmethod
+    def post(request, pk=None):
+        community = get_object_or_404(Community, pk=pk)
+        community.views += 1
+        community.save()
+        serializer = CommunityRetrieveSerializer(community, read_only=True)
         return Response(serializer.data, status=status.HTTP_200_OK)

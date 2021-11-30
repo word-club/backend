@@ -21,37 +21,10 @@ class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
 
     def get_queryset(self):
-        pt = Administration.objects.first().popularity_threshold
-        sort_by = self.request.query_params.get("sort_by")
-        asc = self.request.query_params.get("asc")
-        asc = helper.check_bool_query(asc)
-        filterset = OrderedDict()
-
-        search = self.request.query_params.get("search")
-        if search:
-            filterset["comment__contains"] = search
-
-        for item in self.filterset_fields:
-            value = self.request.query_params.get(item)
-            if value:
-                if value == "true": value = True
-                if value == "false": value = False
-                if item in ["publication", "created_by"]: value = int(value)
-                if item in ["reply"]: value = uuid.UUID(value)
-                filterset[item] = value
-        sort_string = "-created_at"
-        if sort_by in ['popularity', 'supports', 'discussions']:
-            # only view items with reactions more than administration limit
-            filterset["{}__gte".format(sort_by)] = 1  # TODO: replace with pt here
-            sort_string = "{}{}".format(
-                "-" if not asc else '',
-                sort_by
-            )
-        # for fresh item sort, only show items with popularity less than administration limit
-        if sort_by in ["created_at"]:
-            filterset["popularity__lt"] = 1  # TODO: replace with pt here
-        return Comment.objects.filter(**filterset) \
-            .order_by(sort_string)
+        filterset, sort_string = helper.get_viewset_filterset(
+            self.request, self.filterset_fields, "created_at"
+        )
+        return Comment.objects.filter(**filterset).order_by(sort_string)
 
     def get_serializer_context(self):
         context = super().get_serializer_context()

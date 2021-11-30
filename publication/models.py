@@ -30,7 +30,7 @@ class Publication(models.Model):
 
     is_pinned = models.BooleanField(default=False, editable=False)
 
-    view_count = models.PositiveBigIntegerField(default=0, editable=False)
+    views = models.PositiveBigIntegerField(default=0, editable=False)
 
     created_at = models.DateTimeField(auto_now_add=True)
     timestamp = models.DateTimeField(auto_now=True)

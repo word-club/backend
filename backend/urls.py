@@ -8,6 +8,8 @@ from django.http import HttpResponse
 from django.urls import path, include
 from django.views.static import serve
 
+from backend.views import TopView
+
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api-auth/", include("rest_framework.urls")),
@@ -18,6 +20,7 @@ urlpatterns = [
     path("api/", include("notification.urls")),
     path("api/", include("hashtag.urls")),
     path("api/", include("administration.urls")),
+    path("api/top/", TopView.as_view()),
     url(r"^media/(?P<path>.*)$", serve, {"document_root": settings.MEDIA_ROOT}),
     url(
         r"^robots.txt",

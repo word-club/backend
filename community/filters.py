@@ -30,10 +30,13 @@ class SubscribedCommunityFilter(APIView):
             )
         communities = []
         [communities.append(subscription.community) for subscription in items]
-        return Response({
-            "count": items.count(),
-            "results": CommunitySerializer(communities, many=True).data,
-        },status=status.HTTP_200_OK)
+        return Response(
+            {
+                "count": items.count(),
+                "results": CommunitySerializer(communities, many=True).data,
+            },
+            status=status.HTTP_200_OK,
+        )
 
 
 class CommunitySubscribersFilter(APIView):

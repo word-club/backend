@@ -8,7 +8,8 @@ from community.models import (
     CommunityAvatar,
     CommunityTheme,
     CommunityCover,
-    CommunitySubscription, CommunityHashtag,
+    CommunitySubscription,
+    CommunityHashtag,
 )
 from publication.models import (
     Publication,
@@ -61,14 +62,12 @@ class CommunityGlobalSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def get_subscribers_count(obj):
-        subscribers = CommunitySubscription\
-            .objects.filter(community=obj).count()
+        subscribers = CommunitySubscription.objects.filter(community=obj).count()
         return subscribers
 
     @staticmethod
     def get_hashtags(obj):
-        tags = CommunityHashtag\
-            .objects.filter(community=obj)
+        tags = CommunityHashtag.objects.filter(community=obj)
         dataset = []
         for tag in tags:
             dataset.append({"id": tag.id, "tag": tag.tag.id, "name": tag.tag.tag})

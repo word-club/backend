@@ -20,6 +20,7 @@ from account.views.user import (
     ReportAUser,
     UnBlockAUser,
     GetMeView,
+    ProfileListView,
 )
 
 router = DefaultRouter()
@@ -52,4 +53,5 @@ urlpatterns += [
     path("user/<int:pk>/block/", BlockAUser.as_view()),
     path("block/<int:pk>/", UnBlockAUser.as_view()),
     path("report/<int:pk>/", DeleteReport.as_view()),
+    path("profile/filter/", ProfileListView.as_view({"get": "list"})),
 ]

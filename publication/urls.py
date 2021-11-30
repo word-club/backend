@@ -27,6 +27,7 @@ from publication.views import (
     ShareAPublicationView,
     RemoveMyShareForPublication,
     PublicationPinView,
+    ViewAPublication,
 )
 
 router = DefaultRouter()
@@ -59,4 +60,5 @@ urlpatterns += [
     path("publication-share/<int:pk>/", RemoveMyShareForPublication.as_view()),
     path("publication/<int:pk>/pin/", PublicationPinView.as_view()),
     path("publication/filter/", PublicationFilter.as_view()),
+    path("publication/<int:pk>/view/", ViewAPublication.as_view()),
 ]

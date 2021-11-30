@@ -11,7 +11,7 @@ urlpatterns = router.urls
 app_name = "community"
 
 urlpatterns += [
-    path("community/<int:pk>/", PatchDeleteCommunity.as_view()),
+    path("community/<int:pk>/", CommunityDetail.as_view()),
     path("community/<int:pk>/report/", ReportACommunity.as_view()),
     path("community/<int:pk>/subscribe/", SubscribeToACommunity.as_view()),
     path(
@@ -97,4 +97,5 @@ urlpatterns += [
     path("community/<int:pk>/block/", BlockACommunity.as_view()),
     path("community-block/<int:pk>/", UnBlockACommunity.as_view()),
     path("top-communities/", TopCommunitiesList.as_view()),
+    path("community/<int:pk>/view/", ViewACommunity.as_view()),
 ]
