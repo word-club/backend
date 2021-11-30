@@ -1,3 +1,6 @@
+import uuid
+from collections import OrderedDict
+
 from rest_framework import status, viewsets
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.generics import get_object_or_404
@@ -15,11 +18,40 @@ class CommentViewSet(viewsets.ModelViewSet):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAdminUser]
     filterset_fields = ["publication", "reply", "is_pinned", "created_by"]
-    search_fields = ["comment"]
     serializer_class = CommentSerializer
 
     def get_queryset(self):
-        return Comment.objects.filter(reply=None)
+        pt = Administration.objects.first().popularity_threshold
+        sort_by = self.request.query_params.get("sort_by")
+        asc = self.request.query_params.get("asc")
+        asc = helper.check_bool_query(asc)
+        filterset = OrderedDict()
+
+        search = self.request.query_params.get("search")
+        if search:
+            filterset["comment__contains"] = search
+
+        for item in self.filterset_fields:
+            value = self.request.query_params.get(item)
+            if value:
+                if value == "true": value = True
+                if value == "false": value = False
+                if item in ["publication", "created_by"]: value = int(value)
+                if item in ["reply"]: value = uuid.UUID(value)
+                filterset[item] = value
+        sort_string = "-created_at"
+        if sort_by in ['popularity', 'supports', 'discussions']:
+            # only view items with reactions more than administration limit
+            filterset["{}__gte".format(sort_by)] = 1  # TODO: replace with pt here
+            sort_string = "{}{}".format(
+                "-" if not asc else '',
+                sort_by
+            )
+        # for fresh item sort, only show items with popularity less than administration limit
+        if sort_by in ["created_at"]:
+            filterset["popularity__lt"] = 1  # TODO: replace with pt here
+        return Comment.objects.filter(**filterset) \
+            .order_by(sort_string)
 
     def get_serializer_context(self):
         context = super().get_serializer_context()

@@ -58,16 +58,12 @@ class ReplyPostSerializer(serializers.ModelSerializer):
 
 
 class ReplySerializer(serializers.ModelSerializer):
-    # reactions = serializers.SerializerMethodField()
     up_vote = serializers.SerializerMethodField()
     down_vote = serializers.SerializerMethodField()
     share_status = serializers.SerializerMethodField()
     hidden_status = serializers.SerializerMethodField()
     bookmark_status = serializers.SerializerMethodField()
-
-    # @staticmethod
-    # def get_reactions(obj):
-    #     return get_comment_reactions(obj)
+    created_by = UserGlobalSerializer()
 
     def get_up_vote(self, obj):
         user = self.context["user"]
@@ -96,13 +92,8 @@ class ReplySerializer(serializers.ModelSerializer):
 
 class CommentForProfileSerializer(serializers.ModelSerializer):
     publication = PublicationForUserCommentSerializer()
-    reactions = serializers.SerializerMethodField()
     images = CommentImageSerializer(many=True, read_only=True)
     image_urls = CommentImageUrlSerializer(many=True, read_only=True)
-
-    @staticmethod
-    def get_reactions(obj):
-        return get_comment_reactions(obj)
 
     class Meta:
         model = Comment
@@ -115,7 +106,6 @@ class CommentSerializer(serializers.ModelSerializer):
     image_urls = CommentImageUrlSerializer(many=True, read_only=True)
     created_by = UserGlobalSerializer(read_only=True)
 
-    reactions = serializers.SerializerMethodField()
     up_vote = serializers.SerializerMethodField()
     down_vote = serializers.SerializerMethodField()
     share_status = serializers.SerializerMethodField()
@@ -127,10 +117,6 @@ class CommentSerializer(serializers.ModelSerializer):
         return ReplySerializer(
             replies, many=True, context={"user": self.context["user"]}
         ).data
-
-    @staticmethod
-    def get_reactions(obj):
-        return get_comment_reactions(obj)
 
     def get_up_vote(self, obj):
         user = self.context["user"]

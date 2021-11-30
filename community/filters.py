@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.generics import get_object_or_404
 from community.models import CommunitySubscription, Community
-from community.serializer import SubscribeCommunitySerializer
+from community.serializer import CommunitySerializer
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 
@@ -28,13 +28,12 @@ class SubscribedCommunityFilter(APIView):
             items = CommunitySubscription.objects.filter(
                 is_approved=True, is_banned=False, subscriber=request.user
             )
-        return Response(
-            {
-                "count": items.count(),
-                "results": SubscribeCommunitySerializer(items, many=True).data,
-            },
-            status=status.HTTP_200_OK,
-        )
+        communities = []
+        [communities.append(subscription.community) for subscription in items]
+        return Response({
+            "count": items.count(),
+            "results": CommunitySerializer(communities, many=True).data,
+        },status=status.HTTP_200_OK)
 
 
 class CommunitySubscribersFilter(APIView):

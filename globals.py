@@ -8,7 +8,7 @@ from community.models import (
     CommunityAvatar,
     CommunityTheme,
     CommunityCover,
-    CommunitySubscription,
+    CommunitySubscription, CommunityHashtag,
 )
 from publication.models import (
     Publication,
@@ -19,11 +19,12 @@ from publication.models import (
 
 
 class CommunityGlobalSerializer(serializers.ModelSerializer):
+    hashtags = serializers.SerializerMethodField()
     avatar = serializers.SerializerMethodField(allow_null=True)
     cover = serializers.SerializerMethodField(allow_null=True)
     theme = serializers.SerializerMethodField()
-    reactions = serializers.SerializerMethodField()
-    subscribers = serializers.SerializerMethodField()
+    rating = serializers.SerializerMethodField()
+    subscribers_count = serializers.SerializerMethodField()
 
     @staticmethod
     def get_avatar(obj):
@@ -53,13 +54,25 @@ class CommunityGlobalSerializer(serializers.ModelSerializer):
         except CommunityTheme.DoesNotExist:
             return "primary"
 
-    def get_reactions(self, obj):
-        publications = Publication.objects.filter(community=obj).count()
-        return publications
+    @staticmethod
+    def get_rating(obj):
+        # TODO: implement community rating
+        return 0
 
-    def get_subscribers(self, obj):
-        subscribers = CommunitySubscription.objects.filter(community=obj).count()
+    @staticmethod
+    def get_subscribers_count(obj):
+        subscribers = CommunitySubscription\
+            .objects.filter(community=obj).count()
         return subscribers
+
+    @staticmethod
+    def get_hashtags(obj):
+        tags = CommunityHashtag\
+            .objects.filter(community=obj)
+        dataset = []
+        for tag in tags:
+            dataset.append({"id": tag.id, "tag": tag.tag.id, "name": tag.tag.tag})
+        return dataset
 
     class Meta:
         model = Community
@@ -72,8 +85,9 @@ class CommunityGlobalSerializer(serializers.ModelSerializer):
             "avatar",
             "cover",
             "theme",
-            "reactions",
-            "subscribers",
+            "rating",
+            "hashtags",
+            "subscribers_count",
         ]
 
 

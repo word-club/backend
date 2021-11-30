@@ -67,5 +67,7 @@ fresh-migrations:
 	make migrate
 	make make-migrations APP=notification
 	make migrate
+	make make-migrations APP=administration
+	make migrate
 
 fresh: clean-db-migration fresh-migrations new-admin

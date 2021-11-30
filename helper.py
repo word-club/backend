@@ -185,7 +185,10 @@ def check_sort_by_query(sort_by):
 
 
 def check_bool_query(value):
-    return bool(int(value)) if value else False
+    try:
+        return bool(int(value)) if value else False
+    except ValueError:
+        return False
 
 
 def fetch_query(request):

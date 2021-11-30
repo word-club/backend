@@ -75,7 +75,6 @@ def post_delete_comment(sender, instance, **kwargs):
 @receiver(post_save, sender=CommentUpVote)
 def post_save_up_vote(sender, instance, created, **kwargs):
     add_popularity(instance, created)
-    add_supports(instance, created)
 
 
 @receiver(post_save, sender=CommentDownVote)

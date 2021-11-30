@@ -42,7 +42,6 @@ class Comment(models.Model):
         editable=False,
     )
 
-    reactions = models.PositiveBigIntegerField(default=0, editable=False)
     popularity = models.PositiveBigIntegerField(default=0, editable=False)
     dislikes = models.PositiveBigIntegerField(default=0, editable=False)
     supports = models.PositiveBigIntegerField(default=0, editable=False)
@@ -58,20 +57,21 @@ class Comment(models.Model):
     )
 
     class Meta:
-        ordering = ["-timestamp"]
+        ordering = ["-created_at"]
 
     def save(self, *args, **kwargs):
-        now = timezone.now()
-        diff = now - self.created_at
-        limit = Administration.objects.first()
-        if diff.days > limit.comment_update_limit:
-            raise ValidationError(
-                {
-                    "detail": "Sorry, you cannot update the comment after {} days.".format(
-                        limit.comment_update_limit
-                    )
-                }
-            )
+        if self.created_at:
+            now = timezone.now()
+            diff = now - self.created_at
+            limit = Administration.objects.first()
+            if diff.days > limit.comment_update_limit:
+                raise ValidationError(
+                    {
+                        "detail": "Sorry, you cannot update the comment after {} days.".format(
+                            limit.comment_update_limit
+                        )
+                    }
+                )
         return super().save(*args, **kwargs)
 
 

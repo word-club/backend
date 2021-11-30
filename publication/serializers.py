@@ -166,7 +166,7 @@ class PublicationFormSerializer(serializers.ModelSerializer):
                     tag_not_found.append(
                         {"tag": hashtag.tag, "id": hashtag.id, "detail": "Not allowed."}
                     )
-            raise serializers.ValidationError({"hashtags": tag_not_found})
+                    raise serializers.ValidationError({"hash_tags": tag_not_found})
         return validated_data
 
     def create(self, validated_data):
@@ -174,7 +174,7 @@ class PublicationFormSerializer(serializers.ModelSerializer):
         hashtags = None
         if validated_data.get("hash_tags"):
             hashtags = validated_data.pop("hash_tags")
-        publication = Publication.objects.create(validated_data)
+        publication = Publication.objects.create(**validated_data)
         if hashtags:
             for hashtag in hashtags:
                 PublicationHashtag.objects.create(

@@ -1,3 +1,5 @@
+from collections import OrderedDict
+
 from rest_framework import viewsets, mixins, status
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.generics import get_object_or_404
@@ -14,8 +16,7 @@ from rest_framework.authtoken.models import Token
 
 
 class PublicationListView(mixins.ListModelMixin, viewsets.GenericViewSet):
-    queryset = Publication.objects.all()
-    serializer_class = PublicationFormSerializer
+    serializer_class = PublicationSerializer
     authentication_classes = []
     permission_classes = []
     filterset_fields = [
@@ -26,7 +27,38 @@ class PublicationListView(mixins.ListModelMixin, viewsets.GenericViewSet):
         "community",
         "is_pinned",
     ]
-    search_fields = ["title", "content"]
+
+    def get_queryset(self):
+        pt = Administration.objects.first().popularity_threshold
+        sort_by = self.request.query_params.get("sort_by")
+        asc = self.request.query_params.get("asc")
+        asc = helper.check_bool_query(asc)
+        filterset = OrderedDict()
+        for item in self.filterset_fields:
+            value = self.request.query_params.get(item)
+            if value:
+                if value == "true": value = True
+                if value == "false": value = False
+                if item in ["community", "created_by"]: value = int(value)
+                filterset[item] = value
+        sort_string = "-published_at"
+        if sort_by in ['popularity', 'supports', 'discussions']:
+            # only view items with reactions more than administration limit
+            filterset["{}__gte".format(sort_by)] = 1 # TODO: replace with pt here
+            sort_string = "{}{}".format(
+                "-" if not asc else '',
+                sort_by
+            )
+        # for fresh item sort, only show items with popularity less than administration limit
+        if sort_by in ["published_at"]:
+            filterset["popularity__lt"] = 1 # TODO: replace with pt here
+
+        search = self.request.query_params.get("search")
+        search_by = self.request.query_params.get("search_by")
+        if search and search_by:
+            filterset["{}__contains".format(search_by)] = search
+        return Publication.objects.filter(**filterset)\
+            .order_by(sort_string)
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
@@ -82,6 +114,7 @@ class RetrieveUpdatePublicationView(APIView):
         )
 
     def patch(self, request, pk):
+        context = {"user": request.user}
         publication = get_object_or_404(Publication, pk=pk)
         self.check_object_permissions(request, publication)
         serializer = PublicationFormSerializer(
@@ -93,8 +126,8 @@ class RetrieveUpdatePublicationView(APIView):
                 do_break, detail = check_community_law(community, request.user)
                 if do_break:
                     return Response(detail, status=status.HTTP_403_FORBIDDEN)
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            publication = serializer.save()
+            return Response(PublicationSerializer(publication, context=context).data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, pk):
