@@ -18,15 +18,19 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("DEBUG")
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    "wordclub.foodswipe.com.np",
+]
 
 # SECURITY WARNING: don't include unknown hosts
 CORS_ALLOWED_ORIGIN_REGEXES = [
     r"^http:\/\/localhost\:8080$",
+    r"https?:\/\/wc.foodswipe.com.np",
 ]
 
 CSRF_TRUSTED_ORIGINS = [
     "localhost:8080",
+    "wc.foodswipe.com.np",
 ]
 
 # Application definition
