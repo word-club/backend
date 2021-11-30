@@ -1,9 +1,15 @@
 from rest_framework import viewsets, serializers, mixins, status
 from rest_framework.response import Response
 from rest_framework.authentication import TokenAuthentication
+from rest_framework.views import APIView
+from rest_framework import status
 
-from account.permissions import IsSuperUser
 from administration.models import Administration, PageView
+from account.permissions import IsSuperUser
+from account.models import Profile
+from account.serializers.user import UserRetrieveSerializer
+from community.models import Community
+from community.serializer import CommunityRetrieveSerializer
 
 
 class AdministrationSerializer(serializers.ModelSerializer):
@@ -21,20 +27,20 @@ class AdministrationViewSet(
     queryset = Administration.objects.all()
 
     def list(self, request, *args, **kwargs):
-        administration = Administration.objects.first()
+        instance = Administration.objects.first()
         if not administration:
-            administration = Administration.objects.create()
+            instance = Administration.objects.create()
         return Response(
-            AdministrationSerializer(administration).data, status=status.HTTP_200_OK
+            AdministrationSerializer(instance).data, status=status.HTTP_200_OK
         )
 
     def create(self, request, *args, **kwargs):
-        administration = Administration.objects.first()
+        instance = Administration.objects.first()
         if not administration:
-            administration = Administration.objects.create()
+            instance = Administration.objects.create()
 
         serializer = AdministrationSerializer(
-            administration, data=request.data, partial=True
+            instance, data=request.data, partial=True
         )
         if serializer.is_valid():
             serializer.save()
@@ -104,3 +110,45 @@ class PageViewViewSet(
         page_view.save()
 
         return Response(PageViewSerializer(page_view).data, status=status.HTTP_200_OK)
+
+# TODO: replace with next line
+administration = Administration.objects.first()
+count = administration.top_count
+# limit = administration.popularity_threshold
+limit = 0
+
+
+class TopView(APIView):
+    @staticmethod
+    def get(request):
+        communities = Community.objects.filter(
+            type__in=["public", "restricted"],
+            popularity__gte=limit,
+        ).order_by("-popularity")[:count]
+
+        profiles = Profile.objects.filter(popularity__gte=limit).order_by(
+            "-popularity"
+        )[:count]
+        users = []
+        [users.append(profile.user) for profile in profiles]
+
+        profiles = Profile.objects.filter(discussions__gte=limit,).order_by(
+            "-discussions"
+        )[:count]
+        commentators = []
+        [commentators.append(profile.user) for profile in profiles]
+
+        context = {"user": request.user}
+
+        return Response(
+            {
+                "communities": CommunityRetrieveSerializer(
+                    communities, many=True, context=context
+                ).data,
+                "users": UserRetrieveSerializer(users, many=True, context=context).data,
+                "commentators": UserRetrieveSerializer(
+                    commentators, many=True, context=context
+                ).data,
+            },
+            status=status.HTTP_200_OK,
+        )
