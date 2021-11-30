@@ -113,27 +113,27 @@ class PageViewViewSet(
 
 
 class TopView(APIView):
-    # TODO: replace with next line
-    administration, created = Administration.objects.get_or_create(id=1)
-    count = administration.top_count
-    # limit = administration.popularity_threshold
-    limit = 0
-
-    def get(self, request):
+    @staticmethod
+    def get(request):
+        # TODO: replace with next line
+        administration, created = Administration.objects.get_or_create(id=1)
+        count = administration.top_count
+        # limit = administration.popularity_threshold
+        limit = 0
         communities = Community.objects.filter(
             type__in=["public", "restricted"],
-            popularity__gte=self.limit,
-        ).order_by("-popularity")[:self.count]
+            popularity__gte=limit,
+        ).order_by("-popularity")[:count]
 
-        profiles = Profile.objects.filter(popularity__gte=self.limit).order_by(
+        profiles = Profile.objects.filter(popularity__gte=limit).order_by(
             "-popularity"
-        )[:self.count]
+        )[:count]
         users = []
         [users.append(profile.user) for profile in profiles]
 
-        profiles = Profile.objects.filter(discussions__gte=self.limit,).order_by(
+        profiles = Profile.objects.filter(discussions__gte=limit,).order_by(
             "-discussions"
-        )[:self.count]
+        )[:count]
         commentators = []
         [commentators.append(profile.user) for profile in profiles]
 
