@@ -135,3 +135,6 @@ node_modules/
 media/
 static/
 backend.iml
+.htaccess
+core*
+tmp/
