@@ -20,6 +20,7 @@ DEBUG = os.getenv("DEBUG")
 
 ALLOWED_HOSTS = [
     "wordclub.foodswipe.com.np",
+    "localhost",
 ]
 
 # SECURITY WARNING: don't include unknown hosts
