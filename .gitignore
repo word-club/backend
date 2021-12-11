@@ -138,3 +138,4 @@ backend.iml
 .htaccess
 core*
 tmp/
+db.sqlite3
