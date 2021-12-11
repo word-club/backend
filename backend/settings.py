@@ -19,8 +19,8 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 DEBUG = os.getenv("DEBUG")
 
 ALLOWED_HOSTS = [
-    "wordclub.foodswipe.com.np",
     "localhost",
+    "wordclub.foodswipe.com.np",
 ]
 
 # SECURITY WARNING: don't include unknown hosts
