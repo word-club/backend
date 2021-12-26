@@ -321,3 +321,33 @@ class UserInfoSerializer(serializers.ModelSerializer):
     class Meta:
         model = get_user_model()
         fields = "__all__"
+
+
+class MentionUserSerializer(serializers.ModelSerializer):
+    name = serializers.SerializerMethodField()
+    avatar = serializers.SerializerMethodField()
+    value = serializers.SerializerMethodField()
+
+    @staticmethod
+    def get_value(obj):
+        return obj.username
+
+    @staticmethod
+    def get_name(obj):
+        if obj.first_name and obj.last_name:
+            return "{} {}".format(obj.first_name, obj.last_name)
+        return obj.username
+
+    @staticmethod
+    def get_avatar(obj):
+        try:
+            avatar = ProfileAvatar.objects.get(profile__user=obj)
+            return avatar.image.url
+        except ProfileAvatar.DoesNotExist:
+            return None
+
+
+
+    class Meta:
+        model = get_user_model()
+        fields = ["id", "name", "value", "avatar"]
