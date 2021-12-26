@@ -134,6 +134,7 @@ class UserRetrieveSerializer(serializers.ModelSerializer):
     is_blocked = serializers.SerializerMethodField()
 
     def get_is_followed(self, obj):
+        # context "user" is the requester
         user = self.context["user"]
         if type(user) == get_user_model():
             try:
@@ -143,6 +144,7 @@ class UserRetrieveSerializer(serializers.ModelSerializer):
                 return False
 
     def get_is_blocked(self, obj):
+        # context "user" is the requester
         user = self.context["user"]
         if type(user) == get_user_model():
             try:
@@ -301,21 +303,21 @@ class UserInfoSerializer(serializers.ModelSerializer):
     def get_followers(obj):
         followers = FollowUser.objects.filter(user=obj)
         users = []
-        [users.append(item.user) for item in followers]
+        [users.append(item.created_by) for item in followers]
         return UserGlobalSerializer(users, many=True, read_only=True).data
 
     @staticmethod
     def get_following(obj):
         follows = FollowUser.objects.filter(user=obj)
         users = []
-        [users.append(item.to_follow) for item in follows]
+        [users.append(item.created_by) for item in follows]
         return UserGlobalSerializer(users, many=True, read_only=True).data
 
     @staticmethod
     def get_blocked_users(obj):
         blocks = BlockUser.objects.filter(user=obj)
         users = []
-        [users.append(item.to_block) for item in blocks]
+        [users.append(item.created_by) for item in blocks]
         return UserGlobalSerializer(users, many=True, read_only=True).data
 
     class Meta:

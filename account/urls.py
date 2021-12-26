@@ -20,11 +20,11 @@ from account.views.user import (
     ReportAUser,
     UnBlockAUser,
     GetMeView,
-    ProfileListView, MentionList,
+    ProfileListView, MentionList, RetrieveUserByUsername,
 )
 
 router = DefaultRouter()
-router.register(r"user", UserViewSet, basename="user")
+router.register(r"users", UserViewSet, basename="user")
 router.register(r"follower", FollowUserViewSet, basename="follower")
 
 urlpatterns = router.urls
@@ -54,5 +54,6 @@ urlpatterns += [
     path("block/<int:pk>/", UnBlockAUser.as_view()),
     path("report/<int:pk>/", DeleteReport.as_view()),
     path("profile/filter/", ProfileListView.as_view({"get": "list"})),
-    path("mention-list/", MentionList.as_view())
+    path("mention-list/", MentionList.as_view()),
+    path("user/<str:username>/", RetrieveUserByUsername.as_view())
 ]

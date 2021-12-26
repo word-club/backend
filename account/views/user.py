@@ -10,7 +10,13 @@ from account.permissions import IsOwner
 from account.serializers.user import *
 
 
-class UserViewSet(viewsets.ModelViewSet):
+class UserViewSet(
+    mixins.ListModelMixin,
+    mixins.CreateModelMixin,
+    mixins.UpdateModelMixin,
+    mixins.DestroyModelMixin,
+    viewsets.GenericViewSet
+):
     queryset = get_user_model().objects.all().order_by("-date_joined")
     permission_classes = [IsAdminUser]
     authentication_classes = [TokenAuthentication]
@@ -18,14 +24,11 @@ class UserViewSet(viewsets.ModelViewSet):
     def get_serializer_class(self):
         if self.action in ["list", "delete"]:
             return UserSerializer
-        elif self.action == "retrieve":
-            return UserRetrieveSerializer
-        elif self.action in ["create", "update", "partial_update"]:
+        else:
             return UserPostSerializer
 
 
 class ProfileListView(mixins.ListModelMixin, viewsets.GenericViewSet):
-    filterset_fields = []
     search_fields = ["first_name", "last_name", "username"]
     serializer_class = UserSerializer
 
@@ -115,4 +118,15 @@ class MentionList(APIView):
     def get(request):
         users = get_user_model().objects.all()
         serializer = MentionUserSerializer(users, many=True, read_only=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class RetrieveUserByUsername(APIView):
+    authentication_classes =  []
+    permission_classes = []
+
+    @staticmethod
+    def get(request, username):
+        user = get_object_or_404(get_user_model(), username=username)
+        serializer = UserInfoSerializer(user, context={"user": request.user}, read_only=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
