@@ -15,6 +15,26 @@ from publication.serializers import *
 from rest_framework.authtoken.models import Token
 
 
+def check_publication_update_date_limit(obj):
+    """
+    :param obj: Publication instance
+    :return: void if publication is not published yet
+        Response(403) if publication update date limit reached
+    """
+    now = timezone.now()
+    if not obj.published_at: return
+    diff = now - obj.published_at
+    limit = Administration.objects.first()
+    if diff.days > limit.publication_update_limit:
+        return Response(
+            {
+                "detail": "Sorry, you cannot update the publication after {} days.".format(
+                    limit.publication_update_limit
+                )
+            }, status=status.HTTP_403_FORBIDDEN
+        )
+
+
 class PublicationListView(mixins.ListModelMixin, viewsets.GenericViewSet):
     serializer_class = PublicationSerializer
     authentication_classes = []
@@ -93,6 +113,7 @@ class RetrieveUpdatePublicationView(APIView):
     def patch(self, request, pk):
         context = {"user": request.user}
         publication = get_object_or_404(Publication, pk=pk)
+        check_publication_update_date_limit(publication)
         self.check_object_permissions(request, publication)
         serializer = PublicationFormSerializer(
             publication, data=request.data, partial=True, context={"user": request.user}

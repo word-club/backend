@@ -328,10 +328,10 @@ class UserInfoSerializer(serializers.ModelSerializer):
 class MentionUserSerializer(serializers.ModelSerializer):
     name = serializers.SerializerMethodField()
     avatar = serializers.SerializerMethodField()
-    value = serializers.SerializerMethodField()
+    username = serializers.SerializerMethodField()
 
     @staticmethod
-    def get_value(obj):
+    def get_username(obj):
         return obj.username
 
     @staticmethod
@@ -352,4 +352,4 @@ class MentionUserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = get_user_model()
-        fields = ["id", "name", "value", "avatar"]
+        fields = ["id", "name", "username", "avatar"]

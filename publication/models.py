@@ -61,21 +61,6 @@ class Publication(models.Model):
     class Meta:
         ordering = ["-timestamp"]
 
-    def save(self, *args, **kwargs):
-        if self.id:
-            now = timezone.now()
-            diff = now - self.created_at
-            limit = Administration.objects.first()
-            if diff.days > limit.publication_update_limit:
-                raise ValidationError(
-                    {
-                        "detail": "Sorry, you cannot update the publication after {} days.".format(
-                            limit.publication_update_limit
-                        )
-                    }
-                )
-        return super().save(*args, **kwargs)
-
     def is_draft(self):
         return not self.is_published
 
