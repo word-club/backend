@@ -59,21 +59,6 @@ class Comment(models.Model):
     class Meta:
         ordering = ["-created_at"]
 
-    def save(self, *args, **kwargs):
-        if self.created_at:
-            now = timezone.now()
-            diff = now - self.created_at
-            limit = Administration.objects.first()
-            if diff.days > limit.comment_update_limit:
-                raise ValidationError(
-                    {
-                        "detail": "Sorry, you cannot update the comment after {} days.".format(
-                            limit.comment_update_limit
-                        )
-                    }
-                )
-        return super().save(*args, **kwargs)
-
 
 class CommentImage(models.Model):
     id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)

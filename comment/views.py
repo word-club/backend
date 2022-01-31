@@ -14,6 +14,26 @@ from comment.serializers import *
 from publication.permissions import IsPublicationAuthor
 
 
+def check_comment_update_date_limit(obj):
+    """
+    :param obj: Comment instance
+    :return: void if comment date limit is not reached
+        Response(403) if publication update date limit reached
+    """
+    now = timezone.now()
+    if not obj.published_at: return
+    diff = now - obj.created_at
+    limit = Administration.objects.first()
+    if diff.days > limit.comment_update_limit:
+        return Response(
+            {
+                "detail": "Sorry, you cannot update the comment after {} days.".format(
+                    limit.comment_update_limit
+                )
+            }, status=status.HTTP_403_FORBIDDEN
+        )
+
+
 class CommentViewSet(viewsets.ModelViewSet):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAdminUser]
@@ -58,6 +78,7 @@ class UpdateDestroyCommentView(APIView):
 
     def patch(self, request, pk):
         comment = get_object_or_404(Comment, pk=pk)
+        check_comment_update_date_limit(comment)
         self.check_object_permissions(request, comment)
         serializer = CommentSerializer(
             comment, data=request.data, context={"request": request}
