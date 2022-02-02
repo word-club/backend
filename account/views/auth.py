@@ -12,6 +12,9 @@ from account.serializers.user import UserInfoSerializer
 
 
 class LoginView(APIView):
+    authentication_classes = []
+    permission_classes = []
+
     @staticmethod
     def post(request):
         """
