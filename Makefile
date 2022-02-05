@@ -19,6 +19,9 @@ migrate:
 serve:
 	$(PYTHON) manage.py runserver $(BASE_URL)
 
+serve-d:
+	$(PYTHON) manage.py runserver $(BASE_URL) &
+
 shell:
 	$(PYTHON) manage.py shell
 
