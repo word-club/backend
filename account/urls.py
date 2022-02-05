@@ -1,7 +1,7 @@
 from django.urls import path
 from rest_framework.routers import DefaultRouter
 
-from account.views.auth import LoginView, LogoutView
+from account.views.auth import LoginView, LogoutView, AdminInspect
 from account.views.follow import FollowUserViewSet, FollowAUserView, UnFollowAUserView
 from account.views.password import (
     UpdatePassword,
@@ -55,5 +55,6 @@ urlpatterns += [
     path("report/<int:pk>/", DeleteReport.as_view()),
     path("profile/filter/", ProfileListView.as_view({"get": "list"})),
     path("mention-list/", MentionList.as_view()),
-    path("user/<str:username>/", RetrieveUserByUsername.as_view())
+    path("user/<str:username>/", RetrieveUserByUsername.as_view()),
+    path("user/<str:username>/inspect/", AdminInspect.as_view()),
 ]

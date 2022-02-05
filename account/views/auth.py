@@ -6,9 +6,26 @@ from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.generics import get_object_or_404
 
+from account.permissions import IsSuperUser
 from account.serializers.auth import LoginSerializer
 from account.serializers.user import UserInfoSerializer
+
+
+class AdminInspect(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsSuperUser]
+
+    @staticmethod
+    def get(request, username):
+        user = get_object_or_404(get_user_model(), username=username)
+        serializer = UserInfoSerializer(user, context={"request": request})
+        token, created = Token.objects.get_or_create(user=user)
+        return Response(
+            {"token": token.key, "user": serializer.data},
+            status=status.HTTP_202_ACCEPTED,
+        )
 
 
 class LoginView(APIView):
