@@ -1,4 +1,5 @@
 from community.models import CommunitySubscription
+from notification.models import Notification
 
 
 def check_community_law(community, user):
@@ -19,3 +20,15 @@ def check_community_law(community, user):
             return True, {
                 "detail": "Please subscribe the community first to add publication."
             }
+
+
+def notify_community(instance, created):
+    # TODO: if subscription, notify community admin, sub admin
+    if instance.__class__.__name__ == "CommunitySubscription":
+        notification = Notification.objects.create(
+            subject="subscription",
+            community=instance.commnunity,
+            subscription=instance
+        )
+        # admins = instance.community.
+    pass

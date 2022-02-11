@@ -22,3 +22,6 @@ from notification.serializers import NotificationSerializer, NotificationToSeria
 #                 "to": to_serializer.data
 #             }
 #         )
+
+# TODO create notification from other models signals
+# TODO broadcast notification from here

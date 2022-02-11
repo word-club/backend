@@ -77,3 +77,8 @@ def decrease_supports(instance):
     if publication.community and publication.community.supports > 0:
         publication.community.supports -= 1
         publication.community.save()
+
+
+def notify_author(instance, created):
+    # TODO
+    pass

@@ -3,6 +3,7 @@ from django.dispatch import receiver
 from django.utils import timezone
 
 from choices import PROGRESS_STATES
+from community.helper import notify_community
 from community.models import (
     Community,
     CommunityAdmin,
@@ -44,3 +45,8 @@ def setup_post_community_actions(sender, instance, created, **kwargs):
         set_admin_and_subscriber(instance, writer)
         init_progress_states(instance)
         init_theme(instance, writer)
+
+
+@receiver(post_save, sender=CommunitySubscription)
+def post_save_subscription(sender, instance, created, **kwargs):
+    notify_community(instance, created)

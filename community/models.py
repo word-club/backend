@@ -30,6 +30,50 @@ def validate_unique_id(value):
             raise ValidationError(", ".join(items_to_ignore) + " are not allowed.")
 
 
+class CommunityAdmin(models.Model):
+    is_accepted = models.BooleanField(default=False, editable=False)
+    accepted_at = models.DateTimeField(null=True, editable=False)
+    community = models.ForeignKey(
+        "Community", on_delete=models.CASCADE, related_name="admins", editable=False
+    )
+    user = models.ForeignKey(
+        get_user_model(), on_delete=models.CASCADE, related_name="managed_communities"
+    )
+    created_by = models.ForeignKey(
+        get_user_model(),
+        on_delete=models.CASCADE,
+        related_name="created_community_admins",
+        editable=False,
+    )
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-timestamp"]
+        unique_together = [["user", "community"]]
+
+
+class CommunitySubAdmin(models.Model):
+    community = models.ForeignKey(
+        "Community", on_delete=models.CASCADE, related_name="sub_admins", editable=False
+    )
+    user = models.ForeignKey(
+        get_user_model(),
+        on_delete=models.CASCADE,
+        related_name="sub_managed_communities",
+    )
+    created_by = models.ForeignKey(
+        get_user_model(),
+        on_delete=models.CASCADE,
+        related_name="created_community_sub_admins",
+        editable=False,
+    )
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-timestamp"]
+        unique_together = [["user", "community"]]
+
+
 class Community(models.Model):
     unique_id = models.CharField(
         max_length=64, unique=True, validators=[validate_unique_id]
@@ -204,50 +248,6 @@ class CommunityHashtag(models.Model):
 
     class Meta:
         unique_together = [["tag", "community"]]
-
-
-class CommunityAdmin(models.Model):
-    is_accepted = models.BooleanField(default=False, editable=False)
-    accepted_at = models.DateTimeField(null=True, editable=False)
-    community = models.ForeignKey(
-        "Community", on_delete=models.CASCADE, related_name="admins", editable=False
-    )
-    user = models.ForeignKey(
-        get_user_model(), on_delete=models.CASCADE, related_name="managed_communities"
-    )
-    created_by = models.ForeignKey(
-        get_user_model(),
-        on_delete=models.CASCADE,
-        related_name="created_community_admins",
-        editable=False,
-    )
-    timestamp = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        ordering = ["-timestamp"]
-        unique_together = [["user", "community"]]
-
-
-class CommunitySubAdmin(models.Model):
-    community = models.ForeignKey(
-        "Community", on_delete=models.CASCADE, related_name="sub_admins", editable=False
-    )
-    user = models.ForeignKey(
-        get_user_model(),
-        on_delete=models.CASCADE,
-        related_name="sub_managed_communities",
-    )
-    created_by = models.ForeignKey(
-        get_user_model(),
-        on_delete=models.CASCADE,
-        related_name="created_community_sub_admins",
-        editable=False,
-    )
-    timestamp = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        ordering = ["-timestamp"]
-        unique_together = [["user", "community"]]
 
 
 class CommunityAuthorizationCode(models.Model):

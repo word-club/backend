@@ -8,7 +8,7 @@ from django.utils import timezone
 from django.utils.timezone import utc
 from rest_framework import serializers
 
-from administration.models import Administration
+# from administration.models import Administration
 from backend.settings import ALLOWED_IMAGES_EXTENSIONS, MAX_UPLOAD_IMAGE_SIZE
 
 
@@ -203,7 +203,7 @@ def check_bool_query(value):
 def fetch_query(request):
     publication = request.query_params.get("publication")  # expects pk
     all_time = check_bool_query(request.query_params.get("all_time"))  # expects 0|1
-    today = check_bool_query(request.query_params.get("today"))  # expects 0|1
+    q_today = check_bool_query(request.query_params.get("today"))  # expects 0|1
     this_week = check_bool_query(request.query_params.get("this_week"))  # expects 0|1
 
     from_query = request.query_params.get("from")  # expects date string
@@ -217,7 +217,7 @@ def fetch_query(request):
     return {
         "publication": publication,
         "all_time": all_time,
-        "today": today,
+        "today": q_today,
         "this_week": this_week,
         "from_query": from_query,
         "to_query": to_query,
@@ -234,7 +234,7 @@ def get_filter_range(params):
     year = params["year"]
     month = params["month"]
     day = params["day"]
-    today = params["today"]
+    p_today = params["today"]
     this_week = params["this_week"]
 
     if from_query and to_query:
@@ -261,7 +261,7 @@ def get_filter_range(params):
         if err:
             return None, err
         timestamp_range = [date, now]
-    elif today:
+    elif p_today:
         timestamp_range = [today_first_clock, now]
     elif this_week:
         timestamp_range = [first_day_of_week, now]
@@ -271,7 +271,11 @@ def get_filter_range(params):
 
 
 def get_viewset_filterset(request, filterset_fields, default_field):
-    pt = Administration.objects.first().popularity_threshold
+    # TODO: fix this
+    # pt = Administration.objects.first().popularity_threshold
+    # AttributeError: 'NoneType' object has no attribute 'popularity_threshold'
+
+    # pt = Administration.objects.first().popularity_threshold
     sort_by = request.query_params.get("sort_by")
     asc = request.query_params.get("asc")
     asc = check_bool_query(asc)

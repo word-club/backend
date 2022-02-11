@@ -29,11 +29,6 @@ CORS_ALLOWED_ORIGIN_REGEXES = [
     r"https?:\/\/wc.foodswipe.com.np",
 ]
 
-CSRF_TRUSTED_ORIGINS = [
-    "localhost:8080",
-    "wc.foodswipe.com.np",
-]
-
 # Application definition
 
 INTERNAL_APPS = [

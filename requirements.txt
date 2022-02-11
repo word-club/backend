@@ -4,6 +4,7 @@ async-timeout==3.0.1
 attrs==21.2.0
 autobahn==21.3.1
 Automat==20.2.0
+backports.zoneinfo==0.2.1
 beautifulsoup4==4.10.0
 black==21.9b0
 certifi==2021.5.30
@@ -15,11 +16,11 @@ click==8.0.1
 constantly==15.1.0
 cryptography==35.0.0
 daphne==3.0.2
-Django==3.2.12
-django-cors-headers==3.8.0
+Django==4.0.2
+django-cors-headers==3.11.0
 django-filter==21.1
 django-phonenumber-field==5.2.0
-djangorestframework==3.12.4
+djangorestframework==3.13.1
 hiredis==2.0.0
 hyperlink==21.0.0
 idna==3.2
@@ -29,7 +30,7 @@ metadata-parser==0.10.5
 msgpack==1.0.2
 mypy-extensions==0.4.3
 pathspec==0.9.0
-Pillow==9.0.0
+Pillow==9.0.1
 platformdirs==2.4.0
 pyasn1==0.4.8
 pyasn1-modules==0.2.8

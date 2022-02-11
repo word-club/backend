@@ -15,24 +15,28 @@ from publication.signals.helper import *
 def post_save_pub_up_vote(sender, instance, created, **kwargs):
     add_popularity(instance, created)
     add_supports(instance, created)
+    notify_author(instance, created)
 
 
 @receiver(post_save, sender=PublicationDownVote)
 def post_save_pub_down_vote(sender, instance, created, **kwargs):
     add_popularity(instance, created)
     add_dislikes(instance, created)
+    notify_author(instance, created)
 
 
 @receiver(post_save, sender=PublicationShare)
 def post_save_pub_share(sender, instance, created, **kwargs):
     add_popularity(instance, created)
     add_supports(instance, created)
+    notify_author(instance, created)
 
 
 @receiver(post_save, sender=PublicationBookmark)
 def post_save_pub_bookmark(sender, instance, created, **kwargs):
     add_popularity(instance, created)
     add_supports(instance, created)
+    notify_author(instance, created)
 
 
 @receiver(post_save, sender=HidePublication)

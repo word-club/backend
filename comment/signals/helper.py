@@ -64,6 +64,7 @@ def decrease_supports(instance):
 
 def notify_post_subscribers(instance, created):
     if created:
+        # TODO
         # for other commentators notify as "someone also have commented on the publication"
         # for author notify as "someone has commented on your publication"
         # for community notify as "someone has commented on a publication posted on your community"
@@ -73,6 +74,7 @@ def notify_post_subscribers(instance, created):
 
 def notify_author(instance, created):
     if created:
+        # TODO
         # someone has up voted your publication
         # someone has down voted your publication
         # someone has shared your publication (community information)
