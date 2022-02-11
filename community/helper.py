@@ -1,5 +1,5 @@
 from community.models import CommunitySubscription
-from notification.models import Notification
+from notification.models import Notification, NotificationTo
 
 
 def check_community_law(community, user):
@@ -22,6 +22,16 @@ def check_community_law(community, user):
             }
 
 
+def send_notification(receivers, notification):
+    [
+        NotificationTo.objects.create(
+            user=receiver,
+            notification=notification
+        )
+        for receiver in receivers
+    ]
+
+
 def notify_community(instance, created):
     # TODO: if subscription, notify community admin, sub admin
     if instance.__class__.__name__ == "CommunitySubscription":
@@ -30,5 +40,8 @@ def notify_community(instance, created):
             community=instance.commnunity,
             subscription=instance
         )
-        # admins = instance.community.
+        admins = instance.community.admins()
+        send_notification(admins, notification)
+        sub_admins = instance.community.sub_admins()
+        send_notification(sub_admins, notification)
     pass

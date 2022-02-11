@@ -74,48 +74,6 @@ class CommunitySubAdmin(models.Model):
         unique_together = [["user", "community"]]
 
 
-class Community(models.Model):
-    unique_id = models.CharField(
-        max_length=64, unique=True, validators=[validate_unique_id]
-    )
-    name = models.CharField(max_length=64, unique=True)
-    description = models.CharField(max_length=256, null=True)
-    email = models.EmailField(unique=True, null=True)
-
-    is_authorized = models.BooleanField(default=False, editable=False)
-    authorized_at = models.DateTimeField(blank=True, null=True, editable=False)
-    type = models.CharField(max_length=64, choices=COMMUNITY_TYPES)
-
-    completed_registration_steps = models.BooleanField(default=False, editable=False)
-
-    contains_adult_content = models.BooleanField(default=False)
-
-    created_by = models.ForeignKey(
-        get_user_model(),
-        on_delete=models.CASCADE,
-        related_name="created_communities",
-        editable=False,
-    )
-    date_of_registration = models.DateTimeField(auto_now_add=True)
-
-    timestamp = models.DateTimeField(auto_now=True)
-
-    quote = models.TextField(null=True)
-    welcome_text = models.TextField(null=True)
-
-    popularity = models.PositiveIntegerField(default=0, editable=False)
-    dislikes = models.PositiveIntegerField(default=0, editable=False)
-    discussions = models.PositiveIntegerField(default=0, editable=False)
-    supports = models.PositiveBigIntegerField(default=0, editable=False)
-
-    views = models.PositiveBigIntegerField(default=0, editable=False)
-
-    view_globally = models.BooleanField(default=True)
-
-    class Meta:
-        ordering = ["-timestamp"]
-
-
 class CommunityCreateProgress(models.Model):
     community = models.ForeignKey(
         "Community",
@@ -301,3 +259,51 @@ class BlockCommunity(models.Model):
         editable=False,
     )
     timestamp = models.DateTimeField(auto_now_add=True)
+
+
+class Community(models.Model):
+    unique_id = models.CharField(
+        max_length=64, unique=True, validators=[validate_unique_id]
+    )
+    name = models.CharField(max_length=64, unique=True)
+    description = models.CharField(max_length=256, null=True)
+    email = models.EmailField(unique=True, null=True)
+
+    is_authorized = models.BooleanField(default=False, editable=False)
+    authorized_at = models.DateTimeField(blank=True, null=True, editable=False)
+    type = models.CharField(max_length=64, choices=COMMUNITY_TYPES)
+
+    completed_registration_steps = models.BooleanField(default=False, editable=False)
+
+    contains_adult_content = models.BooleanField(default=False)
+
+    created_by = models.ForeignKey(
+        get_user_model(),
+        on_delete=models.CASCADE,
+        related_name="created_communities",
+        editable=False,
+    )
+    date_of_registration = models.DateTimeField(auto_now_add=True)
+
+    timestamp = models.DateTimeField(auto_now=True)
+
+    quote = models.TextField(null=True)
+    welcome_text = models.TextField(null=True)
+
+    popularity = models.PositiveIntegerField(default=0, editable=False)
+    dislikes = models.PositiveIntegerField(default=0, editable=False)
+    discussions = models.PositiveIntegerField(default=0, editable=False)
+    supports = models.PositiveBigIntegerField(default=0, editable=False)
+
+    views = models.PositiveBigIntegerField(default=0, editable=False)
+
+    view_globally = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ["-timestamp"]
+
+    def admins(self):
+        return CommunityAdmin.objects.filter(community=self.id)
+
+    def sub_admins(self):
+        return CommunitySubAdmin.objects.filter(community=self.id)
