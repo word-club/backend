@@ -1,5 +1,3 @@
-from asgiref.sync import async_to_sync
-from channels.layers import get_channel_layer
 from rest_framework import status
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.generics import get_object_or_404
@@ -11,7 +9,7 @@ from notification.permissions import IsNotificationReceiver
 from notification.serializers import *
 
 
-class NotificationListCreateView(APIView):
+class NotificationListView(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAdminUser]
 
@@ -23,32 +21,13 @@ class NotificationListCreateView(APIView):
         )
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    @staticmethod
-    def post(request):
-        serializer = NotificationPostSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            channel_layer = get_channel_layer()
-            list_serializer = NotificationSerializer(
-                Notification.objects.first(), read_only=True
-            )
-            async_to_sync(channel_layer.group_send)(
-                "broadcast",
-                {
-                    "type": "broadcast.notification",
-                    "event": "New Notification",
-                    "notification": list_serializer.data,
-                },
-            )
-            return Response(status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
 
 class DestroyNotificationView(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAdminUser]
 
-    def delete(self, request, pk):
+    @staticmethod
+    def delete(request, pk):
         notification = get_object_or_404(Notification, pk=pk)
         notification.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)

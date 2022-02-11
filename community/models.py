@@ -31,7 +31,6 @@ def validate_unique_id(value):
 
 
 class Community(models.Model):
-
     unique_id = models.CharField(
         max_length=64, unique=True, validators=[validate_unique_id]
     )
@@ -131,7 +130,6 @@ class CommunityCover(models.Model):
 
 
 class CommunityRule(models.Model):
-
     title = models.CharField(max_length=64)
     description = models.TextField()
     community = models.ForeignKey(
@@ -151,7 +149,6 @@ class CommunityRule(models.Model):
 
 
 class CommunitySubscription(models.Model):
-
     subscriber = models.ForeignKey(
         get_user_model(),
         on_delete=models.CASCADE,
@@ -181,7 +178,6 @@ class CommunitySubscription(models.Model):
 
 
 class CommunityReport(models.Model):
-
     reason = models.TextField()
     created_by = models.ForeignKey(
         get_user_model(),
@@ -199,7 +195,6 @@ class CommunityReport(models.Model):
 
 
 class CommunityHashtag(models.Model):
-
     tag = models.ForeignKey(
         Hashtag, related_name="communities", on_delete=models.CASCADE
     )
@@ -234,7 +229,6 @@ class CommunityAdmin(models.Model):
 
 
 class CommunitySubAdmin(models.Model):
-
     community = models.ForeignKey(
         "Community", on_delete=models.CASCADE, related_name="sub_admins", editable=False
     )

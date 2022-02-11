@@ -60,3 +60,21 @@ def decrease_supports(instance):
     instance.comment.save()
     instance.comment.created_by.profile.supports -= 1
     instance.comment.created_by.profile.save()
+
+
+def notify_post_subscribers(instance, created):
+    if created:
+        # for other commentators notify as "someone also have commented on the publication"
+        # for author notify as "someone has commented on your publication"
+        # for community notify as "someone has commented on a publication posted on your community"
+        # for bookmakers notify as "someone has commented on a publication that you've bookmarked on"
+        pass
+
+
+def notify_author(instance, created):
+    if created:
+        # someone has up voted your publication
+        # someone has down voted your publication
+        # someone has shared your publication (community information)
+        # someone has bookmarked your publication
+        pass

@@ -13,6 +13,35 @@ class Notification(models.Model):
     description = models.CharField(max_length=255)
     timestamp = models.DateTimeField(auto_now_add=True)
 
+    publication = models.ForeignKey(
+        Publication,
+        blank=True,
+        null=True,
+        on_delete=models.CASCADE,
+        related_name="notifications",
+    )
+    community = models.ForeignKey(
+        Community,
+        blank=True,
+        null=True,
+        on_delete=models.CASCADE,
+        related_name="notifications",
+    )
+    comment = models.ForeignKey(
+        Comment,
+        blank=True,
+        null=True,
+        on_delete=models.CASCADE,
+        related_name="notifications",
+    )
+    # upvote
+    # down vote
+    # share
+    # bookmark
+    # follow
+    # subscribe
+    # report
+
     class Meta:
         ordering = ["-timestamp"]
 
@@ -32,61 +61,6 @@ class NotificationTo(models.Model):
     )
 
     timestamp = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        ordering = ["-timestamp"]
-
-
-class PublicationNotification(models.Model):
-    publication = models.ForeignKey(
-        Publication,
-        on_delete=models.CASCADE,
-        related_name="notifications",
-    )
-    timestamp = models.DateTimeField(auto_now=True)
-    notification = models.ForeignKey(
-        "Notification",
-        on_delete=models.CASCADE,
-        related_name="publications",
-        editable=False,
-    )
-
-    class Meta:
-        ordering = ["-timestamp"]
-
-
-class CommunityNotification(models.Model):
-    community = models.ForeignKey(
-        Community,
-        on_delete=models.CASCADE,
-        related_name="notifications",
-    )
-    timestamp = models.DateTimeField(auto_now=True)
-    notification = models.ForeignKey(
-        "Notification",
-        on_delete=models.CASCADE,
-        related_name="communities",
-        editable=False,
-    )
-
-    class Meta:
-        ordering = ["-timestamp"]
-
-
-class CommentNotification(models.Model):
-    comment = models.ForeignKey(
-        Comment,
-        on_delete=models.CASCADE,
-        related_name="notifications",
-    )
-    notification = models.ForeignKey(
-        "Notification",
-        on_delete=models.CASCADE,
-        related_name="comments",
-        editable=False,
-    )
-
-    timestamp = models.DateTimeField(auto_now=True)
 
     class Meta:
         ordering = ["-timestamp"]

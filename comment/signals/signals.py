@@ -15,6 +15,7 @@ from comment.signals.helper import *
 @receiver(post_save, sender=Comment)
 def post_save_comment(sender, instance, created, **kwargs):
     add_pub_discussions(instance, created)
+    notify_post_subscribers(instance, created)
 
 
 @receiver(post_delete, sender=Comment)
@@ -25,24 +26,28 @@ def post_delete_comment(sender, instance, **kwargs):
 @receiver(post_save, sender=CommentUpVote)
 def post_save_up_vote(sender, instance, created, **kwargs):
     add_popularity(instance, created)
+    notify_author(instance, created)
 
 
 @receiver(post_save, sender=CommentDownVote)
 def post_save_down_vote(sender, instance, created, **kwargs):
     add_popularity(instance, created)
     add_dislikes(instance, created)
+    notify_author(instance, created)
 
 
 @receiver(post_save, sender=CommentShare)
 def post_save_share(sender, instance, created, **kwargs):
     add_popularity(instance, created)
     add_supports(instance, created)
+    notify_author(instance, created)
 
 
 @receiver(post_save, sender=CommentBookmark)
 def post_save_bookmark(sender, instance, created, **kwargs):
     add_popularity(instance, created)
     add_supports(instance, created)
+    notify_author(instance, created)
 
 
 @receiver(post_save, sender=HideComment)
