@@ -1,4 +1,4 @@
-from rest_framework import viewsets, serializers, mixins, status
+from rest_framework import viewsets, serializers, mixins
 from rest_framework.response import Response
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.views import APIView
@@ -39,9 +39,7 @@ class AdministrationViewSet(
         if not instance:
             instance = Administration.objects.create()
 
-        serializer = AdministrationSerializer(
-            instance, data=request.data, partial=True
-        )
+        serializer = AdministrationSerializer(instance, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)

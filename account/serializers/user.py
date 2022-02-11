@@ -348,8 +348,6 @@ class MentionUserSerializer(serializers.ModelSerializer):
         except ProfileAvatar.DoesNotExist:
             return None
 
-
-
     class Meta:
         model = get_user_model()
         fields = ["id", "name", "username", "avatar"]

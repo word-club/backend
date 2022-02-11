@@ -21,7 +21,8 @@ def check_comment_update_date_limit(obj):
         Response(403) if publication update date limit reached
     """
     now = timezone.now()
-    if not obj.published_at: return
+    if not obj.published_at:
+        return
     diff = now - obj.created_at
     limit = Administration.objects.first()
     if diff.days > limit.comment_update_limit:
@@ -30,7 +31,8 @@ def check_comment_update_date_limit(obj):
                 "detail": "Sorry, you cannot update the comment after {} days.".format(
                     limit.comment_update_limit
                 )
-            }, status=status.HTTP_403_FORBIDDEN
+            },
+            status=status.HTTP_403_FORBIDDEN,
         )
 
 

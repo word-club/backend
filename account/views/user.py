@@ -15,7 +15,7 @@ class UserViewSet(
     mixins.CreateModelMixin,
     mixins.UpdateModelMixin,
     mixins.DestroyModelMixin,
-    viewsets.GenericViewSet
+    viewsets.GenericViewSet,
 ):
     queryset = get_user_model().objects.all().order_by("-date_joined")
     permission_classes = [IsAdminUser]
@@ -122,11 +122,13 @@ class MentionList(APIView):
 
 
 class RetrieveUserByUsername(APIView):
-    authentication_classes =  []
+    authentication_classes = []
     permission_classes = []
 
     @staticmethod
     def get(request, username):
         user = get_object_or_404(get_user_model(), username=username)
-        serializer = UserInfoSerializer(user, context={"user": request.user}, read_only=True)
+        serializer = UserInfoSerializer(
+            user, context={"user": request.user}, read_only=True
+        )
         return Response(serializer.data, status=status.HTTP_200_OK)

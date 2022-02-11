@@ -20,7 +20,9 @@ from account.views.user import (
     ReportAUser,
     UnBlockAUser,
     GetMeView,
-    ProfileListView, MentionList, RetrieveUserByUsername,
+    ProfileListView,
+    MentionList,
+    RetrieveUserByUsername,
 )
 
 router = DefaultRouter()
