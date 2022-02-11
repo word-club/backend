@@ -28,7 +28,7 @@ class AdministrationViewSet(
 
     def list(self, request, *args, **kwargs):
         instance = Administration.objects.first()
-        if not administration:
+        if not instance:
             instance = Administration.objects.create()
         return Response(
             AdministrationSerializer(instance).data, status=status.HTTP_200_OK
@@ -36,7 +36,7 @@ class AdministrationViewSet(
 
     def create(self, request, *args, **kwargs):
         instance = Administration.objects.first()
-        if not administration:
+        if not instance:
             instance = Administration.objects.create()
 
         serializer = AdministrationSerializer(
