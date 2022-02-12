@@ -1,4 +1,4 @@
-from community.models import CommunitySubscription
+from community.models import CommunitySubscription, CommunitySubAdmin, CommunityAdmin
 from notification.models import Notification, NotificationTo
 
 
@@ -22,26 +22,23 @@ def check_community_law(community, user):
             }
 
 
-def send_notification(receivers, notification):
-    [
-        NotificationTo.objects.create(
-            user=receiver,
-            notification=notification
-        )
-        for receiver in receivers
-    ]
+def send_notification(receivers, notification, threshold=1):
+    # more than one because, the first admin is the author
+    if receivers and receivers.count() > threshold:
+        [
+            NotificationTo.objects.create(user=receiver.user, notification=notification)
+            for receiver in receivers
+        ]
 
 
 def notify_community(instance, created):
     # TODO: if subscription, notify community admin, sub admin
     if instance.__class__.__name__ == "CommunitySubscription":
         notification = Notification.objects.create(
-            subject="subscription",
-            community=instance.commnunity,
-            subscription=instance
+            subject="subscription", community=instance.community, subscription=instance
         )
-        admins = instance.community.admins()
+        admins = instance.community.admins
         send_notification(admins, notification)
-        sub_admins = instance.community.sub_admins()
+        sub_admins = instance.community.sub_admins
         send_notification(sub_admins, notification)
     pass

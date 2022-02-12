@@ -58,12 +58,6 @@ class CommunityViewSet(
         context["depth"] = depth
         return context
 
-    def get_permissions(self):
-        if self.action in ["list"]:
-            return [IsAdminUser()]
-        else:
-            return []
-
 
 class CommunityDetail(APIView):
     authentication_classes = [TokenAuthentication]
@@ -172,7 +166,6 @@ class UnSubscribeCommunity(APIView):
     permission_classes = [IsSubscriber]
 
     def delete(self, request, pk):
-
         subscription = get_object_or_404(
             CommunitySubscription, community=pk, subscriber=request.user
         )
@@ -205,11 +198,15 @@ class SubscribeToACommunity(APIView):
         community = get_object_or_404(Community, pk=pk)
         self.check_object_permissions(request, community)
         context = {"community": community, "request": request}
-        serializer = SubscribeCommunitySerializer(data=request.data, context=context)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        subscription = CommunitySubscription.objects.create(
+            community=community, subscriber=request.user
+        )
+        if community.type == "public":
+            subscription.is_approved = True
+            subscription.approved_at = timezone.now()
+            subscription.save()
+        serializer = CommunitySubscriptionSerializer(subscription, context=context)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
 class DisableNotificationsForACommunity(APIView):

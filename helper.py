@@ -295,7 +295,7 @@ def get_viewset_filterset(request, filterset_fields, default_field):
     sort_string = "-{}".format(default_field)
     if sort_by in ["popularity", "supports", "discussions", "views"]:
         # only view items with reactions more than administration limit
-        filterset["{}__gte".format(sort_by)] = 1  # TODO: replace with pt here
+        filterset["{}__gte".format(sort_by)] = 0  # TODO: replace with pt here
         sort_string = "{}{}".format("-" if not asc else "", sort_by)
     # for fresh item sort, only show items with popularity less than administration limit
     if sort_by in ["{}".format(default_field)]:

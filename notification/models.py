@@ -44,7 +44,7 @@ class Notification(models.Model):
         blank=True,
         null=True,
         on_delete=models.CASCADE,
-        related_name="notifications"
+        related_name="notifications",
     )
     # report
 

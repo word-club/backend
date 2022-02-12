@@ -302,8 +302,10 @@ class Community(models.Model):
     class Meta:
         ordering = ["-timestamp"]
 
+    @property
     def admins(self):
-        return CommunityAdmin.objects.filter(community=self.id)
+        return CommunityAdmin.objects.filter(community=self.id).distinct()
 
+    @property
     def sub_admins(self):
-        return CommunitySubAdmin.objects.filter(community=self.id)
+        return CommunitySubAdmin.objects.filter(community=self.id).distinct()
