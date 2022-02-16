@@ -6,4 +6,4 @@ class PublicationConfig(AppConfig):
     name = "publication"
 
     def ready(self):
-        import publication.signals.signals
+        import publication.signals

@@ -1,13 +1,11 @@
 def add_popularity(instance, created):
     if created:
         publication = instance.publication
-        if publication.popularity > 0:
-            publication.popularity += 1
-            publication.save()
-        if publication.created_by.profile.popularity > 0:
-            publication.created_by.profile.popularity += 1
-            publication.created_by.profile.save()
-        if publication.community and publication.community.popularity > 0:
+        publication.popularity += 1
+        publication.save()
+        publication.created_by.profile.popularity += 1
+        publication.created_by.profile.save()
+        if publication.community:
             publication.community.popularity += 1
             publication.community.save()
 
@@ -15,13 +13,11 @@ def add_popularity(instance, created):
 def add_dislikes(instance, created):
     if created:
         publication = instance.publication
-        if publication.dislikes > 0:
-            publication.dislikes += 1
-            publication.save()
-        if publication.created_by.profile.dislikes > 0:
-            publication.created_by.profile.dislikes += 1
-            publication.created_by.profile.save()
-        if publication.community and publication.community.dislikes > 0:
+        publication.dislikes += 1
+        publication.save()
+        publication.created_by.profile.dislikes += 1
+        publication.created_by.profile.save()
+        if publication.community:
             publication.community.dislikes += 1
             publication.community.save()
 
@@ -29,13 +25,11 @@ def add_dislikes(instance, created):
 def add_supports(instance, created):
     if created:
         publication = instance.publication
-        if publication.supports > 0:
-            publication.supports += 1
-            publication.save()
-        if publication.created_by.profile.supports > 0:
-            publication.created_by.profile.supports += 1
-            publication.created_by.profile.save()
-        if publication.community and publication.community.supports > 0:
+        publication.supports += 1
+        publication.save()
+        publication.created_by.profile.supports += 1
+        publication.created_by.profile.save()
+        if publication.community:
             publication.community.supports += 1
             publication.community.save()
 

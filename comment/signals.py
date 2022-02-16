@@ -9,7 +9,7 @@ from comment.models import (
     CommentBookmark,
     HideComment,
 )
-from comment.signals.helper import *
+from comment.signal_helper import *
 
 
 @receiver(post_save, sender=Comment)

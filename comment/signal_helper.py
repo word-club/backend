@@ -9,9 +9,10 @@ def add_pub_discussions(instance, created):
 
 def decrease_pub_discussions(instance):
     if instance.publication:
-        instance.publication.discussions -= 1
-        instance.publication.save()
-        if instance.reply:
+        if instance.publication.discussions > 0:
+            instance.publication.discussions -= 1
+            instance.publication.save()
+        if instance.reply and instance.reply.discussions > 0:
             instance.reply.discussions -= 1
             instance.reply.save()
 
@@ -41,25 +42,30 @@ def add_supports(instance, created):
 
 
 def decrease_popularity(instance):
-    instance.comment.popularity -= 1
-    instance.comment.save()
-    instance.comment.created_by.profile.popularity -= 1
-    instance.comment.created_by.profile.save()
+    if instance.comment.popularity > 0:
+        instance.comment.popularity -= 1
+        instance.comment.save()
+    if instance.comment.created_by.profile.popularity > 0:
+        instance.comment.created_by.profile.popularity -= 1
+        instance.comment.created_by.profile.save()
 
 
 def decrease_dislikes(instance):
-    instance.comment.dislikes -= 1
-    instance.comment.save()
-
-    instance.comment.created_by.profile.dislikes -= 1
-    instance.comment.created_by.profile.save()
+    if instance.comment.dislikes > 0:
+        instance.comment.dislikes -= 1
+        instance.comment.save()
+    if instance.comment.created_by.profile.dislikes > 0:
+        instance.comment.created_by.profile.dislikes -= 1
+        instance.comment.created_by.profile.save()
 
 
 def decrease_supports(instance):
-    instance.comment.supports -= 1
-    instance.comment.save()
-    instance.comment.created_by.profile.supports -= 1
-    instance.comment.created_by.profile.save()
+    if instance.comment.supports > 0:
+        instance.comment.supports -= 1
+        instance.comment.save()
+    if instance.comment.created_by.profile.supports > 0:
+        instance.comment.created_by.profile.supports -= 1
+        instance.comment.created_by.profile.save()
 
 
 def notify_post_subscribers(instance, created):

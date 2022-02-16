@@ -8,7 +8,7 @@ from publication.models import (
     PublicationBookmark,
     HidePublication,
 )
-from publication.signals.helper import *
+from publication.helper import *
 
 
 @receiver(post_save, sender=PublicationUpVote)
