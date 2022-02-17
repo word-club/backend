@@ -9,7 +9,6 @@ from django.template.loader import render_to_string
 from rest_framework import viewsets, status, mixins
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.generics import get_object_or_404
-from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -37,6 +36,7 @@ class CommunityViewSet(
         "is_authorized",
         "contains_adult_content",
         "completed_registration_steps",
+        "created_by",
     ]
 
     def get_queryset(self):
