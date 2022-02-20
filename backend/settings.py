@@ -26,7 +26,7 @@ ALLOWED_HOSTS = [
 # SECURITY WARNING: don't include unknown hosts
 CORS_ALLOWED_ORIGIN_REGEXES = [
     r"^http:\/\/localhost\:8080$",
-    r"https?:\/\/wc.foodswipe.com.np",
+    r"https?:\/\/wc.foodswipe.com.np$",
 ]
 
 # Application definition
