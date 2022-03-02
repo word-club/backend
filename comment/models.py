@@ -4,9 +4,7 @@ import uuid
 
 from django.contrib.auth import get_user_model
 from django.core.validators import FileExtensionValidator
-from rest_framework.exceptions import ValidationError
 from django.db import models
-from django.utils import timezone
 
 from administration.models import Administration
 from backend.settings import ALLOWED_IMAGES_EXTENSIONS
@@ -26,7 +24,11 @@ def upload_reply_image_to(instance, filename):
 
 
 class Comment(models.Model):
-    id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
+    id = models.UUIDField(
+        default=uuid.uuid4,
+        editable=False,
+        primary_key=True
+    )
     comment = models.TextField()
     publication = models.ForeignKey(
         Publication,
@@ -50,7 +52,7 @@ class Comment(models.Model):
     is_pinned = models.BooleanField(default=False, editable=False)
 
     created_at = models.DateTimeField(auto_now_add=True)
-    timestamp = models.DateTimeField(auto_now=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     reply = models.ForeignKey(
         "self", null=True, on_delete=models.CASCADE, related_name="replies"
@@ -110,20 +112,3 @@ class CommentLink(models.Model):
     class Meta:
         ordering = ["-timestamp"]
         unique_together = [["comment", "link"]]
-
-
-class HideComment(models.Model):
-    comment = models.ForeignKey(
-        "Comment", on_delete=models.CASCADE, related_name="hides", editable=False
-    )
-    created_by = models.ForeignKey(
-        get_user_model(),
-        on_delete=models.CASCADE,
-        related_name="hidden_comments",
-        editable=False,
-    )
-    timestamp = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        ordering = ["-timestamp"]
-        unique_together = [["comment", "created_by"]]

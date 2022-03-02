@@ -237,39 +237,6 @@ class RemovePublicationImageUrlView(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class HideAPublicationView(APIView):
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
-
-    @staticmethod
-    def post(request, pk):
-        publication = get_object_or_404(Publication, pk=pk)
-        instance, created = HidePublication.objects.get_or_create(
-            created_by=request.user, publication=publication
-        )
-        if created:
-            return Response(
-                PublicationSerializer(publication, context={"user": request.user}).data,
-                status=status.HTTP_201_CREATED,
-            )
-        else:
-            return Response(
-                HidePublicationSerializer(instance).data,
-                status=status.HTTP_204_NO_CONTENT,
-            )
-
-
-class RemovePublicationHiddenStateView(APIView):
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsOwner]
-
-    def delete(self, request, pk):
-        hidden_pub = get_object_or_404(HidePublication, pk=pk)
-        self.check_object_permissions(request, hidden_pub)
-        hidden_pub.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
-
 class AddPublicationLinkView(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsOwner]

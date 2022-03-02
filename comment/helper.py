@@ -1,17 +1,11 @@
-from rest_framework import serializers
-
 from bookmark.models import Bookmark
 from bookmark.serializers import BookmarkSerializer
 from comment.models import *
+from hide.models import Hide
+from hide.serializers import HideSerializer
 from share.models import Share
 from vote.models import Vote
 from vote.serializers import VoteSerializer
-
-
-class HideCommentSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = HideComment
-        exclude = ["comment"]
 
 
 def get_my_upvote(user, obj):
@@ -56,9 +50,9 @@ def get_my_hidden_status(user, obj):
     if type(user) != get_user_model():
         return False
     try:
-        instance = HideComment.objects.get(created_by=user, comment=obj)
-        return HideCommentSerializer(instance).data
-    except HideComment.DoesNotExist:
+        instance = Hide.objects.get(created_by=user, comment=obj)
+        return HideSerializer(instance).data
+    except Hide.DoesNotExist:
         return False
 
 

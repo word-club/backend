@@ -97,24 +97,6 @@ class PublicationImageUrl(models.Model):
         ordering = ["-timestamp"]
 
 
-class HidePublication(models.Model):
-
-    publication = models.ForeignKey(
-        "Publication", on_delete=models.CASCADE, related_name="hides", editable=False
-    )
-    created_by = models.ForeignKey(
-        get_user_model(),
-        on_delete=models.CASCADE,
-        related_name="hidden_publications",
-        editable=False,
-    )
-    timestamp = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        ordering = ["-timestamp"]
-        unique_together = [["publication", "created_by"]]
-
-
 class PublicationLink(models.Model):
     link = models.URLField()
     title = models.CharField(max_length=512, editable=False, null=True)

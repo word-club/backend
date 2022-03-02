@@ -1,6 +1,7 @@
 from django.db import models
 from django.db.models import UniqueConstraint
 from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
 
 from comment.models import Comment
 from publication.models import Publication
@@ -29,15 +30,14 @@ class Bookmark(models.Model):
     )
     created_at = models.DateTimeField(auto_now_add=True)
 
-    def save(self, *args, **kwargs):
+    def clean(self):
         check = 0
         if self.publication:
             check += 1
         if self.comment:
             check += 1
-        if check > 1:
-            raise Exception("Only one key field is allowed.")
-        super().save(*args, **kwargs)
+        if check != 0 and check > 1:
+            raise ValidationError({'detail': 'Only one key field can be submitted'})
 
     class Meta:
         ordering = ["-created_at"]

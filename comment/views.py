@@ -133,32 +133,6 @@ class ReplyCommentView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class HideCommentForMe(APIView):
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
-
-    def post(self, request, pk):
-        instance = get_object_or_404(Comment, pk=pk)
-        hidden_status, created = HideComment.objects.get_or_create(
-            comment=instance, created_by=request.user
-        )
-        if created:
-            return Response(
-                HideCommentSerializer(hidden_status).data,
-                status=status.HTTP_201_CREATED,
-            )
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
-
-class RemoveHiddenStatus(APIView):
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsOwner]
-
-    def delete(self, request, pk):
-        instance = get_object_or_404(HideComment, pk=pk)
-        self.check_object_permissions(request, instance)
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
 
 class CommentPinView(APIView):
     authentication_classes = [TokenAuthentication]

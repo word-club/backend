@@ -7,6 +7,8 @@ from comment.models import Comment
 from comment.serializers import CommentSerializer
 from community.models import CommunityHashtag
 from globals import CommunityGlobalSerializer, UserGlobalSerializer
+from hide.models import Hide
+from hide.serializers import HideSerializer
 from publication.models import *
 from share.models import Share
 from share.serializers import ShareSerializer
@@ -87,12 +89,6 @@ class PublicationImageUrlSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         validated_data["publication"] = self.context["publication"]
         return super().create(validated_data)
-
-
-class HidePublicationSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = HidePublication
-        exclude = ["publication"]
 
 
 class PublicationHashtags(serializers.ModelSerializer):
@@ -233,9 +229,9 @@ class PublicationSerializer(serializers.ModelSerializer):
         if type(user) != get_user_model():
             return False
         try:
-            instance = HidePublication.objects.get(created_by=user, publication=obj)
-            return HidePublicationSerializer(instance).data
-        except HidePublication.DoesNotExist:
+            instance = Hide.objects.get(created_by=user, publication=obj)
+            return HideSerializer(instance).data
+        except Hide.DoesNotExist:
             return False
 
     def get_bookmark_status(self, obj):

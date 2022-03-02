@@ -1,4 +1,6 @@
 from django.db import models
+from django.db.models import UniqueConstraint
+from django.core.exceptions import ValidationError
 from django.contrib.auth import get_user_model
 
 from comment.models import Comment
@@ -31,19 +33,28 @@ class Share(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-    def save(self, *args, **kwargs):
+    def clean(self):
         check = 0
         if self.publication:
             check += 1
         if self.comment:
             check += 1
-        if check > 1:
-            raise Exception("Only one key field is allowed.")
-        super().save(*args, **kwargs)
+        if check == 0 and check > 1:
+            raise ValidationError({
+                "detail": "Only one key field is allowed."
+            })
 
     class Meta:
         ordering = ["-created_at"]
-        unique_together = [
-            ["comment", "created_by"],
-            ["publication", "created_by"]
+        constraints = [
+            UniqueConstraint(
+                fields=['publication', 'created_by'],
+                condition=models.Q(publication__isnull=False),
+                name='unique_report_target'
+            ),
+            UniqueConstraint(
+                fields=['comment', 'created_by'],
+                condition=models.Q(comment__isnull=False),
+                name='unique_report_target'
+            ),
         ]

@@ -1,10 +1,7 @@
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 
-from comment.models import (
-    Comment,
-    HideComment,
-)
+from comment.models import Comment
 from comment.signal_helper import *
 
 
@@ -17,13 +14,3 @@ def post_save_comment(sender, instance, created, **kwargs):
 @receiver(post_delete, sender=Comment)
 def post_delete_comment(sender, instance, **kwargs):
     decrease_pub_discussions(instance)
-
-
-@receiver(post_save, sender=HideComment)
-def post_save_hide(sender, instance, created, **kwargs):
-    add_dislikes(instance, created)
-
-
-@receiver(post_save, sender=HideComment)
-def post_delete_hide(sender, instance, **kwargs):
-    decrease_dislikes(instance)

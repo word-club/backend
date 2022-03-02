@@ -4,10 +4,7 @@ from rest_framework import serializers
 from account.models import *
 from account.serializers.follow import FollowUserSerializer
 from bookmark.models import Bookmark
-from comment.models import (
-    HideComment,
-    Comment,
-)
+from comment.models import Comment
 from comment.serializers import (
     CommentSerializer,
     CommentForProfileSerializer,
@@ -19,14 +16,10 @@ from community.serializer import (
     CommunitySubAdminSerializer,
 )
 from globals import UserGlobalSerializer
+from hide.models import Hide
 from notification.serializers import NotificationReceiverSerializer
-from publication.models import (
-    Publication,
-    HidePublication,
-)
-from publication.serializers import (
-    PublicationSerializer,
-)
+from publication.models import Publication
+from publication.serializers import PublicationSerializer
 from report.serializers import ReportSerializer
 from share.serializers import ShareSerializer
 from vote.models import Vote
@@ -200,7 +193,7 @@ class UserInfoSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def get_saved_publications(obj):
-        bookmarks = Bookmark.objects.filter(created_by=obj, comment=None)
+        bookmarks = Bookmark.objects.filter(created_by=obj, publication__isnull=False)
         publications = []
         [publications.append(bookmark.publication) for bookmark in bookmarks]
         return PublicationSerializer(
@@ -209,7 +202,7 @@ class UserInfoSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def get_up_voted_publications(obj):
-        items = Vote.objects.filter(created_by=obj, up=True, comment=None)
+        items = Vote.objects.filter(created_by=obj, up=True, publication__isnull=False)
         publications = []
         [publications.append(item.publication) for item in items]
         return PublicationSerializer(
@@ -218,7 +211,7 @@ class UserInfoSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def get_down_voted_publications(obj):
-        items = Vote.objects.filter(created_by=obj, up=False, comment=None)
+        items = Vote.objects.filter(created_by=obj, up=False, publication__isnull=False)
         publications = []
         [publications.append(item.publication) for item in items]
         return PublicationSerializer(
@@ -227,7 +220,7 @@ class UserInfoSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def get_hidden_publications(obj):
-        items = HidePublication.objects.filter(created_by=obj)
+        items = Hide.objects.filter(created_by=obj, publication__isnull=False)
         publications = []
         [publications.append(item.publication) for item in items]
         return PublicationSerializer(
@@ -245,7 +238,7 @@ class UserInfoSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def get_up_voted_comments(obj):
-        items = Vote.objects.filter(created_by=obj, up=True, publication=None)
+        items = Vote.objects.filter(created_by=obj, up=True, comment__isnull=False)
         comments = []
         [comments.append(item.comment) for item in items]
         return CommentSerializer(
@@ -254,7 +247,7 @@ class UserInfoSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def get_down_voted_comments(obj):
-        items = Vote.objects.filter(created_by=obj, up=False, publication=None)
+        items = Vote.objects.filter(created_by=obj, up=False, comment__isnull=False)
         comments = []
         [comments.append(item.comment) for item in items]
         return CommentSerializer(
@@ -263,7 +256,7 @@ class UserInfoSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def get_hidden_comments(obj):
-        items = HideComment.objects.filter(created_by=obj)
+        items = Hide.objects.filter(created_by=obj, comment__isnull=False)
         comments = []
         [comments.append(item.comment) for item in items]
         return CommentSerializer(
@@ -272,7 +265,7 @@ class UserInfoSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def get_saved_comments(obj):
-        items = Bookmark.objects.filter(created_by=obj, publication=None)
+        items = Bookmark.objects.filter(created_by=obj, comment__isnull=False)
         comments = []
         [comments.append(item.comment) for item in items]
         return CommentSerializer(

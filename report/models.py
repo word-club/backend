@@ -1,5 +1,5 @@
 from django.db import models
-
+from django.core.exceptions import ValidationError
 from django.contrib.auth import get_user_model
 from django.db.models.constraints import UniqueConstraint
 
@@ -79,7 +79,7 @@ class Report(models.Model):
     def is_pending(self):
         return self.status == 'pending'
 
-    def save(self, *args, **kwargs):
+    def clean(self):
         check = 0
         if self.user:
             check += 1
@@ -91,9 +91,10 @@ class Report(models.Model):
             check += 1
         if self.share:
             check += 1
-        if check > 1:
-            raise Exception("Only one key field is allowed.")
-        super().save(*args, **kwargs)
+        if check == 0 and check > 1:
+            raise ValidationError({
+                "detail": "Only one key field can be submitted"
+            })
 
     class Meta:
         ordering = ["-created_at"]
