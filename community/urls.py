@@ -2,7 +2,7 @@ from django.urls import path
 from rest_framework.routers import DefaultRouter
 
 from community.filters import SubscribedCommunityFilter, CommunitySubscribersFilter
-from community.views import *
+from community.views.views import *
 
 router = DefaultRouter()
 router.register(r"community-view", CommunityViewSet, basename="community")
@@ -56,7 +56,11 @@ urlpatterns += [
     ),
     path(
         "community-report/<int:pk>/",
-        DeleteCommunityReport.as_view(),
+        CommunityReportDetailView.as_view(),
+    ),
+    path(
+        "resolve-report/<int:pk>/",
+        ResolveReportView.as_view(),
     ),
     path(
         "community-unsubscribe/<int:pk>/",

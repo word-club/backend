@@ -31,3 +31,9 @@ PUBLICATION_TYPE_CHOICES = (
     ("link", "Link"),
     ("poll", "Poll"),
 )
+
+REPORT_STATES = (
+    ("pending", "Pending"),
+    ("resolved", "Resolved"),
+    ("ignored", "Ignored"),
+)

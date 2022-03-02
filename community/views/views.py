@@ -1,4 +1,3 @@
-from collections import OrderedDict
 from django.db.models import Q
 
 from django.conf import settings
@@ -6,20 +5,11 @@ from django.db.utils import IntegrityError
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
-from rest_framework import viewsets, status, mixins
-from rest_framework.authentication import TokenAuthentication
-from rest_framework.generics import get_object_or_404
-from rest_framework.response import Response
-from rest_framework.views import APIView
+from rest_framework import viewsets, mixins
 
 import helper
-from account.permissions import IsOwner
-from community.permissions import (
-    IsCommunityAdministrator,
-    IsSubscriber,
-    IsNotASubscriber,
-)
-from community.serializer import *
+from community.permissions import IsNotASubscriber
+from community.views.report import *
 
 
 class CommunityViewSet(
@@ -150,15 +140,6 @@ class DeleteCommunityAvatar(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class DeleteCommunityReport(APIView):
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsCommunityAdministrator]
-
-    def delete(self, request, pk):
-        report = get_object_or_404(CommunityReport, pk=pk)
-        self.check_object_permissions(request, report)
-        report.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class UnSubscribeCommunity(APIView):
@@ -175,19 +156,6 @@ class UnSubscribeCommunity(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class ReportACommunity(APIView):
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsSubscriber]
-
-    def post(self, request, pk):
-        community = get_object_or_404(Community, pk=pk)
-        self.check_object_permissions(request, community)
-        context = {"community": community, "request": request}
-        serializer = ReportCommunitySerializer(data=request.data, context=context)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class SubscribeToACommunity(APIView):

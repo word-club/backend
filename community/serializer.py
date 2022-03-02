@@ -40,12 +40,18 @@ class CommunityRuleSerializer(serializers.ModelSerializer):
 class ReportCommunitySerializer(serializers.ModelSerializer):
     class Meta:
         model = CommunityReport
-        fields = "__all__"
+        exclude = ["community"]
+        depth = 1
 
     def create(self, validated_data):
         validated_data["created_by"] = self.context["request"].user
         validated_data["community"] = self.context["community"]
         return super().create(validated_data)
+
+
+class ResolveReportSerializer(serializers.Serializer):
+    resolve_text = serializers.CharField(max_length=1000, required=True)
+    state = serializers.ChoiceField(required=True, choices=REPORT_STATES)
 
 
 class CommunityHashtagSerializer(serializers.ModelSerializer):
@@ -170,8 +176,10 @@ class CommunityRetrieveSerializer(serializers.ModelSerializer):
     sub_admins = CommunitySubAdminSerializer(many=True, read_only=True)
     subscription = serializers.SerializerMethodField()
     is_blocked = serializers.SerializerMethodField()
+    reports = ReportCommunitySerializer(many=True, read_only=True)
 
-    def get_subscriptions(self, obj):
+    @staticmethod
+    def get_subscriptions(obj):
         subscribers = CommunitySubscription.objects.filter(community=obj)
         notification_disables = CommunitySubscription.objects.filter(
             community=obj, disable_notification=True
