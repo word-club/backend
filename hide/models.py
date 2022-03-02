@@ -9,10 +9,7 @@ from publication.models import Publication
 
 class Hide(models.Model):
     publication = models.ForeignKey(
-        Publication,
-        on_delete=models.CASCADE,
-        related_name="hidden",
-        editable=False
+        Publication, on_delete=models.CASCADE, related_name="hidden", editable=False
     )
     comment = models.ForeignKey(
         Comment,
@@ -36,21 +33,19 @@ class Hide(models.Model):
         if self.comment:
             check += 1
         if check != 0 and check > 1:
-            raise ValidationError({'detail': 'Only one key field can be submitted'})
+            raise ValidationError({"detail": "Only one key field can be submitted"})
 
     class Meta:
         ordering = ["-created_at"]
         constraints = [
             UniqueConstraint(
-                fields=['publication', 'created_by'],
+                fields=["publication", "created_by"],
                 condition=models.Q(publication__isnull=False),
-                name='unique_publication_user_bookmark'
+                name="unique_publication_user_hide",
             ),
             UniqueConstraint(
-                fields=['comment', 'created_by'],
+                fields=["comment", "created_by"],
                 condition=models.Q(comment__isnull=False),
-                name='unique_comment_user_bookmark'
+                name="unique_comment_user_hide",
             ),
         ]
-
-

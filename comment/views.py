@@ -133,7 +133,6 @@ class ReplyCommentView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-
 class CommentPinView(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsPublicationAuthor]

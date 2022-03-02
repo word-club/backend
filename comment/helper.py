@@ -12,11 +12,7 @@ def get_my_upvote(user, obj):
     if type(user) != get_user_model():
         return False
     try:
-        up_vote = Vote.objects.get(
-            created_by=user,
-            comment=obj,
-            up=True
-        )
+        up_vote = Vote.objects.get(created_by=user, comment=obj, up=True)
         return VoteSerializer(up_vote).data
     except Vote.DoesNotExist:
         return False
@@ -26,11 +22,7 @@ def get_my_downvote(user, obj):
     if type(user) != get_user_model():
         return False
     try:
-        down_vote = Vote.objects.get(
-            created_by=user,
-            comment=obj,
-            up=False
-        )
+        down_vote = Vote.objects.get(created_by=user, comment=obj, up=False)
         return VoteSerializer(down_vote).data
     except Vote.DoesNotExist:
         return False

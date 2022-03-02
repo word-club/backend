@@ -5,13 +5,13 @@ from vote.views import (
     AddPublicationDownVote,
     AddCommentUpVote,
     AddCommentDownVote,
-    DestroyVote
+    DestroyVote,
 )
 
 urlpatterns = [
-    path('publication/<int:pk>/up-vote/', AddPublicationUpVote.as_view()),
-    path('publication/<int:pk>/down-vote/', AddPublicationDownVote.as_view()),
-    path('comment/<int:pk>/up-vote/', AddCommentUpVote.as_view()),
-    path('comment/<int:pk>/down-vote/', AddCommentDownVote.as_view()),
-    path('vote/<int:pk>/', DestroyVote.as_view())
+    path("publication/<int:pk>/up-vote/", AddPublicationUpVote.as_view()),
+    path("publication/<int:pk>/down-vote/", AddPublicationDownVote.as_view()),
+    path("comment/<int:pk>/up-vote/", AddCommentUpVote.as_view()),
+    path("comment/<int:pk>/down-vote/", AddCommentDownVote.as_view()),
+    path("vote/<int:pk>/", DestroyVote.as_view()),
 ]

@@ -7,7 +7,7 @@ from helpers.vote_signals import (
     add_supports,
     notify_author,
     decrease_popularity,
-    decrease_supports
+    decrease_supports,
 )
 
 

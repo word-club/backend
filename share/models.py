@@ -13,14 +13,14 @@ class Share(models.Model):
         related_name="shares",
         on_delete=models.CASCADE,
         editable=False,
-        null=True
+        null=True,
     )
     comment = models.ForeignKey(
         Comment,
         related_name="shares",
         on_delete=models.CASCADE,
         editable=False,
-        null=True
+        null=True,
     )
     created_by = models.ForeignKey(
         get_user_model(),
@@ -40,21 +40,19 @@ class Share(models.Model):
         if self.comment:
             check += 1
         if check == 0 and check > 1:
-            raise ValidationError({
-                "detail": "Only one key field is allowed."
-            })
+            raise ValidationError({"detail": "Only one key field is allowed."})
 
     class Meta:
         ordering = ["-created_at"]
         constraints = [
             UniqueConstraint(
-                fields=['publication', 'created_by'],
+                fields=["publication", "created_by"],
                 condition=models.Q(publication__isnull=False),
-                name='unique_report_target'
+                name="unique_publication_share",
             ),
             UniqueConstraint(
-                fields=['comment', 'created_by'],
+                fields=["comment", "created_by"],
                 condition=models.Q(comment__isnull=False),
-                name='unique_report_target'
+                name="unique_comment_share",
             ),
         ]

@@ -37,19 +37,19 @@ class Bookmark(models.Model):
         if self.comment:
             check += 1
         if check != 0 and check > 1:
-            raise ValidationError({'detail': 'Only one key field can be submitted'})
+            raise ValidationError({"detail": "Only one key field can be submitted"})
 
     class Meta:
         ordering = ["-created_at"]
         constraints = [
             UniqueConstraint(
-                fields=['publication', 'created_by'],
+                fields=["publication", "created_by"],
                 condition=models.Q(publication__isnull=False),
-                name='unique_publication_user_bookmark'
+                name="unique_publication_user_bookmark",
             ),
             UniqueConstraint(
-                fields=['comment', 'created_by'],
+                fields=["comment", "created_by"],
                 condition=models.Q(comment__isnull=False),
-                name='unique_comment_user_bookmark'
+                name="unique_comment_user_bookmark",
             ),
         ]

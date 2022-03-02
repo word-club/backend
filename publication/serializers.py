@@ -191,11 +191,7 @@ class PublicationSerializer(serializers.ModelSerializer):
         if type(user) != get_user_model():
             return False
         try:
-            up_vote = Vote.objects.get(
-                created_by=user,
-                publication=obj,
-                up=True
-            )
+            up_vote = Vote.objects.get(created_by=user, publication=obj, up=True)
             return VoteSerializer(up_vote).data
         except Vote.DoesNotExist:
             return False
@@ -205,11 +201,7 @@ class PublicationSerializer(serializers.ModelSerializer):
         if type(user) != get_user_model():
             return False
         try:
-            down_vote = Vote.objects.get(
-                created_by=user,
-                publication=obj,
-                up=False
-            )
+            down_vote = Vote.objects.get(created_by=user, publication=obj, up=False)
             return VoteSerializer(down_vote).data
         except Vote.DoesNotExist:
             return False

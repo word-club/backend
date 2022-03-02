@@ -21,10 +21,7 @@ class AddPublicationShare(APIView):
     @staticmethod
     def post(request, pk):
         publication = get_object_or_404(Publication, pk=pk)
-        context = {
-            "publication": publication,
-            "request": request
-        }
+        context = {"publication": publication, "request": request}
         serializer = ShareSerializer(data=request.data, context=context)
         if serializer.is_valid():
             serializer.save()
@@ -38,10 +35,7 @@ class AddCommentShare(APIView):
 
     def post(self, request, pk):
         comment = get_object_or_404(Comment, pk=pk)
-        context = {
-            "comment": comment,
-            "request": request
-        }
+        context = {"comment": comment, "request": request}
         serializer = ShareSerializer(data=request.data, context=context)
         if serializer.is_valid():
             serializer.save()

@@ -1,4 +1,13 @@
-from comment.helper import *
+from rest_framework import serializers
+
+from comment.models import CommentImage, CommentImageUrl, Comment
+from comment.helper import (
+    get_my_upvote,
+    get_my_downvote,
+    get_my_share_status,
+    get_my_hidden_status,
+    get_my_bookmark_status,
+)
 from globals import UserGlobalSerializer, PublicationForUserCommentSerializer
 
 

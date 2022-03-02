@@ -16,6 +16,7 @@ class HideAPublication(APIView):
     """
     Hide a publication
     """
+
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAuthenticated,)
 
@@ -23,7 +24,9 @@ class HideAPublication(APIView):
     def post(request, pk):
         user = request.user
         publication = get_object_or_404(Publication, pk=pk)
-        _, created = Hide.objects.get_or_create(created_by=user, publication=publication)
+        _, created = Hide.objects.get_or_create(
+            created_by=user, publication=publication
+        )
         http_status = status.HTTP_201_CREATED if created else status.HTTP_200_OK
         return Response(status=http_status)
 
@@ -32,6 +35,7 @@ class HideAComment(APIView):
     """
     Hide a comment
     """
+
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAuthenticated,)
 
@@ -48,6 +52,7 @@ class HideDetail(APIView):
     """
     Hide detail
     """
+
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAuthenticated, IsOwner)
 

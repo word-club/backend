@@ -24,11 +24,7 @@ def upload_reply_image_to(instance, filename):
 
 
 class Comment(models.Model):
-    id = models.UUIDField(
-        default=uuid.uuid4,
-        editable=False,
-        primary_key=True
-    )
+    id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
     comment = models.TextField()
     publication = models.ForeignKey(
         Publication,

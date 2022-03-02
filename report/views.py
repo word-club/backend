@@ -20,6 +20,7 @@ class AddUserReport(APIView):
     """
     Add a user report to the database.
     """
+
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAuthenticated,)
 
@@ -41,6 +42,7 @@ class AddCommunityReport(APIView):
     """
     Add a community report to the database.
     """
+
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAuthenticated,)
 
@@ -62,6 +64,7 @@ class AddPublicationReport(APIView):
     """
     Add a publication report to the database.
     """
+
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAuthenticated,)
 
@@ -83,6 +86,7 @@ class AddCommentReport(APIView):
     """
     Add a comment report to the database.
     """
+
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAuthenticated,)
 
@@ -104,6 +108,7 @@ class AddShareReport(APIView):
     """
     Add a share report to the database.
     """
+
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAuthenticated,)
 
@@ -125,6 +130,7 @@ class ReportDetail(APIView):
     """
     Delete a report from the database.
     """
+
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAuthenticated, IsOwner)
 
@@ -154,6 +160,7 @@ class ResolveAReport(APIView):
     """
     Resolve a report from the database.
     """
+
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsSuperUser]
 
@@ -164,7 +171,7 @@ class ResolveAReport(APIView):
         if not report.is_pending:
             return Response(
                 {"detail": "Report is already resolved"},
-                status=status.HTTP_400_BAD_REQUEST
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
         serializer = ResolveReportSerializer(report, data=request.data)
@@ -182,6 +189,7 @@ class UnResolveAReport(APIView):
     """
     Unresolve a report from the database.
     """
+
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsSuperUser]
 
@@ -192,7 +200,7 @@ class UnResolveAReport(APIView):
         if report.is_pending:
             return Response(
                 {"detail": "This report is not resolved."},
-                status=status.HTTP_400_BAD_REQUEST
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
         report.resolve_text = None

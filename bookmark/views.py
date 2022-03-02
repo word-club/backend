@@ -16,6 +16,7 @@ class AddPublicationBookmark(APIView):
     """
     Add a bookmark to a publication
     """
+
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
 
@@ -23,8 +24,7 @@ class AddPublicationBookmark(APIView):
     def post(request, pk):
         publication = get_object_or_404(Publication, pk=pk)
         _, created = Bookmark.objects.get_or_create(
-            publication=publication,
-            created_by=request.user
+            publication=publication, created_by=request.user
         )
         http_status = status.HTTP_201_CREATED if created else status.HTTP_200_OK
         return Response(status=http_status)
@@ -34,6 +34,7 @@ class AddCommentBookmark(APIView):
     """
     Add a bookmark to a comment
     """
+
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
 
@@ -41,8 +42,7 @@ class AddCommentBookmark(APIView):
     def post(request, pk):
         comment = get_object_or_404(Comment, pk=pk)
         _, created = Bookmark.objects.get_or_create(
-            comment=comment,
-            created_by=request.user
+            comment=comment, created_by=request.user
         )
         http_status = status.HTTP_201_CREATED if created else status.HTTP_200_OK
         return Response(status=http_status)
@@ -52,6 +52,7 @@ class BookmarkDetail(APIView):
     """
     Retrieve or delete a bookmark instance.
     """
+
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated, IsOwner]
 

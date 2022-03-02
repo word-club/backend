@@ -1,5 +1,6 @@
 # vote signal helper functions
 
+
 def add_popularity(vote):
     instance = vote.publication if vote.publication else vote.comment
     instance.popularity += 1

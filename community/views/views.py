@@ -1,15 +1,49 @@
 from django.db.models import Q
-
+from django.utils import timezone
 from django.conf import settings
 from django.db.utils import IntegrityError
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
-from rest_framework import viewsets, mixins
+
+from rest_framework import viewsets, mixins, status
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework.generics import get_object_or_404
 
 import helper
-from community.permissions import IsNotASubscriber
-from community.views.report import *
+from account.permissions import IsOwner
+from community.models import (
+    Community,
+    CommunitySubscription,
+    CommunityRule,
+    CommunityCover,
+    CommunityAvatar,
+    CommunityHashtag,
+    CommunityAdmin,
+    CommunityAuthorizationCode,
+    CommunityTheme,
+    CommunityCreateProgress,
+    BlockCommunity,
+)
+from community.permissions import (
+    IsNotASubscriber,
+    IsCommunityAdministrator,
+    IsSubscriber,
+)
+from community.serializer import (
+    CommunitySerializer,
+    CommunityRetrieveSerializer,
+    CommunityRuleSerializer,
+    CommunitySubscriptionSerializer,
+    CommunityAvatarSerializer,
+    CommunityCoverSerializer,
+    CommunityHashtagPostSerializer,
+    CommunityAdminSerializer,
+    CommunityThemeSerializer,
+    CommunityBlockSerializer,
+)
 
 
 class CommunityViewSet(
@@ -140,8 +174,6 @@ class DeleteCommunityAvatar(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-
-
 class UnSubscribeCommunity(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsSubscriber]
@@ -154,8 +186,6 @@ class UnSubscribeCommunity(APIView):
 
         subscription.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
-
-
 
 
 class SubscribeToACommunity(APIView):

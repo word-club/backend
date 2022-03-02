@@ -19,9 +19,7 @@ class AddPublicationUpVote(APIView):
     def post(request, pk):
         publication = get_object_or_404(Publication, pk=pk)
         upvote, created = Vote.objects.get_or_create(
-            Vote,
-            publication=publication,
-            up=True
+            Vote, publication=publication, up=True
         )
         http_status = status.HTTP_201_CREATED if created else status.HTTP_200_OK
         return Response(status=http_status)
@@ -34,11 +32,7 @@ class AddCommentUpVote(APIView):
     @staticmethod
     def post(request, pk):
         comment = get_object_or_404(Comment, pk=pk)
-        upvote, created = Vote.objects.get_or_create(
-            Vote,
-            comment=comment,
-            up=True
-        )
+        upvote, created = Vote.objects.get_or_create(Vote, comment=comment, up=True)
         http_status = status.HTTP_201_CREATED if created else status.HTTP_200_OK
         return Response(status=http_status)
 
@@ -51,9 +45,7 @@ class AddPublicationDownVote(APIView):
     def post(request, pk):
         publication = get_object_or_404(Publication, pk=pk)
         upvote, created = Vote.objects.get_or_create(
-            Vote,
-            publication=publication,
-            up=False
+            Vote, publication=publication, up=False
         )
         http_status = status.HTTP_201_CREATED if created else status.HTTP_200_OK
         return Response(status=http_status)
@@ -66,11 +58,7 @@ class AddCommentDownVote(APIView):
     @staticmethod
     def post(request, pk):
         comment = get_object_or_404(Comment, pk=pk)
-        upvote, created = Vote.objects.get_or_create(
-            Vote,
-            comment=comment,
-            up=False
-        )
+        upvote, created = Vote.objects.get_or_create(Vote, comment=comment, up=False)
         http_status = status.HTTP_201_CREATED if created else status.HTTP_200_OK
         return Response(status=http_status)
 

@@ -19,35 +19,35 @@ class Report(models.Model):
         on_delete=models.CASCADE,
         related_name="reports",
         editable=False,
-        null=True
+        null=True,
     )
     publication = models.ForeignKey(
         Publication,
         related_name="reports",
         on_delete=models.CASCADE,
         editable=False,
-        null=True
+        null=True,
     )
     comment = models.ForeignKey(
         Comment,
         related_name="reports",
         on_delete=models.CASCADE,
         editable=False,
-        null=True
+        null=True,
     )
     community = models.ForeignKey(
         Community,
         related_name="reports",
         on_delete=models.CASCADE,
         editable=False,
-        null=True
+        null=True,
     )
     share = models.ForeignKey(
         Share,
         related_name="reports",
         on_delete=models.CASCADE,
         editable=False,
-        null=True
+        null=True,
     )
     created_by = models.ForeignKey(
         get_user_model(),
@@ -58,7 +58,7 @@ class Report(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-    status = models.CharField(default='pending', max_length=8, choices=REPORT_STATES)
+    status = models.CharField(default="pending", max_length=8, choices=REPORT_STATES)
 
     resolve_text = models.TextField(null=True, editable=False)
     resolved_by = models.ForeignKey(
@@ -66,18 +66,18 @@ class Report(models.Model):
         on_delete=models.CASCADE,
         related_name="resolved_reports",
         editable=False,
-        null=True
+        null=True,
     )
     resolved_at = models.DateTimeField(null=True, editable=False)
 
     def is_resolved(self):
-        return self.status == 'resolved'
+        return self.status == "resolved"
 
     def is_ignored(self):
-        return self.status == 'ignored'
+        return self.status == "ignored"
 
     def is_pending(self):
-        return self.status == 'pending'
+        return self.status == "pending"
 
     def clean(self):
         check = 0
@@ -92,36 +92,34 @@ class Report(models.Model):
         if self.share:
             check += 1
         if check == 0 and check > 1:
-            raise ValidationError({
-                "detail": "Only one key field can be submitted"
-            })
+            raise ValidationError({"detail": "Only one key field can be submitted"})
 
     class Meta:
         ordering = ["-created_at"]
         constraints = [
             UniqueConstraint(
-                fields=['user', 'created_by'],
+                fields=["user", "created_by"],
                 condition=models.Q(user__isnull=False),
-                name='unique_report_target'
+                name="unique_user_report",
             ),
             UniqueConstraint(
-                fields=['publication', 'created_by'],
+                fields=["publication", "created_by"],
                 condition=models.Q(publication__isnull=False),
-                name='unique_report_target'
+                name="unique_publication_report",
             ),
             UniqueConstraint(
-                fields=['comment', 'created_by'],
+                fields=["comment", "created_by"],
                 condition=models.Q(comment__isnull=False),
-                name='unique_report_target'
+                name="unique_comment_report",
             ),
             UniqueConstraint(
-                fields=['community', 'created_by'],
+                fields=["community", "created_by"],
                 condition=models.Q(community__isnull=False),
-                name='unique_report_target'
+                name="unique_community_report",
             ),
             UniqueConstraint(
-                fields=['share', 'created_by'],
+                fields=["share", "created_by"],
                 condition=models.Q(share__isnull=False),
-                name='unique_report_target'
+                name="unique_share_report",
             ),
         ]
