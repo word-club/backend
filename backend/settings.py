@@ -55,6 +55,7 @@ LOCAL_APPS = [
     "community",
     "publication",
     "comment",
+    "vote",
     "notification",
     "administration",
 ]

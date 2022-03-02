@@ -6,6 +6,7 @@ from comment.serializers import CommentSerializer
 from community.models import CommunityHashtag
 from globals import CommunityGlobalSerializer, UserGlobalSerializer
 from publication.models import *
+from vote.models import Vote
 
 
 class PublicationImageSerializer(serializers.ModelSerializer):
@@ -81,18 +82,6 @@ class PublicationImageUrlSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         validated_data["publication"] = self.context["publication"]
         return super().create(validated_data)
-
-
-class PublicationUpVoteSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = PublicationUpVote
-        exclude = ["publication"]
-
-
-class PublicationDownVoteSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = PublicationDownVote
-        exclude = ["publication"]
 
 
 class PublicationReportSerializer(serializers.ModelSerializer):
@@ -195,8 +184,8 @@ class PublicationFormSerializer(serializers.ModelSerializer):
 
 
 def get_publication_reactions(publication):
-    up_votes = PublicationUpVote.objects.filter(publication=publication).count()
-    down_votes = PublicationDownVote.objects.filter(publication=publication).count()
+    up_votes = Vote.objects.filter(publication=publication, up=True).count()
+    down_votes = Vote.objects.filter(publication=publication, up=False).count()
     shares = PublicationShare.objects.filter(publication=publication).count()
     comments = Comment.objects.filter(publication=publication).count()
     total = up_votes + down_votes + shares + comments
@@ -229,9 +218,13 @@ class PublicationSerializer(serializers.ModelSerializer):
         if type(user) != get_user_model():
             return False
         try:
-            up_vote = PublicationUpVote.objects.get(created_by=user, publication=obj)
-            return PublicationUpVoteSerializer(up_vote).data
-        except PublicationUpVote.DoesNotExist:
+            up_vote = Vote.objects.get(
+                created_by=user,
+                publication=obj,
+                up=True
+            )
+            return VoteSerializer(up_vote).data
+        except Vote.DoesNotExist:
             return False
 
     def get_down_vote(self, obj):
@@ -239,10 +232,12 @@ class PublicationSerializer(serializers.ModelSerializer):
         if type(user) != get_user_model():
             return False
         try:
-            down_vote = PublicationDownVote.objects.get(
-                created_by=user, publication=obj
+            down_vote = Vote.objects.get(
+                created_by=user,
+                publication=obj,
+                up=False
             )
-            return PublicationDownVoteSerializer(down_vote).data
+            return VoteSerializer(down_vote).data
         except PublicationDownVote.DoesNotExist:
             return False
 

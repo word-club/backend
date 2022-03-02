@@ -237,68 +237,6 @@ class RemovePublicationImageUrlView(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class UpVoteAPublicationView(APIView):
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
-
-    @staticmethod
-    def post(request, pk):
-        publication = get_object_or_404(Publication, pk=pk)
-        up_vote, created = PublicationUpVote.objects.get_or_create(
-            created_by=request.user, publication=publication
-        )
-        if created:
-            return Response(
-                PublicationSerializer(publication, context={"user": request.user}).data,
-                status=status.HTTP_201_CREATED,
-            )
-        else:
-            return Response(status=status.HTTP_204_NO_CONTENT)
-
-
-class RemovePublicationUpVote(APIView):
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsOwner]
-
-    def delete(self, request, pk):
-        up_vote = get_object_or_404(PublicationUpVote, pk=pk)
-        self.check_object_permissions(request, up_vote)
-        up_vote.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
-
-class DownVoteAPublication(APIView):
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
-
-    @staticmethod
-    def post(request, pk):
-        publication = get_object_or_404(Publication, pk=pk)
-        down_vote, created = PublicationDownVote.objects.get_or_create(
-            created_by=request.user, publication=publication
-        )
-        if created:
-            return Response(
-                PublicationSerializer(publication, context={"user": request.user}).data,
-                status=status.HTTP_201_CREATED,
-            )
-        else:
-            return Response(
-                PublicationDownVoteSerializer(down_vote).data, status=status.HTTP_200_OK
-            )
-
-
-class RemovePublicationDownVote(APIView):
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsOwner]
-
-    def delete(self, request, pk):
-        down_vote = get_object_or_404(PublicationDownVote, pk=pk)
-        self.check_object_permissions(request, down_vote)
-        down_vote.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
-
 class BookmarkAPublicationView(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]

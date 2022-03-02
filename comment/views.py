@@ -1,6 +1,3 @@
-import uuid
-from collections import OrderedDict
-
 from rest_framework import status, viewsets
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.generics import get_object_or_404
@@ -99,37 +96,6 @@ class UpdateDestroyCommentView(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class UpVoteACommentView(APIView):
-    authentication_classes = [TokenAuthentication]
-
-    @staticmethod
-    def post(request, pk):
-        comment = get_object_or_404(Comment, pk=pk)
-        up_vote, created = CommentUpVote.objects.get_or_create(
-            created_by=request.user, comment=comment
-        )
-        if created:
-            return Response(status=status.HTTP_201_CREATED)
-        else:
-            return Response(status=status.HTTP_200_OK)
-
-
-class DownVoteACommentView(APIView):
-    authentication_classes = [TokenAuthentication]
-
-    @staticmethod
-    def post(request, pk):
-        comment = get_object_or_404(Comment, pk=pk)
-        down_vote, created = CommentDownVote.objects.get_or_create(
-            created_by=request.user, comment=comment
-        )
-        serializer = CommentDownVoteSerializer(down_vote)
-        if created:
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        else:
-            return Response(status=status.HTTP_200_OK)
-
-
 class ReportACommentView(APIView):
     authentication_classes = [TokenAuthentication]
 
@@ -184,28 +150,6 @@ class RemoveCommentImageUrlView(APIView):
         comment_image_url = get_object_or_404(CommentImageUrl, pk=pk)
         self.check_object_permissions(request, comment_image_url.comment)
         comment_image_url.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
-
-class RemoveUpVoteForACommentView(APIView):
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsOwner]
-
-    def delete(self, request, pk):
-        up_vote = get_object_or_404(CommentUpVote, pk=pk)
-        self.check_object_permissions(request, up_vote)
-        up_vote.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
-
-class RemoveDownVoteForACommentView(APIView):
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsOwner]
-
-    def delete(self, request, pk):
-        down_vote = get_object_or_404(CommentDownVote, pk=pk)
-        self.check_object_permissions(request, down_vote)
-        down_vote.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 

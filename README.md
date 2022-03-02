@@ -10,3 +10,20 @@ To run a raw backend version with SQLite DB
 ```shell script
 make fresh
 ```
+
+
+## Apps
+- administration  : I
+- account         : I
+- hashtag         : I
+- images          : I
+- files           : I
+- publication     : II
+- community       : II
+- comment         : III
+- upvote          : IIV
+- downvote        : IIV
+- bookmark        : IIV
+- share           : IIV
+- report          : IIV
+- notification    : V

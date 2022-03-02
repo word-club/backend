@@ -121,45 +121,6 @@ class PublicationBookmark(models.Model):
         unique_together = [["publication", "created_by"]]
 
 
-class PublicationUpVote(models.Model):
-
-    publication = models.ForeignKey(
-        "Publication", related_name="up_votes", on_delete=models.CASCADE, editable=False
-    )
-    created_by = models.ForeignKey(
-        get_user_model(),
-        on_delete=models.CASCADE,
-        related_name="up_voted_publications",
-        editable=False,
-    )
-    timestamp = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        ordering = ["-timestamp"]
-        unique_together = [["publication", "created_by"]]
-
-
-class PublicationDownVote(models.Model):
-
-    publication = models.ForeignKey(
-        "Publication",
-        related_name="down_votes",
-        on_delete=models.CASCADE,
-        editable=False,
-    )
-    created_by = models.ForeignKey(
-        get_user_model(),
-        on_delete=models.CASCADE,
-        related_name="down_voted_publications",
-        editable=False,
-    )
-    timestamp = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        ordering = ["-timestamp"]
-        unique_together = [["publication", "created_by"]]
-
-
 class HidePublication(models.Model):
 
     publication = models.ForeignKey(

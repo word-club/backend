@@ -23,19 +23,6 @@ def post_delete_comment(sender, instance, **kwargs):
     decrease_pub_discussions(instance)
 
 
-@receiver(post_save, sender=CommentUpVote)
-def post_save_up_vote(sender, instance, created, **kwargs):
-    add_popularity(instance, created)
-    notify_author(instance, created)
-
-
-@receiver(post_save, sender=CommentDownVote)
-def post_save_down_vote(sender, instance, created, **kwargs):
-    add_popularity(instance, created)
-    add_dislikes(instance, created)
-    notify_author(instance, created)
-
-
 @receiver(post_save, sender=CommentShare)
 def post_save_share(sender, instance, created, **kwargs):
     add_popularity(instance, created)

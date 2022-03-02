@@ -1,28 +1,8 @@
 from rest_framework import serializers
 
 from comment.models import *
-
-
-class CommentUpVoteSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = CommentUpVote
-        exclude = ["comment"]
-
-    def create(self, validated_data):
-        validated_data["comment"] = self.context["comment"]
-        validated_data["created_by"] = self.context["request"].user
-        return super().create(validated_data)
-
-
-class CommentDownVoteSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = CommentDownVote
-        exclude = ["comment"]
-
-    def create(self, validated_data):
-        validated_data["comment"] = self.context["comment"]
-        validated_data["created_by"] = self.context["request"].user
-        return super().create(validated_data)
+from vote.models import Vote
+from vote.serializers import VoteSerializer
 
 
 class CommentShareSerializer(serializers.ModelSerializer):
@@ -47,9 +27,13 @@ def get_my_upvote(user, obj):
     if type(user) != get_user_model():
         return False
     try:
-        up_vote = CommentUpVote.objects.get(created_by=user, comment=obj)
-        return CommentUpVoteSerializer(up_vote).data
-    except CommentUpVote.DoesNotExist:
+        up_vote = Vote.objects.get(
+            created_by=user,
+            comment=obj,
+            up=True
+        )
+        return VoteSerializer(up_vote).data
+    except Vote.DoesNotExist:
         return False
 
 
@@ -57,9 +41,13 @@ def get_my_downvote(user, obj):
     if type(user) != get_user_model():
         return False
     try:
-        down_vote = CommentDownVote.objects.get(created_by=user, comment=obj)
-        return CommentDownVoteSerializer(down_vote).data
-    except CommentDownVote.DoesNotExist:
+        down_vote = Vote.objects.get(
+            created_by=user,
+            comment=obj,
+            up=False
+        )
+        return VoteSerializer(down_vote).data
+    except Vote.DoesNotExist:
         return False
 
 
