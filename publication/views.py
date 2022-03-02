@@ -261,7 +261,7 @@ class RemovePublicationBookmarkView(APIView):
     permission_classes = [IsOwner]
 
     def delete(self, request, pk):
-        bookmark = get_object_or_404(PublicationDownVote, pk=pk)
+        bookmark = get_object_or_404(PublicationBookmark, pk=pk)
         self.check_object_permissions(request, bookmark)
         bookmark.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
@@ -388,34 +388,6 @@ class GetTwitterEmbed(APIView):
             )
         )
         return Response(serializer.data, status=status.HTTP_200_OK)
-
-
-class ShareAPublicationView(APIView):
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
-
-    @staticmethod
-    def post(request, pk):
-        publication = get_object_or_404(Publication, pk=pk)
-        context = {"publication": publication, "request": request}
-        serializer = PublicationShareSerializer(data=request.data, context=context)
-        if serializer.is_valid():
-            serializer.save()
-            publication.timestamp = timezone.now()
-            publication.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-class RemoveMyShareForPublication(APIView):
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsOwner]
-
-    @staticmethod
-    def delete(request, pk):
-        share = get_object_or_404(PublicationShare, pk=pk)
-        share.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class PublicationPinView(APIView):

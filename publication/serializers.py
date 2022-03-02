@@ -6,7 +6,10 @@ from comment.serializers import CommentSerializer
 from community.models import CommunityHashtag
 from globals import CommunityGlobalSerializer, UserGlobalSerializer
 from publication.models import *
+from share.models import Share
+from share.serializers import ShareSerializer
 from vote.models import Vote
+from vote.serializers import VoteSerializer
 
 
 class PublicationImageSerializer(serializers.ModelSerializer):
@@ -95,17 +98,6 @@ class PublicationReportSerializer(serializers.ModelSerializer):
         return super().create(validated_data)
 
 
-class PublicationShareSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = PublicationShare
-        exclude = ["publication"]
-
-    def create(self, validated_data):
-        validated_data["created_by"] = self.context["request"].user
-        validated_data["publication"] = self.context["publication"]
-        return super().create(validated_data)
-
-
 class HidePublicationSerializer(serializers.ModelSerializer):
     class Meta:
         model = HidePublication
@@ -186,7 +178,7 @@ class PublicationFormSerializer(serializers.ModelSerializer):
 def get_publication_reactions(publication):
     up_votes = Vote.objects.filter(publication=publication, up=True).count()
     down_votes = Vote.objects.filter(publication=publication, up=False).count()
-    shares = PublicationShare.objects.filter(publication=publication).count()
+    shares = Share.objects.filter(publication=publication).count()
     comments = Comment.objects.filter(publication=publication).count()
     total = up_votes + down_votes + shares + comments
 
@@ -238,7 +230,7 @@ class PublicationSerializer(serializers.ModelSerializer):
                 up=False
             )
             return VoteSerializer(down_vote).data
-        except PublicationDownVote.DoesNotExist:
+        except Vote.DoesNotExist:
             return False
 
     def get_share_status(self, obj):
@@ -246,9 +238,9 @@ class PublicationSerializer(serializers.ModelSerializer):
         if type(user) != get_user_model():
             return False
         try:
-            share = PublicationShare.objects.get(created_by=user, publication=obj)
-            return PublicationShareSerializer(share).data
-        except PublicationShare.DoesNotExist:
+            share = Share.objects.get(created_by=user, publication=obj)
+            return ShareSerializer(share).data
+        except Share.DoesNotExist:
             return False
 
     def get_hidden_status(self, obj):

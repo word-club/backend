@@ -1,14 +1,9 @@
 from rest_framework import serializers
 
 from comment.models import *
+from share.models import Share
 from vote.models import Vote
 from vote.serializers import VoteSerializer
-
-
-class CommentShareSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = CommentShare
-        exclude = ["comment"]
 
 
 class HideCommentSerializer(serializers.ModelSerializer):
@@ -55,9 +50,9 @@ def get_my_share_status(user, obj):
     if type(user) != get_user_model():
         return False
     try:
-        share = CommentShare.objects.get(created_by=user, comment=obj)
-        return CommentShareSerializer(share).data
-    except CommentShare.DoesNotExist:
+        share = Share.objects.get(created_by=user, comment=obj)
+        return Share(share).data
+    except Share.DoesNotExist:
         return False
 
 
@@ -82,9 +77,9 @@ def get_my_bookmark_status(user, obj):
 
 
 def get_comment_reactions(obj):
-    up_votes = CommentUpVote.objects.filter(comment=obj).count()
-    down_votes = CommentDownVote.objects.filter(comment=obj).count()
-    shares = CommentShare.objects.filter(comment=obj).count()
+    up_votes = Vote.objects.filter(comment=obj, up=True).count()
+    down_votes = Vote.objects.filter(comment=obj, up=False).count()
+    shares = Share.objects.filter(comment=obj).count()
     replies = Comment.objects.filter(reply=obj).count()
 
     return {

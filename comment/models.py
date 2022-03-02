@@ -112,48 +112,6 @@ class CommentLink(models.Model):
         unique_together = [["comment", "link"]]
 
 
-class CommentUpVote(models.Model):
-    id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
-    comment = models.ForeignKey(
-        "Comment",
-        related_name="up_votes",
-        on_delete=models.CASCADE,
-        editable=False,
-    )
-    created_by = models.ForeignKey(
-        get_user_model(),
-        on_delete=models.CASCADE,
-        related_name="up_voted_comments",
-        editable=False,
-    )
-    timestamp = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        ordering = ["-timestamp"]
-        unique_together = [["created_by", "comment"]]
-
-
-class CommentDownVote(models.Model):
-    id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
-    comment = models.ForeignKey(
-        "Comment",
-        related_name="down_votes",
-        on_delete=models.CASCADE,
-        editable=False,
-    )
-    created_by = models.ForeignKey(
-        get_user_model(),
-        on_delete=models.CASCADE,
-        related_name="down_voted_comments",
-        editable=False,
-    )
-    timestamp = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        ordering = ["-timestamp"]
-        unique_together = [["created_by", "comment"]]
-
-
 class ReportComment(models.Model):
     id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
     reason = models.TextField()
@@ -182,25 +140,6 @@ class HideComment(models.Model):
         related_name="hidden_comments",
         editable=False,
     )
-    timestamp = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        ordering = ["-timestamp"]
-        unique_together = [["comment", "created_by"]]
-
-
-class CommentShare(models.Model):
-    title = models.CharField(max_length=128)
-    comment = models.ForeignKey(
-        "Comment", on_delete=models.CASCADE, related_name="shares", editable=False
-    )
-    created_by = models.ForeignKey(
-        get_user_model(),
-        on_delete=models.CASCADE,
-        related_name="shared_comments",
-        editable=False,
-    )
-    tags = models.CharField(max_length=16, null=True, blank=True)
     timestamp = models.DateTimeField(auto_now=True)
 
     class Meta:

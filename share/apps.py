@@ -1,9 +1,9 @@
 from django.apps import AppConfig
 
 
-class UpvoteConfig(AppConfig):
+class ShareConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'vote'
+    name = 'share'
 
     def ready(self):
-        import vote.signals
+        import share.signals

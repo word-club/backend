@@ -5,17 +5,17 @@ from comment.models import Comment
 from publication.models import Publication
 
 
-class Vote(models.Model):
+class Share(models.Model):
     publication = models.ForeignKey(
         Publication,
-        related_name="votes",
+        related_name="shares",
         on_delete=models.CASCADE,
         editable=False,
         null=True
     )
     comment = models.ForeignKey(
         Comment,
-        related_name="votes",
+        related_name="shares",
         on_delete=models.CASCADE,
         editable=False,
         null=True
@@ -23,18 +23,17 @@ class Vote(models.Model):
     created_by = models.ForeignKey(
         get_user_model(),
         on_delete=models.CASCADE,
-        related_name="votes",
+        related_name="shares",
         editable=False,
     )
 
-    up = models.BooleanField(default=False, editable=False)
-
+    title = models.CharField(max_length=128)
     created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        ordering = ["-timestamp"]
+        ordering = ["-created_at"]
         unique_together = [
-            ["publication", "created_by", "up"],
-            ["community", "created_by", "up"],
-            ["comment", "created_by", "up"],
+            ["comment", "created_by"],
+            ["publication", "created_by"]
         ]

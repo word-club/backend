@@ -13,10 +13,9 @@ from community.models import (
 )
 from publication.models import (
     Publication,
-    PublicationUpVote,
-    PublicationShare,
-    PublicationDownVote,
 )
+from share.models import Share
+from vote.models import Vote
 
 
 class CommunityGlobalSerializer(serializers.ModelSerializer):
@@ -136,9 +135,9 @@ class UserGlobalSerializer(serializers.ModelSerializer):
         for pub in publications:
             comments = Comment.objects.filter(publication=pub).count()
 
-            up_votes = PublicationUpVote.objects.filter(publication=pub).count()
-            down_votes = PublicationDownVote.objects.filter(publication=pub).count()
-            shares = PublicationShare.objects.filter(publication=pub).count()
+            up_votes = Vote.objects.filter(publication=pub, up=True).count()
+            down_votes = Vote.objects.filter(publication=pub, up=False).count()
+            shares = Share.objects.filter(publication=pub).count()
             count += comments + up_votes + down_votes + shares
         return count
 

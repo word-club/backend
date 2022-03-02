@@ -20,8 +20,6 @@ from publication.views import (
     EditOrRemovePublicationLink,
     AddPublicationLinkView,
     GetTwitterEmbed,
-    ShareAPublicationView,
-    RemoveMyShareForPublication,
     PublicationPinView,
     ViewAPublication,
 )
@@ -48,8 +46,6 @@ urlpatterns += [
     path("publication/<int:pk>/link/", AddPublicationLinkView.as_view()),
     path("publication-link/<int:pk>/", EditOrRemovePublicationLink.as_view()),
     path("get-twitter-embed/", GetTwitterEmbed.as_view()),
-    path("publication/<int:pk>/share/", ShareAPublicationView.as_view()),
-    path("publication-share/<int:pk>/", RemoveMyShareForPublication.as_view()),
     path("publication/<int:pk>/pin/", PublicationPinView.as_view()),
     path("publication/filter/", PublicationFilter.as_view()),
     path("publication/<int:pk>/view/", ViewAPublication.as_view()),

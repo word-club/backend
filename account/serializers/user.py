@@ -4,15 +4,12 @@ from rest_framework import serializers
 from account.models import *
 from account.serializers.follow import FollowUserSerializer
 from comment.models import (
-    CommentUpVote,
-    CommentDownVote,
     HideComment,
     CommentBookmark,
     Comment,
 )
 from comment.serializers import (
     CommentSerializer,
-    CommentShareSerializer,
     CommentReportSerializer,
     CommentForProfileSerializer,
 )
@@ -28,15 +25,14 @@ from notification.serializers import NotificationReceiverSerializer
 from publication.models import (
     Publication,
     PublicationBookmark,
-    PublicationUpVote,
-    PublicationDownVote,
     HidePublication,
 )
 from publication.serializers import (
     PublicationSerializer,
     PublicationReportSerializer,
-    PublicationShareSerializer,
 )
+from share.serializers import ShareSerializer
+from vote.models import Vote
 
 
 class ProfilePostSerializer(serializers.ModelSerializer):
@@ -171,7 +167,7 @@ class UserInfoSerializer(serializers.ModelSerializer):
     hidden_publications = serializers.SerializerMethodField()
     reported_publications = PublicationReportSerializer(many=True, read_only=True)
     # TODO: add serializer with publication instance
-    shared_publications = PublicationShareSerializer(many=True, read_only=True)
+    shared_publications = ShareSerializer(many=True, read_only=True)
 
     comments = serializers.SerializerMethodField()
     up_voted_comments = serializers.SerializerMethodField()
@@ -179,7 +175,7 @@ class UserInfoSerializer(serializers.ModelSerializer):
     reported_comments = CommentReportSerializer(many=True, read_only=True)
     hidden_comments = serializers.SerializerMethodField()
     saved_comments = serializers.SerializerMethodField()
-    shared_comments = CommentShareSerializer(many=True, read_only=True)
+    shared_comments = ShareSerializer(many=True, read_only=True)
 
     created_communities = CommunitySerializer(many=True, read_only=True)
     subscribed_communities = serializers.SerializerMethodField()
@@ -218,7 +214,7 @@ class UserInfoSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def get_up_voted_publications(obj):
-        items = PublicationUpVote.objects.filter(created_by=obj)
+        items = Vote.objects.filter(created_by=obj, up=True, comment=None)
         publications = []
         [publications.append(item.publication) for item in items]
         return PublicationSerializer(
@@ -227,7 +223,7 @@ class UserInfoSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def get_down_voted_publications(obj):
-        items = PublicationDownVote.objects.filter(created_by=obj)
+        items = Vote.objects.filter(created_by=obj, up=False, comment=None)
         publications = []
         [publications.append(item.publication) for item in items]
         return PublicationSerializer(
@@ -254,7 +250,7 @@ class UserInfoSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def get_up_voted_comments(obj):
-        items = CommentUpVote.objects.filter(created_by=obj)
+        items = Vote.objects.filter(created_by=obj, up=True, publication=None)
         comments = []
         [comments.append(item.comment) for item in items]
         return CommentSerializer(
@@ -263,7 +259,7 @@ class UserInfoSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def get_down_voted_comments(obj):
-        items = CommentDownVote.objects.filter(created_by=obj)
+        items = Vote.objects.filter(created_by=obj, up=False, publication=None)
         comments = []
         [comments.append(item.comment) for item in items]
         return CommentSerializer(

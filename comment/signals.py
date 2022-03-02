@@ -3,9 +3,6 @@ from django.dispatch import receiver
 
 from comment.models import (
     Comment,
-    CommentUpVote,
-    CommentDownVote,
-    CommentShare,
     CommentBookmark,
     HideComment,
 )
@@ -23,13 +20,6 @@ def post_delete_comment(sender, instance, **kwargs):
     decrease_pub_discussions(instance)
 
 
-@receiver(post_save, sender=CommentShare)
-def post_save_share(sender, instance, created, **kwargs):
-    add_popularity(instance, created)
-    add_supports(instance, created)
-    notify_author(instance, created)
-
-
 @receiver(post_save, sender=CommentBookmark)
 def post_save_bookmark(sender, instance, created, **kwargs):
     add_popularity(instance, created)
@@ -40,24 +30,6 @@ def post_save_bookmark(sender, instance, created, **kwargs):
 @receiver(post_save, sender=HideComment)
 def post_save_hide(sender, instance, created, **kwargs):
     add_dislikes(instance, created)
-
-
-@receiver(post_delete, sender=CommentUpVote)
-def post_delete_up_vote(sender, instance, **kwargs):
-    decrease_popularity(instance)
-    decrease_supports(instance)
-
-
-@receiver(post_delete, sender=CommentDownVote)
-def post_delete_down_vote(sender, instance, **kwargs):
-    decrease_popularity(instance)
-    decrease_dislikes(instance)
-
-
-@receiver(post_delete, sender=CommentShare)
-def post_delete_share(sender, instance, **kwargs):
-    decrease_popularity(instance)
-    decrease_supports(instance)
 
 
 @receiver(post_save, sender=CommentBookmark)

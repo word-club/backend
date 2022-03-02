@@ -174,25 +174,6 @@ class PublicationLink(models.Model):
         unique_together = [["publication", "link"]]
 
 
-class PublicationShare(models.Model):
-    title = models.CharField(max_length=128)
-    publication = models.ForeignKey(
-        "Publication", on_delete=models.CASCADE, related_name="shares", editable=False
-    )
-    created_by = models.ForeignKey(
-        get_user_model(),
-        on_delete=models.CASCADE,
-        related_name="shared_publications",
-        editable=False,
-    )
-    tags = models.CharField(max_length=16, null=True, blank=True)
-    timestamp = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        ordering = ["-timestamp"]
-        unique_together = [["publication", "created_by"]]
-
-
 class PublicationHashtag(models.Model):
     hashtag = models.ForeignKey(
         Hashtag, on_delete=models.CASCADE, related_name="publications", editable=False
