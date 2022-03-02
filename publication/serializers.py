@@ -1,6 +1,8 @@
 import metadata_parser
 from rest_framework import serializers
 
+from bookmark.models import Bookmark
+from bookmark.serializers import BookmarkSerializer
 from comment.models import Comment
 from comment.serializers import CommentSerializer
 from community.models import CommunityHashtag
@@ -90,12 +92,6 @@ class PublicationImageUrlSerializer(serializers.ModelSerializer):
 class HidePublicationSerializer(serializers.ModelSerializer):
     class Meta:
         model = HidePublication
-        exclude = ["publication"]
-
-
-class PublicationBookmarkSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = PublicationBookmark
         exclude = ["publication"]
 
 
@@ -247,9 +243,9 @@ class PublicationSerializer(serializers.ModelSerializer):
         if type(user) != get_user_model():
             return False
         try:
-            bookmark = PublicationBookmark.objects.get(created_by=user, publication=obj)
-            return PublicationBookmarkSerializer(bookmark).data
-        except PublicationBookmark.DoesNotExist:
+            bookmark = Bookmark.objects.get(created_by=user, publication=obj)
+            return BookmarkSerializer(bookmark).data
+        except Bookmark.DoesNotExist:
             return False
 
     def get_comments(self, obj):

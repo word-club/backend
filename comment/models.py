@@ -127,23 +127,3 @@ class HideComment(models.Model):
     class Meta:
         ordering = ["-timestamp"]
         unique_together = [["comment", "created_by"]]
-
-
-class CommentBookmark(models.Model):
-    comment = models.ForeignKey(
-        "Comment",
-        related_name="bookmarks",
-        on_delete=models.CASCADE,
-        editable=False,
-    )
-    created_by = models.ForeignKey(
-        get_user_model(),
-        on_delete=models.CASCADE,
-        related_name="saved_comments",
-        editable=False,
-    )
-    timestamp = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        ordering = ["-timestamp"]
-        unique_together = [["comment", "created_by"]]

@@ -150,38 +150,12 @@ class HideCommentForMe(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class BookmarkComment(APIView):
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
-
-    def post(self, request, pk):
-        instance = get_object_or_404(Comment, pk=pk)
-        bookmark, created = CommentBookmark.objects.get_or_create(
-            comment=instance, created_by=request.user
-        )
-        if created:
-            return Response(
-                CommentBookmarkSerializer(bookmark).data, status=status.HTTP_201_CREATED
-            )
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
-
 class RemoveHiddenStatus(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsOwner]
 
     def delete(self, request, pk):
         instance = get_object_or_404(HideComment, pk=pk)
-        self.check_object_permissions(request, instance)
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
-
-class RemoveCommentBookmark(APIView):
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsOwner]
-
-    def delete(self, request, pk):
-        instance = get_object_or_404(CommentBookmark, pk=pk)
         self.check_object_permissions(request, instance)
         return Response(status=status.HTTP_204_NO_CONTENT)
 

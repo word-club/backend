@@ -97,30 +97,6 @@ class PublicationImageUrl(models.Model):
         ordering = ["-timestamp"]
 
 
-class PublicationBookmark(models.Model):
-
-    is_bookmarked = models.BooleanField(default=True, editable=False)
-
-    publication = models.ForeignKey(
-        "Publication",
-        related_name="bookmarks",
-        on_delete=models.CASCADE,
-        editable=False,
-    )
-    created_by = models.ForeignKey(
-        get_user_model(),
-        on_delete=models.CASCADE,
-        related_name="saved_publications",
-        editable=False,
-    )
-    created_at = models.DateTimeField(auto_now_add=True)
-    timestamp = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        ordering = ["-timestamp"]
-        unique_together = [["publication", "created_by"]]
-
-
 class HidePublication(models.Model):
 
     publication = models.ForeignKey(

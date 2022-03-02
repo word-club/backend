@@ -93,7 +93,7 @@ class Report(models.Model):
             check += 1
         if check > 1:
             raise Exception("Only one key field is allowed.")
-        super(Report, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)
 
     class Meta:
         ordering = ["-created_at"]

@@ -1,5 +1,7 @@
 from rest_framework import serializers
 
+from bookmark.models import Bookmark
+from bookmark.serializers import BookmarkSerializer
 from comment.models import *
 from share.models import Share
 from vote.models import Vote
@@ -9,12 +11,6 @@ from vote.serializers import VoteSerializer
 class HideCommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = HideComment
-        exclude = ["comment"]
-
-
-class CommentBookmarkSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = CommentBookmark
         exclude = ["comment"]
 
 
@@ -70,9 +66,9 @@ def get_my_bookmark_status(user, obj):
     if type(user) != get_user_model():
         return False
     try:
-        bookmark = CommentBookmark.objects.get(created_by=user, comment=obj)
-        return CommentBookmarkSerializer(bookmark).data
-    except CommentBookmark.DoesNotExist:
+        bookmark = Bookmark.objects.get(created_by=user, comment=obj)
+        return BookmarkSerializer(bookmark).data
+    except Bookmark.DoesNotExist:
         return False
 
 

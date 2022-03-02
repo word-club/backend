@@ -3,9 +3,9 @@ from rest_framework import serializers
 
 from account.models import *
 from account.serializers.follow import FollowUserSerializer
+from bookmark.models import Bookmark
 from comment.models import (
     HideComment,
-    CommentBookmark,
     Comment,
 )
 from comment.serializers import (
@@ -22,7 +22,6 @@ from globals import UserGlobalSerializer
 from notification.serializers import NotificationReceiverSerializer
 from publication.models import (
     Publication,
-    PublicationBookmark,
     HidePublication,
 )
 from publication.serializers import (
@@ -201,7 +200,7 @@ class UserInfoSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def get_saved_publications(obj):
-        bookmarks = PublicationBookmark.objects.filter(created_by=obj)
+        bookmarks = Bookmark.objects.filter(created_by=obj, comment=None)
         publications = []
         [publications.append(bookmark.publication) for bookmark in bookmarks]
         return PublicationSerializer(
@@ -273,7 +272,7 @@ class UserInfoSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def get_saved_comments(obj):
-        items = CommentBookmark.objects.filter(created_by=obj)
+        items = Bookmark.objects.filter(created_by=obj, publication=None)
         comments = []
         [comments.append(item.comment) for item in items]
         return CommentSerializer(

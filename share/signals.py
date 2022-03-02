@@ -1,8 +1,14 @@
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 
-from helpers.vote_signals import add_popularity, add_supports, notify_author, decrease_popularity, decrease_supports
 from share.models import Share
+from helpers.vote_signals import (
+    add_popularity,
+    add_supports,
+    notify_author,
+    decrease_popularity,
+    decrease_supports
+)
 
 
 @receiver(post_save, sender=Share)
