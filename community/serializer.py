@@ -2,6 +2,7 @@ from django.utils import timezone
 from rest_framework import serializers
 
 from community.models import *
+from report.serializers import ReportSerializer
 
 
 class CommunityAvatarSerializer(serializers.ModelSerializer):
@@ -35,23 +36,6 @@ class CommunityRuleSerializer(serializers.ModelSerializer):
         validated_data["created_by"] = self.context["request"].user
         validated_data["community"] = self.context["community"]
         return CommunityRule.objects.create(**validated_data)
-
-
-class ReportCommunitySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = CommunityReport
-        exclude = ["community"]
-        depth = 1
-
-    def create(self, validated_data):
-        validated_data["created_by"] = self.context["request"].user
-        validated_data["community"] = self.context["community"]
-        return super().create(validated_data)
-
-
-class ResolveReportSerializer(serializers.Serializer):
-    resolve_text = serializers.CharField(max_length=1000, required=True)
-    state = serializers.ChoiceField(required=True, choices=REPORT_STATES)
 
 
 class CommunityHashtagSerializer(serializers.ModelSerializer):
@@ -176,7 +160,7 @@ class CommunityRetrieveSerializer(serializers.ModelSerializer):
     sub_admins = CommunitySubAdminSerializer(many=True, read_only=True)
     subscription = serializers.SerializerMethodField()
     is_blocked = serializers.SerializerMethodField()
-    reports = ReportCommunitySerializer(many=True, read_only=True)
+    reports = ReportSerializer(many=True, read_only=True)
 
     @staticmethod
     def get_subscriptions(obj):

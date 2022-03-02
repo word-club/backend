@@ -4,8 +4,6 @@ from comment.filter import CommentFilter
 from comment.views import (
     AddPublicationComment,
     UpdateDestroyCommentView,
-    ReportACommentView,
-    RemoveCommentReportView,
     RemoveCommentImageView,
     RemoveCommentImageUrlView,
     ReplyCommentView,
@@ -30,8 +28,6 @@ urlpatterns += [
     path("comment/<str:pk>/", UpdateDestroyCommentView.as_view()),
     path("comment/<str:pk>/hide/", HideCommentForMe.as_view()),
     path("comment/<str:pk>/comment/", BookmarkComment.as_view()),
-    path("comment/<str:pk>/report/", ReportACommentView.as_view()),
-    path("comment-report/<str:pk>/", RemoveCommentReportView.as_view()),
     path("comment-image/<str:pk>/", RemoveCommentImageView.as_view()),
     path("comment-image-url/<str:pk>/", RemoveCommentImageUrlView.as_view()),
     path("comment/<str:pk>/", UpdateDestroyCommentView.as_view()),

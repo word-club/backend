@@ -59,21 +59,6 @@ class RegisterUserView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class ReportAUser(APIView):
-    @staticmethod
-    def post(request, pk):
-        user = get_object_or_404(get_user_model(), pk=pk)
-        report, created = ReportUser.objects.get_or_create(
-            to_report=user, user=request.user
-        )
-        if created:
-            return Response(status=status.HTTP_201_CREATED)
-        return Response(
-            {"detail": "Cannot report already reported user."},
-            status=status.HTTP_403_FORBIDDEN,
-        )
-
-
 class BlockAUser(APIView):
     @staticmethod
     def post(request, pk):
@@ -96,17 +81,6 @@ class UnBlockAUser(APIView):
         block = get_object_or_404(BlockUser, pk=pk)
         self.check_object_permissions(request, block)
         block.delete()
-        return Response(status=status.HTTP_200_OK)
-
-
-class DeleteReport(APIView):
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsOwner]
-
-    def delete(self, request, pk):
-        report = get_object_or_404(ReportUser, pk=pk)
-        self.check_object_permissions(request, report)
-        report.delete()
         return Response(status=status.HTTP_200_OK)
 
 

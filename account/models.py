@@ -112,28 +112,6 @@ class FollowUser(models.Model):
         unique_together = [["created_by", "user"]]
 
 
-class ReportUser(models.Model):
-    title = models.CharField(max_length=256)
-    report = models.TextField()
-    user = models.ForeignKey(
-        get_user_model(),
-        on_delete=models.CASCADE,
-        related_name="reported_by",
-        editable=False,
-    )
-    created_by = models.ForeignKey(
-        get_user_model(),
-        on_delete=models.CASCADE,
-        related_name="reported_users",
-        editable=False,
-    )
-    timestamp = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        ordering = ["-timestamp"]
-        unique_together = [["created_by", "user"]]
-
-
 class BlockUser(models.Model):
     user = models.ForeignKey(
         get_user_model(),

@@ -22,17 +22,6 @@ class CommentImageUrlSerializer(serializers.ModelSerializer):
         return super().create(validated_data)
 
 
-class CommentReportSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ReportComment
-        fields = "__all__"
-
-    def create(self, validated_data):
-        validated_data["comment"] = self.context["comment"]
-        validated_data["created_by"] = self.context["request"].user
-        return super().create(validated_data)
-
-
 class CommentPostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment

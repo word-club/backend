@@ -87,17 +87,6 @@ class PublicationImageUrlSerializer(serializers.ModelSerializer):
         return super().create(validated_data)
 
 
-class PublicationReportSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ReportPublication
-        exclude = ["publication"]
-
-    def create(self, validated_data):
-        validated_data["publication"] = self.context["publication"]
-        validated_data["created_by"] = self.context["request"].user
-        return super().create(validated_data)
-
-
 class HidePublicationSerializer(serializers.ModelSerializer):
     class Meta:
         model = HidePublication

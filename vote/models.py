@@ -31,6 +31,16 @@ class Vote(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
 
+    def save(self, *args, **kwargs):
+        check = 0
+        if self.publication:
+            check += 1
+        if self.comment:
+            check += 1
+        if check > 1:
+            raise Exception("Only one key field is allowed.")
+        super().save(*args, **kwargs)
+
     class Meta:
         ordering = ["-timestamp"]
         unique_together = [

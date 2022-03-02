@@ -12,7 +12,6 @@ app_name = "community"
 
 urlpatterns += [
     path("community/<int:pk>/", CommunityDetail.as_view()),
-    path("community/<int:pk>/report/", ReportACommunity.as_view()),
     path("community/<int:pk>/subscribe/", SubscribeToACommunity.as_view()),
     path(
         "community/<int:pk>/disable-notifications/",
@@ -53,14 +52,6 @@ urlpatterns += [
     path(
         "community-avatar/<int:pk>/",
         DeleteCommunityAvatar.as_view(),
-    ),
-    path(
-        "community-report/<int:pk>/",
-        CommunityReportDetailView.as_view(),
-    ),
-    path(
-        "resolve-report/<int:pk>/",
-        ResolveReportView.as_view(),
     ),
     path(
         "community-unsubscribe/<int:pk>/",

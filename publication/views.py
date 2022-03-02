@@ -300,46 +300,6 @@ class RemovePublicationHiddenStateView(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class ReportAPublicationView(APIView):
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
-
-    @staticmethod
-    def post(request, pk):
-        publication = get_object_or_404(Publication, pk=pk)
-        reports = ReportPublication.objects.filter(
-            created_by=request.user, publication=publication
-        )
-        most_recent_report_found, diff = helper.is_recent_report_present(reports)
-
-        if most_recent_report_found:
-            return Response(
-                data={"detail": "recently reported", "remaining": 15 - diff},
-                status=status.HTTP_403_FORBIDDEN,
-            )
-
-        context = {"publication": publication, "request": request}
-        serializer = PublicationReportSerializer(data=request.data, context=context)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(
-                PublicationSerializer(publication, context={"user": request.user}).data,
-                status=status.HTTP_201_CREATED,
-            )
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-class RemovePublicationReportView(APIView):
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAdminUser]
-
-    def delete(self, request, pk):
-        report = get_object_or_404(ReportPublication, pk=pk)
-        self.check_object_permissions(request, report)
-        report.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
-
 class AddPublicationLinkView(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsOwner]

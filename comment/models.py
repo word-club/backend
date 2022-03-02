@@ -112,24 +112,6 @@ class CommentLink(models.Model):
         unique_together = [["comment", "link"]]
 
 
-class ReportComment(models.Model):
-    id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
-    reason = models.TextField()
-    comment = models.ForeignKey(
-        "Comment", on_delete=models.CASCADE, related_name="reports", editable=False
-    )
-    created_by = models.ForeignKey(
-        get_user_model(),
-        on_delete=models.CASCADE,
-        related_name="reported_comments",
-        editable=False,
-    )
-    timestamp = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        ordering = ["-timestamp"]
-
-
 class HideComment(models.Model):
     comment = models.ForeignKey(
         "Comment", on_delete=models.CASCADE, related_name="hides", editable=False

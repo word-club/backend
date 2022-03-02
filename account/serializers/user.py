@@ -10,13 +10,11 @@ from comment.models import (
 )
 from comment.serializers import (
     CommentSerializer,
-    CommentReportSerializer,
     CommentForProfileSerializer,
 )
 from community.models import CommunitySubscription
 from community.serializer import (
     CommunitySerializer,
-    ReportCommunitySerializer,
     CommunityAdminSerializer,
     CommunitySubAdminSerializer,
 )
@@ -29,8 +27,8 @@ from publication.models import (
 )
 from publication.serializers import (
     PublicationSerializer,
-    PublicationReportSerializer,
 )
+from report.serializers import ReportSerializer
 from share.serializers import ShareSerializer
 from vote.models import Vote
 
@@ -165,21 +163,19 @@ class UserInfoSerializer(serializers.ModelSerializer):
     up_voted_publications = serializers.SerializerMethodField()
     down_voted_publications = serializers.SerializerMethodField()
     hidden_publications = serializers.SerializerMethodField()
-    reported_publications = PublicationReportSerializer(many=True, read_only=True)
     # TODO: add serializer with publication instance
     shared_publications = ShareSerializer(many=True, read_only=True)
 
     comments = serializers.SerializerMethodField()
     up_voted_comments = serializers.SerializerMethodField()
     down_voted_comments = serializers.SerializerMethodField()
-    reported_comments = CommentReportSerializer(many=True, read_only=True)
+    added_reports = ReportSerializer(many=True, read_only=True)
     hidden_comments = serializers.SerializerMethodField()
     saved_comments = serializers.SerializerMethodField()
     shared_comments = ShareSerializer(many=True, read_only=True)
 
     created_communities = CommunitySerializer(many=True, read_only=True)
     subscribed_communities = serializers.SerializerMethodField()
-    reported_communities = ReportCommunitySerializer(many=True, read_only=True)
     managed_communities = CommunityAdminSerializer(many=True, read_only=True)
     sub_managed_communities = CommunitySubAdminSerializer(many=True, read_only=True)
 

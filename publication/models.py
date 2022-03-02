@@ -139,26 +139,6 @@ class HidePublication(models.Model):
         unique_together = [["publication", "created_by"]]
 
 
-class ReportPublication(models.Model):
-
-    reason = models.TextField()
-
-    publication = models.ForeignKey(
-        "Publication", on_delete=models.CASCADE, related_name="reports", editable=False
-    )
-    created_by = models.ForeignKey(
-        get_user_model(),
-        on_delete=models.CASCADE,
-        related_name="reported_publications",
-        editable=False,
-    )
-    timestamp = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        ordering = ["-timestamp"]
-        unique_together = [["publication", "created_by"]]
-
-
 class PublicationLink(models.Model):
     link = models.URLField()
     title = models.CharField(max_length=512, editable=False, null=True)

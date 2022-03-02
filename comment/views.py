@@ -96,40 +96,6 @@ class UpdateDestroyCommentView(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class ReportACommentView(APIView):
-    authentication_classes = [TokenAuthentication]
-
-    @staticmethod
-    def post(request, pk):
-        comment = get_object_or_404(Comment, pk=pk)
-        reports = ReportComment.objects.filter(created_by=request.user, comment=comment)
-        most_recent_report_found, diff = helper.is_recent_report_present(reports)
-
-        if most_recent_report_found:
-            return Response(
-                data={"detail": "recently reported", "remaining": 15 - diff},
-                status=status.HTTP_403_FORBIDDEN,
-            )
-
-        context = {"comment": comment, "request": request}
-        serializer = CommentReportSerializer(data=request.data, context=context)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-class RemoveCommentReportView(APIView):
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAdminUser]
-
-    def delete(self, request, pk):
-        report = get_object_or_404(ReportComment, pk=pk)
-        self.check_object_permissions(request, report)
-        report.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
-
 class RemoveCommentImageView(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsOwner]

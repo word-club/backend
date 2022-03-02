@@ -7,7 +7,7 @@ from django.core.validators import FileExtensionValidator
 from django.core.exceptions import ValidationError
 from django.db import models
 from backend.settings import ALLOWED_IMAGES_EXTENSIONS
-from choices import COMMUNITY_TYPES, PROGRESS_STATES, COLOR_CHOICES, REPORT_STATES
+from choices import COMMUNITY_TYPES, PROGRESS_STATES, COLOR_CHOICES
 from hashtag.models import Hashtag
 
 
@@ -177,36 +177,6 @@ class CommunitySubscription(models.Model):
     class Meta:
         ordering = ["-timestamp"]
         unique_together = [["subscriber", "community"]]
-
-
-class CommunityReport(models.Model):
-    reason = models.TextField()
-    created_by = models.ForeignKey(
-        get_user_model(),
-        on_delete=models.CASCADE,
-        related_name="reported_communities",
-        editable=False,
-    )
-    community = models.ForeignKey(
-        "Community", on_delete=models.CASCADE, related_name="reports", editable=False
-    )
-    timestamp = models.DateTimeField(auto_now=True)
-    state = models.CharField(default="pending", max_length=8, choices=REPORT_STATES, editable=False)
-    resolve_text = models.TextField(null=True, editable=False)
-    resolved_by = models.ForeignKey(
-        get_user_model(),
-        on_delete=models.CASCADE,
-        related_name="resolved_community_reports",
-        null=True,
-        editable=False
-    )
-    resolved_at = models.DateTimeField(null=True, editable=False)
-
-    # is seen by the administrator
-    is_seen = models.BooleanField(default=False, editable=False)
-
-    class Meta:
-        ordering = ["-timestamp"]
 
 
 class CommunityHashtag(models.Model):
