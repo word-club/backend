@@ -208,6 +208,8 @@ class PublicationPinView(APIView):
         if publication.is_pinned:
             return Response(status=status.HTTP_200_OK)
         publication.is_pinned = True
+        publication.pinned_at = timezone.now()
+        publication.pinned_by = request.user
         publication.save()
         return Response(status=status.HTTP_201_CREATED)
 
@@ -230,6 +232,5 @@ class ViewAPublication(APIView):
         publication = get_object_or_404(Publication, pk=pk)
         publication.views += 1
         publication.save()
-        context = {"user": request.user}
-        serializer = PublicationSerializer(publication, read_only=True, context=context)
+        serializer = PublicationSerializer(publication)
         return Response(serializer.data, status=status.HTTP_200_OK)

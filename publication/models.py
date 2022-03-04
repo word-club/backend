@@ -8,7 +8,6 @@ from hashtag.models import Hashtag
 
 
 class Publication(models.Model):
-
     title = models.CharField(max_length=128)
     content = models.TextField(null=True, blank=True)
 
@@ -16,15 +15,21 @@ class Publication(models.Model):
     published_at = models.DateTimeField(null=True, editable=False)
 
     is_pinned = models.BooleanField(default=False, editable=False)
+    pinned_at = models.DateTimeField(null=True, editable=False)
+    pinned_by = models.ForeignKey(
+        get_user_model(), null=True, editable=False, on_delete=models.SET_NULL
+    )
 
     views = models.PositiveBigIntegerField(default=0, editable=False)
 
-    created_at = models.DateTimeField(auto_now_add=True)
-    timestamp = models.DateTimeField(auto_now=True)
-    tags = models.CharField(max_length=16, null=True)
-
     type = models.CharField(
         max_length=32, choices=PUBLICATION_TYPE_CHOICES, default="editor"
+    )
+
+    tags = models.ManyToManyField(
+        Hashtag,
+        null=True,
+        related_name="publications",
     )
 
     community = models.ForeignKey(
@@ -45,25 +50,11 @@ class Publication(models.Model):
     supports = models.PositiveBigIntegerField(default=0, editable=False)
     discussions = models.PositiveBigIntegerField(default=0, editable=False)
 
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
     class Meta:
-        ordering = ["-timestamp"]
+        ordering = ["-created_at"]
 
     def is_draft(self):
         return not self.is_published
-
-
-class PublicationHashtag(models.Model):
-    hashtag = models.ForeignKey(
-        Hashtag, on_delete=models.CASCADE, related_name="publications", editable=False
-    )
-    publication = models.ForeignKey(
-        "Publication",
-        on_delete=models.CASCADE,
-        related_name="hashtags",
-        editable=False,
-    )
-    timestamp = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        ordering = ["-timestamp"]
-        unique_together = [["publication", "hashtag"]]

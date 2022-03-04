@@ -6,6 +6,7 @@ from block.models import Block
 from block.serializers import BlockCommunitySerializer
 from community.models import *
 from cover.serializers import CommunityCoverSerializer
+from hashtag.serializers import HashtagSerializer
 from report.serializers import ReportSerializer
 
 
@@ -18,26 +19,6 @@ class CommunityRuleSerializer(serializers.ModelSerializer):
         validated_data["created_by"] = self.context["request"].user
         validated_data["community"] = self.context["community"]
         return CommunityRule.objects.create(**validated_data)
-
-
-class CommunityHashtagSerializer(serializers.ModelSerializer):
-    name = serializers.SerializerMethodField()
-
-    @staticmethod
-    def get_name(obj):
-        return obj.tag.tag
-
-    class Meta:
-        model = CommunityHashtag
-        exclude = ["community"]
-
-
-class CommunityHashtagPostSerializer(serializers.Serializer):
-    tags = serializers.ListField(
-        child=serializers.PrimaryKeyRelatedField(queryset=Hashtag.objects.all()),
-        required=True,
-        max_length=16,
-    )
 
 
 class CommunityAdminSerializer(serializers.ModelSerializer):
@@ -79,27 +60,16 @@ class CommunityThemeSerializer(serializers.ModelSerializer):
         return super().update(instance, validated_data)
 
 
-class CreateProgressSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = CommunityCreateProgress
-        exclude = ["community"]
-
-
 class CommunitySerializer(serializers.ModelSerializer):
-    hashtags = CommunityHashtagSerializer(many=True, read_only=True)
+    tags = HashtagSerializer(many=True, read_only=True)
     rules = CommunityRuleSerializer(many=True, read_only=True)
     avatar = CommunityAvatarSerializer(many=False, read_only=True)
     cover = CommunityCoverSerializer(many=False, read_only=True)
-    create_progress = CreateProgressSerializer(many=True, read_only=True)
     theme = CommunityThemeSerializer(read_only=True)
 
     class Meta:
         model = Community
         fields = "__all__"
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.Meta.depth = self.context.get("depth", 0)
 
     def create(self, validated_data):
         validated_data["created_by"] = self.context["request"].user
@@ -135,8 +105,7 @@ class CommunityRetrieveSerializer(serializers.ModelSerializer):
     rules = CommunityRuleSerializer(many=True, read_only=True)
     cover = CommunityCoverSerializer(many=False, read_only=True)
     avatar = CommunityAvatarSerializer(many=False, read_only=True)
-    hashtags = CommunityHashtagSerializer(many=True, read_only=True)
-    create_progress = CreateProgressSerializer(many=True, read_only=True)
+    hashtags = HashtagSerializer(many=True, read_only=True)
     subscriptions = serializers.SerializerMethodField()
     admins = CommunityAdminSerializer(many=True, read_only=True)
     sub_admins = CommunitySubAdminSerializer(many=True, read_only=True)

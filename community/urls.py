@@ -67,11 +67,6 @@ urlpatterns += [
         AcceptRejectACommunitySubscriber.as_view(),
     ),
     path("community-subscriber/<int:pk>/ban/", BanUnBanACommunitySubscriber.as_view()),
-    path("community-progress/<int:pk>/complete/", SetProgressStepAsComplete.as_view()),
-    path("community-progress/<int:pk>/skip/", SetProgressStepAsSkipped.as_view()),
-    path(
-        "community/<int:pk>/complete-registration", CompleteRegistrationSteps.as_view()
-    ),
     path("subscribed-community/filter/", SubscribedCommunityFilter.as_view()),
     path("community/<int:pk>/subscriber-filter/", CommunitySubscribersFilter.as_view()),
     path("top-communities/", TopCommunitiesList.as_view()),

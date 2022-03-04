@@ -1,5 +1,4 @@
-from community.models import (CommunityAdmin, CommunitySubAdmin,
-                              CommunitySubscription)
+from community.models import CommunitySubscription
 from notification.models import Notification, NotificationTo
 
 

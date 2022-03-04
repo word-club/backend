@@ -2,10 +2,8 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils import timezone
 
-from choices import PROGRESS_STATES
 from community.helper import notify_community
-from community.models import (Community, CommunityAdmin,
-                              CommunityCreateProgress, CommunitySubscription,
+from community.models import (Community, CommunityAdmin, CommunitySubscription,
                               CommunityTheme)
 
 
@@ -25,11 +23,6 @@ def set_admin_and_subscriber(instance, writer):
     )
 
 
-def init_progress_states(instance):
-    for (key, value) in PROGRESS_STATES:
-        CommunityCreateProgress.objects.create(community=instance, state=key)
-
-
 def init_theme(instance, writer):
     CommunityTheme.objects.create(community=instance, created_by=writer)
 
@@ -39,7 +32,6 @@ def setup_post_community_actions(sender, instance, created, **kwargs):
     if created:
         writer = instance.created_by
         set_admin_and_subscriber(instance, writer)
-        init_progress_states(instance)
         init_theme(instance, writer)
 
 

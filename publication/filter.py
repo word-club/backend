@@ -5,11 +5,29 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from comment.models import Comment
 from helper import (check_bool_query, check_sort_by_query, fetch_query,
                     get_filter_range)
 from publication.models import Publication
-from publication.serializers import (PublicationSerializer,
-                                     get_publication_reactions)
+from publication.serializers import PublicationSerializer
+from share.models import Share
+from vote.models import Vote
+
+
+def get_publication_reactions(publication):
+    up_votes = Vote.objects.filter(publication=publication, up=True).count()
+    down_votes = Vote.objects.filter(publication=publication, up=False).count()
+    shares = Share.objects.filter(publication=publication).count()
+    comments = Comment.objects.filter(publication=publication).count()
+    total = up_votes + down_votes + shares + comments
+
+    return {
+        "up_votes": up_votes,
+        "down_votes": down_votes,
+        "shares": shares,
+        "comments": comments,
+        "total": total,
+    }
 
 
 def get_publication_wrt_query(request):
