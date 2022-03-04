@@ -1,75 +1,14 @@
-import metadata_parser
 from rest_framework import serializers
 
-from bookmark.models import Bookmark
-from bookmark.serializers import BookmarkSerializer
 from comment.models import Comment
 from comment.serializers import CommentSerializer
 from community.models import CommunityHashtag
 from globals import CommunityGlobalSerializer, UserGlobalSerializer
-from hide.models import Hide
-from hide.serializers import HideSerializer
 from image.serializers import PublicationImageSerializer
+from link.serializers import LinkInfoSerializer
 from publication.models import *
 from share.models import Share
-from share.serializers import ShareSerializer
 from vote.models import Vote
-from vote.serializers import VoteSerializer
-
-
-class PublicationLinkSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = PublicationLink
-        exclude = ["publication"]
-
-    def create(self, validated_data):
-        validated_data["publication"] = self.context["publication"]
-        page = metadata_parser.MetadataParser(url=validated_data.get("link"))
-        image = page.get_metadata_link("image", allow_encoded_uri=True)
-        page_title = page.get_metadatas(
-            "title",
-            strategy=[
-                "page",
-                "og",
-                "dc",
-            ],
-        )
-        page_desc = page.get_metadatas(
-            "description",
-            strategy=[
-                "page",
-                "og",
-                "dc",
-            ],
-        )
-        validated_data["image"] = image
-        validated_data["title"] = page_title[0] if page_title else None
-        validated_data["description"] = page_desc[0] if page_desc else None
-        return super().create(validated_data)
-
-    def update(self, instance, validated_data):
-        page = metadata_parser.MetadataParser(url=validated_data.get("link"))
-        image = page.get_metadata_link("image", allow_encoded_uri=True)
-        page_title = page.get_metadatas(
-            "title",
-            strategy=[
-                "page",
-                "og",
-                "dc",
-            ],
-        )
-        page_desc = page.get_metadatas(
-            "description",
-            strategy=[
-                "page",
-                "og",
-                "dc",
-            ],
-        )
-        validated_data["image"] = image
-        validated_data["title"] = page_title[0] if page_title else None
-        validated_data["description"] = page_desc[0] if page_desc else None
-        return super().update(instance, validated_data)
 
 
 class PublicationHashtags(serializers.ModelSerializer):
@@ -156,88 +95,11 @@ def get_publication_reactions(publication):
 class PublicationSerializer(serializers.ModelSerializer):
     community = CommunityGlobalSerializer()
     hashtags = PublicationHashtags(many=True, read_only=True)
-    up_vote = serializers.SerializerMethodField()
-    down_vote = serializers.SerializerMethodField()
-    share_status = serializers.SerializerMethodField()
-    hidden_status = serializers.SerializerMethodField()
-    bookmark_status = serializers.SerializerMethodField()
-    comments = serializers.SerializerMethodField()
-    link = PublicationLinkSerializer(read_only=True)
+    comments = CommentSerializer(many=True, read_only=True)
+    links = LinkInfoSerializer(read_only=True)
     images = PublicationImageSerializer(read_only=True, many=True)
     created_by = UserGlobalSerializer(read_only=True)
-
-    def get_up_vote(self, obj):
-        user = self.context["user"]
-        if type(user) != get_user_model():
-            return False
-        try:
-            up_vote = Vote.objects.get(created_by=user, publication=obj, up=True)
-            return VoteSerializer(up_vote).data
-        except Vote.DoesNotExist:
-            return False
-
-    def get_down_vote(self, obj):
-        user = self.context["user"]
-        if type(user) != get_user_model():
-            return False
-        try:
-            down_vote = Vote.objects.get(created_by=user, publication=obj, up=False)
-            return VoteSerializer(down_vote).data
-        except Vote.DoesNotExist:
-            return False
-
-    def get_share_status(self, obj):
-        user = self.context["user"]
-        if type(user) != get_user_model():
-            return False
-        try:
-            share = Share.objects.get(created_by=user, publication=obj)
-            return ShareSerializer(share).data
-        except Share.DoesNotExist:
-            return False
-
-    def get_hidden_status(self, obj):
-        user = self.context["user"]
-        if type(user) != get_user_model():
-            return False
-        try:
-            instance = Hide.objects.get(created_by=user, publication=obj)
-            return HideSerializer(instance).data
-        except Hide.DoesNotExist:
-            return False
-
-    def get_bookmark_status(self, obj):
-        user = self.context["user"]
-        if type(user) != get_user_model():
-            return False
-        try:
-            bookmark = Bookmark.objects.get(created_by=user, publication=obj)
-            return BookmarkSerializer(bookmark).data
-        except Bookmark.DoesNotExist:
-            return False
-
-    def get_comments(self, obj):
-        context = {"user": self.context["user"]}
-        comments = Comment.objects.filter(publication=obj, reply=None)
-        return CommentSerializer(
-            comments, read_only=True, many=True, context=context
-        ).data
 
     class Meta:
         model = Publication
         fields = "__all__"
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.Meta.depth = self.context.get("depth", 0)
-
-
-class TwitterOEmbedData:
-    def __init__(self, source, oembed):
-        self.source = source
-        self.oembed = oembed
-
-
-class TwitterEmbedSerializer(serializers.Serializer):
-    source = serializers.URLField()
-    oembed = serializers.JSONField()

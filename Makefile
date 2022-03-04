@@ -84,6 +84,10 @@ fresh-migrations:
 	make migrate
 	make make-migrations APP=cover
 	make migrate
+	make make-migrations APP=image
+	make migrate
+	make make-migrations APP=link
+	make migrate
 	make make-migrations APP=notification
 	make migrate
 	make make-migrations APP=administration

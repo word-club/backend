@@ -1,26 +1,10 @@
-import os
-import random
 import uuid
 
 from django.contrib.auth import get_user_model
-from django.core.validators import FileExtensionValidator
 from django.db import models
 
 from administration.models import Administration
-from backend.settings import ALLOWED_IMAGES_EXTENSIONS
 from publication.models import Publication
-
-
-def upload_comment_image_to(instance, filename):
-    _, file_extension = os.path.splitext(filename)
-    filename = str(random.getrandbits(64)) + file_extension
-    return f"comments/{instance.comment.pk}/{filename}"
-
-
-def upload_reply_image_to(instance, filename):
-    _, file_extension = os.path.splitext(filename)
-    filename = str(random.getrandbits(64)) + file_extension
-    return f"replies/{instance.reply.pk}/{filename}"
 
 
 class Comment(models.Model):
@@ -56,18 +40,3 @@ class Comment(models.Model):
 
     class Meta:
         ordering = ["-created_at"]
-
-
-class CommentLink(models.Model):
-    link = models.URLField()
-    title = models.CharField(max_length=512, editable=False, null=True)
-    image = models.URLField(editable=False, null=True)
-    description = models.TextField(editable=False, null=True)
-    comment = models.OneToOneField(
-        "Comment", on_delete=models.CASCADE, related_name="link", editable=False
-    )
-    timestamp = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        ordering = ["-timestamp"]
-        unique_together = [["comment", "link"]]

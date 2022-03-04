@@ -1,20 +1,20 @@
 from django.urls import path
 from rest_framework.routers import DefaultRouter
 
-from account.views.auth import LoginView, LogoutView, AdminInspect
-from account.views.follow import FollowUserViewSet, FollowAUserView, UnFollowAUserView
+from account.views.auth import AdminInspect, LoginView, LogoutView
+from account.views.follow import FollowAUserView, FollowUserViewSet, UnFollowAUserView
 from account.views.password import (
-    UpdatePassword,
-    ResetPasswordRequestCode,
     ConfirmResetPassword,
+    ResetPasswordRequestCode,
+    UpdatePassword,
 )
 from account.views.user import (
-    RegisterUserView,
-    UserViewSet,
     GetMeView,
-    ProfileListView,
     MentionList,
+    ProfileListView,
+    RegisterUserView,
     RetrieveUserByUsername,
+    UserViewSet,
 )
 
 router = DefaultRouter()

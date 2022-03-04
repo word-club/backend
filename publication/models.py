@@ -52,21 +52,6 @@ class Publication(models.Model):
         return not self.is_published
 
 
-class PublicationLink(models.Model):
-    link = models.URLField()
-    title = models.CharField(max_length=512, editable=False, null=True)
-    image = models.URLField(editable=False, null=True)
-    description = models.TextField(editable=False, null=True)
-    publication = models.OneToOneField(
-        "Publication", on_delete=models.CASCADE, related_name="link", editable=False
-    )
-    timestamp = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        ordering = ["-timestamp"]
-        unique_together = [["publication", "link"]]
-
-
 class PublicationHashtag(models.Model):
     hashtag = models.ForeignKey(
         Hashtag, on_delete=models.CASCADE, related_name="publications", editable=False

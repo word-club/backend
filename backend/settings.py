@@ -64,6 +64,7 @@ LOCAL_APPS = [
     "avatar",
     "cover",
     "image",
+    "link",
     "notification",
     "administration",
 ]
