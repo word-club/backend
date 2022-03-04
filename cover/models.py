@@ -21,13 +21,15 @@ class Cover(models.Model):
         Profile,
         on_delete=models.CASCADE,
         related_name="covers",
-        null=True, editable=False
+        null=True,
+        editable=False,
     )
     community = models.ForeignKey(
         Community,
         on_delete=models.CASCADE,
         related_name="covers",
-        null=True, editable=False
+        null=True,
+        editable=False,
     )
 
     is_active = models.BooleanField(default=False, editable=False)
@@ -36,7 +38,7 @@ class Cover(models.Model):
         get_user_model(),
         related_name="my_covers",
         on_delete=models.CASCADE,
-        editable=False
+        editable=False,
     )
 
     def save(self, *args, **kwargs):

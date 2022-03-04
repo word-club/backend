@@ -12,10 +12,10 @@ class BlockSerializer(serializers.ModelSerializer):
 class BlockUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = Block
-        exclude = ['community']
+        exclude = ["community"]
 
 
 class BlockCommunitySerializer(serializers.ModelSerializer):
     class Meta:
         model = Block
-        exclude = ['user']
+        exclude = ["user"]

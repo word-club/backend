@@ -14,7 +14,7 @@ class Hide(models.Model):
         on_delete=models.CASCADE,
         related_name="hidden",
         editable=False,
-        null=True
+        null=True,
     )
     comment = models.ForeignKey(
         Comment,
@@ -47,7 +47,7 @@ class Hide(models.Model):
         if self.comment:
             check += 1
         if check == 0:
-            raise ValidationError({'detail': 'One of the key field must be specified'})
+            raise ValidationError({"detail": "One of the key field must be specified"})
         if check > 1:
             raise ValidationError({"detail": "Only one key field can be submitted"})
         return super().save(*args, **kwargs)
@@ -69,5 +69,5 @@ class Hide(models.Model):
                 fields=["comment", "created_by"],
                 condition=models.Q(comment__isnull=False),
                 name="unique_comment_user_hide",
-            )
+            ),
         ]

@@ -8,7 +8,11 @@ from rest_framework.permissions import IsAdminUser
 from account.models import Profile
 from account.permissions import IsOwner
 from avatar.models import Avatar
-from avatar.serializers import ProfileAvatarSerializer, CommunityAvatarSerializer, AvatarSerializer
+from avatar.serializers import (
+    ProfileAvatarSerializer,
+    CommunityAvatarSerializer,
+    AvatarSerializer,
+)
 from community.models import Community
 from community.permissions import IsCommunityAdministrator
 
@@ -20,10 +24,7 @@ class AddProfileAvatarView(APIView):
     def post(self, request):
         profile = get_object_or_404(Profile, user=request.user)
         self.check_object_permissions(request, profile)
-        context = {
-            'profile': profile,
-            'request': request
-        }
+        context = {"profile": profile, "request": request}
         serializer = ProfileAvatarSerializer(data=request.data, context=context)
         if serializer.is_valid():
             serializer.save()
@@ -38,10 +39,7 @@ class AddCommunityAvatarView(APIView):
     def post(self, request):
         community = get_object_or_404(Community, user=request.user)
         self.check_object_permissions(request, community)
-        context = {
-            'community': community,
-            'request': request
-        }
+        context = {"community": community, "request": request}
         serializer = CommunityAvatarSerializer(data=request.data, context=context)
         if serializer.is_valid():
             serializer.save()

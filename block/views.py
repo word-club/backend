@@ -16,6 +16,7 @@ class BlockACommunity(APIView):
     """
     Block a community
     """
+
     @staticmethod
     def post(request, pk):
         community = get_object_or_404(Community, pk=pk)
@@ -30,12 +31,11 @@ class BlockAUser(APIView):
     """
     Block a user
     """
+
     @staticmethod
     def post(request, pk):
         user = get_object_or_404(get_user_model(), pk=pk)
-        block, created = Block.objects.get_or_create(
-            user=user, created_by=request.user
-        )
+        block, created = Block.objects.get_or_create(user=user, created_by=request.user)
         http_status = status.HTTP_201_CREATED if created else status.HTTP_200_OK
         return Response(status=http_status)
 
@@ -44,6 +44,7 @@ class BlockDetail(APIView):
     """
     Block detail
     """
+
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsOwner]
 

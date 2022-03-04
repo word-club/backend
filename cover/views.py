@@ -10,7 +10,11 @@ from account.permissions import IsOwner
 from cover.models import Cover
 from community.models import Community
 from community.permissions import IsCommunityAdministrator
-from cover.serializers import ProfileCoverSerializer, CommunityCoverSerializer, CoverSerializer
+from cover.serializers import (
+    ProfileCoverSerializer,
+    CommunityCoverSerializer,
+    CoverSerializer,
+)
 
 
 class AddProfileCoverView(APIView):
@@ -20,10 +24,7 @@ class AddProfileCoverView(APIView):
     def post(self, request):
         profile = get_object_or_404(Profile, user=request.user)
         self.check_object_permissions(request, profile)
-        context = {
-            'profile': profile,
-            'request': request
-        }
+        context = {"profile": profile, "request": request}
         serializer = ProfileCoverSerializer(data=request.data, context=context)
         if serializer.is_valid():
             serializer.save()
@@ -38,10 +39,7 @@ class AddCommunityCoverView(APIView):
     def post(self, request):
         community = get_object_or_404(Community, user=request.user)
         self.check_object_permissions(request, community)
-        context = {
-            'community': community,
-            'request': request
-        }
+        context = {"community": community, "request": request}
         serializer = CommunityCoverSerializer(data=request.data, context=context)
         if serializer.is_valid():
             serializer.save()

@@ -14,10 +14,7 @@ class Block(models.Model):
         editable=False,
     )
     community = models.ForeignKey(
-        Community,
-        related_name="blocks",
-        on_delete=models.CASCADE,
-        editable=False
+        Community, related_name="blocks", on_delete=models.CASCADE, editable=False
     )
     created_by = models.ForeignKey(
         get_user_model(),
