@@ -86,3 +86,6 @@ fresh-migrations:
 	make migrate
 
 fresh: clean-db-migration fresh-migrations new-admin
+
+test:
+	$(PYTHON) manage.py test $(TEST)

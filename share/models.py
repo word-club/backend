@@ -48,7 +48,7 @@ class Share(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-    def clean(self):
+    def save(self, *args, **kwargs):
         check = 0
         if self.user:
             check += 1
@@ -62,6 +62,7 @@ class Share(models.Model):
             raise ValidationError({"detail": "One of the key field must be specified"})
         if check > 1:
             raise ValidationError({"detail": "Only one key field can be submitted"})
+        return super().save(*args, **kwargs)
 
     class Meta:
         ordering = ["-created_at"]

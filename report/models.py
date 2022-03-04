@@ -79,7 +79,7 @@ class Report(models.Model):
     def is_pending(self):
         return self.status == "pending"
 
-    def clean(self):
+    def save(self, *args, **kwargs):
         check = 0
         if self.user:
             check += 1
@@ -95,6 +95,7 @@ class Report(models.Model):
             raise ValidationError({"detail": "One of the key field must be specified"})
         if check > 1:
             raise ValidationError({"detail": "Only one key field can be submitted"})
+        return super().save(*args, **kwargs)
 
     class Meta:
         ordering = ["-created_at"]
