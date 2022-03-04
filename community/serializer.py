@@ -1,6 +1,8 @@
 from django.utils import timezone
 from rest_framework import serializers
 
+from block.models import Block
+from block.serializers import BlockCommunitySerializer
 from community.models import *
 from report.serializers import ReportSerializer
 
@@ -188,22 +190,11 @@ class CommunityRetrieveSerializer(serializers.ModelSerializer):
         user = self.context["user"]
         if type(user) == get_user_model():
             try:
-                block = BlockCommunity.objects.get(created_by=user, community=obj)
-                return CommunityBlockSerializer(block).data
-            except BlockCommunity.DoesNotExist:
+                block = Block.objects.get(created_by=user, community=obj)
+                return BlockCommunitySerializer(block).data
+            except Block.DoesNotExist:
                 return False
 
     class Meta:
         model = Community
         fields = "__all__"
-
-
-class CommunityBlockSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = BlockCommunity
-        fields = "__all__"
-
-    def create(self, validated_data):
-        validated_data["community"] = self.context["community"]
-        validated_data["created_by"] = self.context["request"].user
-        return super().create(validated_data)

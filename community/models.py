@@ -230,20 +230,6 @@ class CommunityTheme(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)
 
 
-class BlockCommunity(models.Model):
-    reason = models.TextField()
-    community = models.ForeignKey(
-        "Community", related_name="blocked_by", on_delete=models.CASCADE, editable=False
-    )
-    created_by = models.ForeignKey(
-        get_user_model(),
-        on_delete=models.CASCADE,
-        related_name="blocked_communities",
-        editable=False,
-    )
-    timestamp = models.DateTimeField(auto_now_add=True)
-
-
 class Community(models.Model):
     unique_id = models.CharField(
         max_length=64, unique=True, validators=[validate_unique_id]

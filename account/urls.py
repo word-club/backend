@@ -15,8 +15,6 @@ from account.views.profile import (
 from account.views.user import (
     RegisterUserView,
     UserViewSet,
-    BlockAUser,
-    UnBlockAUser,
     GetMeView,
     ProfileListView,
     MentionList,
@@ -49,8 +47,6 @@ urlpatterns += [
     path("profile/add-avatar/", AddProfileAvatarView.as_view()),
     path("user/<int:pk>/follow/", FollowAUserView.as_view()),
     path("follower/<int:pk>/", UnFollowAUserView.as_view()),
-    path("user/<int:pk>/block/", BlockAUser.as_view()),
-    path("block/<int:pk>/", UnBlockAUser.as_view()),
     path("profile/filter/", ProfileListView.as_view({"get": "list"})),
     path("mention-list/", MentionList.as_view()),
     path("user/<str:username>/", RetrieveUserByUsername.as_view()),

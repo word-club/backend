@@ -59,6 +59,7 @@ LOCAL_APPS = [
     "share",
     "hide",
     "report",
+    "block",
     "bookmark",
     "notification",
     "administration",

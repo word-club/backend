@@ -110,23 +110,3 @@ class FollowUser(models.Model):
     class Meta:
         ordering = ["-timestamp"]
         unique_together = [["created_by", "user"]]
-
-
-class BlockUser(models.Model):
-    user = models.ForeignKey(
-        get_user_model(),
-        on_delete=models.CASCADE,
-        related_name="blocked_by",
-        editable=False,
-    )
-    created_by = models.ForeignKey(
-        get_user_model(),
-        on_delete=models.CASCADE,
-        related_name="blocked_users",
-        editable=False,
-    )
-    timestamp = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        ordering = ["-timestamp"]
-        unique_together = [["created_by", "user"]]

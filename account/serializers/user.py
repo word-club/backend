@@ -3,6 +3,8 @@ from rest_framework import serializers
 
 from account.models import *
 from account.serializers.follow import FollowUserSerializer
+from block.models import Block
+from block.serializers import BlockUserSerializer
 from bookmark.models import Bookmark
 from comment.models import Comment
 from comment.serializers import (
@@ -108,12 +110,6 @@ class UserSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class BlockUserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = BlockUser
-        fields = "__all__"
-
-
 class UserRetrieveSerializer(serializers.ModelSerializer):
     profile = ProfileSerializer(read_only=True)
     is_followed = serializers.SerializerMethodField()
@@ -134,9 +130,9 @@ class UserRetrieveSerializer(serializers.ModelSerializer):
         user = self.context["user"]
         if type(user) == get_user_model():
             try:
-                block = BlockUser.objects.get(created_by=user, user=obj)
+                block = Block.objects.get(created_by=user, user=obj)
                 return BlockUserSerializer(block).data
-            except BlockUser.DoesNotExist:
+            except Block.DoesNotExist:
                 return False
 
     class Meta:
@@ -292,16 +288,9 @@ class UserInfoSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def get_following(obj):
-        follows = FollowUser.objects.filter(user=obj)
+        follows = FollowUser.objects.filter(created_by=obj)
         users = []
-        [users.append(item.created_by) for item in follows]
-        return UserGlobalSerializer(users, many=True, read_only=True).data
-
-    @staticmethod
-    def get_blocked_users(obj):
-        blocks = BlockUser.objects.filter(user=obj)
-        users = []
-        [users.append(item.created_by) for item in blocks]
+        [users.append(item.user) for item in follows]
         return UserGlobalSerializer(users, many=True, read_only=True).data
 
     class Meta:

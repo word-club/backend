@@ -59,31 +59,6 @@ class RegisterUserView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class BlockAUser(APIView):
-    @staticmethod
-    def post(request, pk):
-        user = get_object_or_404(get_user_model(), pk=pk)
-        block, created = BlockUser.objects.get_or_create(
-            user=user, created_by=request.user
-        )
-        if created:
-            code = status.HTTP_201_CREATED
-        else:
-            code = status.HTTP_200_OK
-        return Response(status=code)
-
-
-class UnBlockAUser(APIView):
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsOwner]
-
-    def delete(self, request, pk):
-        block = get_object_or_404(BlockUser, pk=pk)
-        self.check_object_permissions(request, block)
-        block.delete()
-        return Response(status=status.HTTP_200_OK)
-
-
 class MentionList(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
