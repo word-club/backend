@@ -1,8 +1,8 @@
-from django.test import TestCase
-from hide.models import Hide
-from comment.models import Comment
 from django.contrib.auth import get_user_model
+from django.test import TestCase
 
+from comment.models import Comment
+from hide.models import Hide
 from publication.models import Publication
 
 

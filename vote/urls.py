@@ -1,12 +1,8 @@
 from rest_framework.urls import path
 
-from vote.views import (
-    AddPublicationUpVote,
-    AddPublicationDownVote,
-    AddCommentUpVote,
-    AddCommentDownVote,
-    DestroyVote,
-)
+from vote.views import (AddCommentDownVote, AddCommentUpVote,
+                        AddPublicationDownVote, AddPublicationUpVote,
+                        DestroyVote)
 
 urlpatterns = [
     path("publication/<int:pk>/up-vote/", AddPublicationUpVote.as_view()),

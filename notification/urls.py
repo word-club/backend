@@ -1,10 +1,7 @@
 from django.urls import path
 
-from notification.views import (
-    DestroyNotificationView,
-    SetANotificationAsSeen,
-    NotificationListView,
-)
+from notification.views import (DestroyNotificationView, NotificationListView,
+                                SetANotificationAsSeen)
 
 urlpatterns = [
     path("notification/", NotificationListView.as_view()),

@@ -1,8 +1,8 @@
 from rest_framework import serializers
 
 from comment.models import Comment
+from globals import PublicationForUserCommentSerializer, UserGlobalSerializer
 from image.serializers import CommentImageSerializer
-from globals import UserGlobalSerializer, PublicationForUserCommentSerializer
 
 
 class CommentPostSerializer(serializers.ModelSerializer):

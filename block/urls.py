@@ -1,6 +1,6 @@
 from django.urls import path
 
-from block.views import BlockAUser, BlockACommunity, BlockDetail
+from block.views import BlockACommunity, BlockAUser, BlockDetail
 
 urlpatterns = [
     path("user/<int:pk>/block/", BlockACommunity.as_view()),

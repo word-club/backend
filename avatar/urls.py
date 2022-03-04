@@ -1,6 +1,7 @@
 from django.urls import path
 
-from avatar.views import AddProfileAvatarView, AddCommunityAvatarView, AvatarDetail
+from avatar.views import (AddCommunityAvatarView, AddProfileAvatarView,
+                          AvatarDetail)
 
 urlpatterns = [
     path("community/<int:pk>/avatar/", AddProfileAvatarView.as_view()),

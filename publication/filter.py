@@ -1,14 +1,15 @@
 from collections import OrderedDict
 
-
-from rest_framework.views import APIView
 from rest_framework import status
-from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
-from helper import fetch_query, check_bool_query, check_sort_by_query, get_filter_range
+from helper import (check_bool_query, check_sort_by_query, fetch_query,
+                    get_filter_range)
 from publication.models import Publication
-from publication.serializers import PublicationSerializer, get_publication_reactions
+from publication.serializers import (PublicationSerializer,
+                                     get_publication_reactions)
 
 
 def get_publication_wrt_query(request):

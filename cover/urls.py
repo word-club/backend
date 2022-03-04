@@ -1,6 +1,6 @@
 from django.urls import path
 
-from cover.views import AddProfileCoverView, AddCommunityCoverView, CoverDetail
+from cover.views import AddCommunityCoverView, AddProfileCoverView, CoverDetail
 
 urlpatterns = [
     path("community/<int:pk>/cover/", AddCommunityCoverView.as_view()),

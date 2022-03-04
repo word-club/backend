@@ -1,6 +1,6 @@
 from django.urls import path
 
-from link.views import AddPublicationLinkView, AddCommentLinkView, LinkDetail
+from link.views import AddCommentLinkView, AddPublicationLinkView, LinkDetail
 
 urlpatterns = [
     path("publication/<int:pk>/link/", AddPublicationLinkView.as_view()),

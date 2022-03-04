@@ -1,12 +1,12 @@
 from rest_framework import status
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.generics import get_object_or_404
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.generics import get_object_or_404
-from community.models import CommunitySubscription, Community
-from community.serializer import CommunitySerializer
-from rest_framework.authentication import TokenAuthentication
-from rest_framework.permissions import IsAuthenticated
 
+from community.models import Community, CommunitySubscription
+from community.serializer import CommunitySerializer
 from globals import UserGlobalSerializer
 
 

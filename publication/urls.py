@@ -2,15 +2,10 @@ from django.urls import path
 from rest_framework.routers import DefaultRouter
 
 from publication.filter import PublicationFilter
-from publication.views import (
-    PublicationListView,
-    AddPublicationView,
-    RetrieveUpdatePublicationView,
-    PublishPublicationView,
-    GetTwitterEmbed,
-    PublicationPinView,
-    ViewAPublication,
-)
+from publication.views import (AddPublicationView, GetTwitterEmbed,
+                               PublicationListView, PublicationPinView,
+                               PublishPublicationView,
+                               RetrieveUpdatePublicationView, ViewAPublication)
 
 router = DefaultRouter()
 router.register(r"s/publication", PublicationListView, basename="publication-list")

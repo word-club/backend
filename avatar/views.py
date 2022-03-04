@@ -1,18 +1,15 @@
-from rest_framework import status
-from rest_framework.views import APIView
-from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
+from rest_framework import status
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAdminUser
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from account.models import Profile
 from account.permissions import IsOwner
 from avatar.models import Avatar
-from avatar.serializers import (
-    ProfileAvatarSerializer,
-    CommunityAvatarSerializer,
-    AvatarSerializer,
-)
+from avatar.serializers import (AvatarSerializer, CommunityAvatarSerializer,
+                                ProfileAvatarSerializer)
 from community.models import Community
 from community.permissions import IsCommunityAdministrator
 

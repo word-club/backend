@@ -1,6 +1,6 @@
 from rest_framework.urls import path
 
-from share.views import AddPublicationShare, AddCommentShare, ShareDetail
+from share.views import AddCommentShare, AddPublicationShare, ShareDetail
 
 urlpatterns = [
     path("publication/<int:pk>/share/", AddPublicationShare.as_view()),

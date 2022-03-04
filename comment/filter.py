@@ -1,13 +1,14 @@
 from collections import OrderedDict
 
-from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from comment.helper import get_comment_reactions
 from comment.models import Comment
 from comment.serializers import CommentSerializer
-from helper import fetch_query, get_filter_range, check_bool_query, check_sort_by_query
+from helper import (check_bool_query, check_sort_by_query, fetch_query,
+                    get_filter_range)
 
 
 def get_comments_wrt_query(request):

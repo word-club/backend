@@ -1,15 +1,9 @@
 from django.urls import path
+from rest_framework.routers import DefaultRouter
 
 from comment.filter import CommentFilter
-from comment.views import (
-    AddPublicationComment,
-    ReplyCommentView,
-    CommentViewSet,
-    CommentPinView,
-    CommentDetail,
-)
-
-from rest_framework.routers import DefaultRouter
+from comment.views import (AddPublicationComment, CommentDetail,
+                           CommentPinView, CommentViewSet, ReplyCommentView)
 
 router = DefaultRouter()
 router.register(r"comment-view", CommentViewSet, basename="comment")

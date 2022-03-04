@@ -1,11 +1,11 @@
 import uuid
 
-from django.db import models
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
+from django.db import models
 
+from choices import COLOR_CHOICES, COMMUNITY_TYPES, PROGRESS_STATES
 from hashtag.models import Hashtag
-from choices import COMMUNITY_TYPES, PROGRESS_STATES, COLOR_CHOICES
 
 
 def validate_unique_id(value):

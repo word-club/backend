@@ -1,8 +1,8 @@
-from django.db import models
-from django.db.models import UniqueConstraint
+from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.core.validators import FileExtensionValidator
-from django.contrib.auth import get_user_model
+from django.db import models
+from django.db.models import UniqueConstraint
 
 from account.models import Profile
 from backend.settings import ALLOWED_IMAGES_EXTENSIONS

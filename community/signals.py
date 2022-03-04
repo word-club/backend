@@ -4,13 +4,9 @@ from django.utils import timezone
 
 from choices import PROGRESS_STATES
 from community.helper import notify_community
-from community.models import (
-    Community,
-    CommunityAdmin,
-    CommunityCreateProgress,
-    CommunitySubscription,
-    CommunityTheme,
-)
+from community.models import (Community, CommunityAdmin,
+                              CommunityCreateProgress, CommunitySubscription,
+                              CommunityTheme)
 
 
 def set_admin_and_subscriber(instance, writer):

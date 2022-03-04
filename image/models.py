@@ -1,12 +1,12 @@
-from django.db import models
 from django.contrib.auth import get_user_model
-from django.core.validators import FileExtensionValidator
 from django.core.exceptions import ValidationError
+from django.core.validators import FileExtensionValidator
+from django.db import models
 
+from backend.settings import ALLOWED_IMAGES_EXTENSIONS
+from comment.models import Comment
 from helpers.upload_path import upload_image_to
 from publication.models import Publication
-from comment.models import Comment
-from backend.settings import ALLOWED_IMAGES_EXTENSIONS
 
 
 class Image(models.Model):

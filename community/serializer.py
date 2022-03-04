@@ -1,10 +1,10 @@
 from django.utils import timezone
 from rest_framework import serializers
 
+from avatar.serializers import CommunityAvatarSerializer
 from block.models import Block
 from block.serializers import BlockCommunitySerializer
 from community.models import *
-from avatar.serializers import CommunityAvatarSerializer
 from cover.serializers import CommunityCoverSerializer
 from report.serializers import ReportSerializer
 

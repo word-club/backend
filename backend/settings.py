@@ -2,8 +2,9 @@
 Django settings for backend project.
 """
 import os
-from dotenv import load_dotenv
 from pathlib import Path
+
+from dotenv import load_dotenv
 
 # load environment
 load_dotenv()

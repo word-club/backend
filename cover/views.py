@@ -1,20 +1,17 @@
-from rest_framework import status
-from rest_framework.views import APIView
-from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
+from rest_framework import status
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAdminUser
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from account.models import Profile
 from account.permissions import IsOwner
-from cover.models import Cover
 from community.models import Community
 from community.permissions import IsCommunityAdministrator
-from cover.serializers import (
-    ProfileCoverSerializer,
-    CommunityCoverSerializer,
-    CoverSerializer,
-)
+from cover.models import Cover
+from cover.serializers import (CommunityCoverSerializer, CoverSerializer,
+                               ProfileCoverSerializer)
 
 
 class AddProfileCoverView(APIView):

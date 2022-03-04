@@ -36,7 +36,7 @@ black:
 
 lint:
 	black .
-	isort .
+	isort **/*.py
 
 clean-migrations:
 	rm -rf **/migrations

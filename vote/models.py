@@ -1,7 +1,7 @@
+from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import UniqueConstraint
-from django.core.exceptions import ValidationError
-from django.contrib.auth import get_user_model
 
 from comment.models import Comment
 from publication.models import Publication

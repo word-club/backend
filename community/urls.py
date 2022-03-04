@@ -1,7 +1,8 @@
 from django.urls import path
 from rest_framework.routers import DefaultRouter
 
-from community.filters import SubscribedCommunityFilter, CommunitySubscribersFilter
+from community.filters import (CommunitySubscribersFilter,
+                               SubscribedCommunityFilter)
 from community.views.views import *
 
 router = DefaultRouter()
