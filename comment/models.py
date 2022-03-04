@@ -58,43 +58,6 @@ class Comment(models.Model):
         ordering = ["-created_at"]
 
 
-class CommentImage(models.Model):
-    id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
-    image = models.ImageField(
-        upload_to=upload_comment_image_to,
-        validators=[FileExtensionValidator(ALLOWED_IMAGES_EXTENSIONS)],
-    )
-    comment = models.ForeignKey(
-        "Comment",
-        related_name="images",
-        on_delete=models.CASCADE,
-        editable=False,
-    )
-    timestamp = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        ordering = ["-timestamp"]
-
-    def delete(self, using=None, keep_parents=False):
-        self.image.delete()
-        super().delete(using, keep_parents)
-
-
-class CommentImageUrl(models.Model):
-    id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
-    url = models.URLField()
-    comment = models.ForeignKey(
-        "Comment",
-        related_name="image_urls",
-        on_delete=models.CASCADE,
-        editable=False,
-    )
-    timestamp = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        ordering = ["-timestamp"]
-
-
 class CommentLink(models.Model):
     link = models.URLField()
     title = models.CharField(max_length=512, editable=False, null=True)

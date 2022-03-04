@@ -3,7 +3,6 @@ from django.utils import timezone
 from rest_framework import viewsets, mixins, status
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.generics import get_object_or_404
-from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -182,59 +181,6 @@ class PublishPublicationView(APIView):
         publication.published_at = None
         publication.save()
         return Response(status=status.HTTP_201_CREATED)
-
-
-class AddPublicationImageView(APIView):
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsOwner]
-
-    def post(self, request, pk):
-        publication = get_object_or_404(Publication, pk=pk)
-        self.check_object_permissions(request, publication)
-        context = {"publication": publication, "request": request}
-        serializer = PublicationImageSerializer(data=request.data, context=context)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-class RemovePublicationImageView(APIView):
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsOwner]
-
-    def delete(self, request, pk):
-        publication_image = get_object_or_404(PublicationImage, pk=pk)
-        self.check_object_permissions(request, publication_image.publication)
-        publication_image.image.delete()
-        publication_image.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
-
-class AddPublicationImageUrlView(APIView):
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsOwner]
-
-    def post(self, request, pk):
-        publication = get_object_or_404(Publication, pk=pk)
-        self.check_object_permissions(request, publication)
-        context = {"publication": publication, "request": request}
-        serializer = PublicationImageUrlSerializer(data=request.data, context=context)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-class RemovePublicationImageUrlView(APIView):
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsOwner]
-
-    def delete(self, request, pk):
-        img_url = get_object_or_404(PublicationImageUrl, pk=pk)
-        self.check_object_permissions(request, img_url.publication)
-        img_url.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class AddPublicationLinkView(APIView):

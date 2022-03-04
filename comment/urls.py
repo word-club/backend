@@ -3,12 +3,10 @@ from django.urls import path
 from comment.filter import CommentFilter
 from comment.views import (
     AddPublicationComment,
-    UpdateDestroyCommentView,
-    RemoveCommentImageView,
-    RemoveCommentImageUrlView,
     ReplyCommentView,
     CommentViewSet,
     CommentPinView,
+    CommentDetail,
 )
 
 from rest_framework.routers import DefaultRouter
@@ -21,10 +19,7 @@ app_name = "comment"
 
 urlpatterns += [
     path("publication/<str:pk>/comment/", AddPublicationComment.as_view()),
-    path("comment/<str:pk>/", UpdateDestroyCommentView.as_view()),
-    path("comment-image/<str:pk>/", RemoveCommentImageView.as_view()),
-    path("comment-image-url/<str:pk>/", RemoveCommentImageUrlView.as_view()),
-    path("comment/<str:pk>/", UpdateDestroyCommentView.as_view()),
+    path("comment/<str:pk>/", CommentDetail.as_view()),
     path("comment/<str:pk>/reply/", ReplyCommentView.as_view()),
     path("comment/<str:pk>/pin/", CommentPinView.as_view()),
     path("comment-filter/", CommentFilter.as_view()),

@@ -63,6 +63,7 @@ LOCAL_APPS = [
     "bookmark",
     "avatar",
     "cover",
+    "image",
     "notification",
     "administration",
 ]

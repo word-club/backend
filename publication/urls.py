@@ -4,10 +4,6 @@ from rest_framework.routers import DefaultRouter
 from publication.filter import PublicationFilter
 from publication.views import (
     PublicationListView,
-    AddPublicationImageView,
-    RemovePublicationImageView,
-    AddPublicationImageUrlView,
-    RemovePublicationImageUrlView,
     AddPublicationView,
     RetrieveUpdatePublicationView,
     PublishPublicationView,
@@ -27,10 +23,6 @@ urlpatterns += [
     path("publication/", AddPublicationView.as_view()),
     path("publication/<int:pk>/", RetrieveUpdatePublicationView.as_view()),
     path("publication/<int:pk>/publish/", PublishPublicationView.as_view()),
-    path("publication/<int:pk>/image/", AddPublicationImageView.as_view()),
-    path("publication-image/<int:pk>/", RemovePublicationImageView.as_view()),
-    path("publication/<int:pk>/image-url/", AddPublicationImageUrlView.as_view()),
-    path("publication-image-url/<int:pk>/", RemovePublicationImageUrlView.as_view()),
     path("publication/<int:pk>/link/", AddPublicationLinkView.as_view()),
     path("publication-link/<int:pk>/", EditOrRemovePublicationLink.as_view()),
     path("get-twitter-embed/", GetTwitterEmbed.as_view()),

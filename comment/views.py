@@ -71,7 +71,7 @@ class AddPublicationComment(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class UpdateDestroyCommentView(APIView):
+class CommentDetail(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsOwner | IsPublicationAuthor]
 
@@ -93,29 +93,6 @@ class UpdateDestroyCommentView(APIView):
         comment_images = CommentImage.objects.filter(comment=comment)
         [img.image.delete() for img in comment_images]
         comment.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
-
-class RemoveCommentImageView(APIView):
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsOwner]
-
-    def delete(self, request, pk):
-        comment_image = get_object_or_404(CommentImage, pk=pk)
-        self.check_object_permissions(request, comment_image.comment)
-        comment_image.image.delete()
-        comment_image.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
-
-class RemoveCommentImageUrlView(APIView):
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsOwner]
-
-    def delete(self, request, pk):
-        comment_image_url = get_object_or_404(CommentImageUrl, pk=pk)
-        self.check_object_permissions(request, comment_image_url.comment)
-        comment_image_url.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 

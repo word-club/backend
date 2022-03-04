@@ -9,21 +9,12 @@ from community.models import CommunityHashtag
 from globals import CommunityGlobalSerializer, UserGlobalSerializer
 from hide.models import Hide
 from hide.serializers import HideSerializer
+from image.serializers import PublicationImageSerializer
 from publication.models import *
 from share.models import Share
 from share.serializers import ShareSerializer
 from vote.models import Vote
 from vote.serializers import VoteSerializer
-
-
-class PublicationImageSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = PublicationImage
-        exclude = ["publication"]
-
-    def create(self, validated_data):
-        validated_data["publication"] = self.context["publication"]
-        return super().create(validated_data)
 
 
 class PublicationLinkSerializer(serializers.ModelSerializer):
@@ -79,16 +70,6 @@ class PublicationLinkSerializer(serializers.ModelSerializer):
         validated_data["title"] = page_title[0] if page_title else None
         validated_data["description"] = page_desc[0] if page_desc else None
         return super().update(instance, validated_data)
-
-
-class PublicationImageUrlSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = PublicationImageUrl
-        exclude = ["publication"]
-
-    def create(self, validated_data):
-        validated_data["publication"] = self.context["publication"]
-        return super().create(validated_data)
 
 
 class PublicationHashtags(serializers.ModelSerializer):
@@ -183,7 +164,6 @@ class PublicationSerializer(serializers.ModelSerializer):
     comments = serializers.SerializerMethodField()
     link = PublicationLinkSerializer(read_only=True)
     images = PublicationImageSerializer(read_only=True, many=True)
-    image_urls = PublicationImageUrlSerializer(read_only=True, many=True)
     created_by = UserGlobalSerializer(read_only=True)
 
     def get_up_vote(self, obj):

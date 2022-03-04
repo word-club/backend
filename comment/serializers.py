@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from comment.models import CommentImage, CommentImageUrl, Comment
+from comment.models import Comment
 from comment.helper import (
     get_my_upvote,
     get_my_downvote,
@@ -9,26 +9,7 @@ from comment.helper import (
     get_my_bookmark_status,
 )
 from globals import UserGlobalSerializer, PublicationForUserCommentSerializer
-
-
-class CommentImageSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = CommentImage
-        fields = "__all__"
-
-    def create(self, validated_data):
-        validated_data["comment"] = self.context["comment"]
-        return super().create(validated_data)
-
-
-class CommentImageUrlSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = CommentImageUrl
-        fields = "__all__"
-
-    def create(self, validated_data):
-        validated_data["comment"] = self.context["comment"]
-        return super().create(validated_data)
+from image.serializers import CommentImageSerializer
 
 
 class CommentPostSerializer(serializers.ModelSerializer):
@@ -91,7 +72,6 @@ class ReplySerializer(serializers.ModelSerializer):
 class CommentForProfileSerializer(serializers.ModelSerializer):
     publication = PublicationForUserCommentSerializer()
     images = CommentImageSerializer(many=True, read_only=True)
-    image_urls = CommentImageUrlSerializer(many=True, read_only=True)
 
     class Meta:
         model = Comment
@@ -101,7 +81,6 @@ class CommentForProfileSerializer(serializers.ModelSerializer):
 class CommentSerializer(serializers.ModelSerializer):
     replies = serializers.SerializerMethodField()
     images = CommentImageSerializer(many=True, read_only=True)
-    image_urls = CommentImageUrlSerializer(many=True, read_only=True)
     created_by = UserGlobalSerializer(read_only=True)
 
     up_vote = serializers.SerializerMethodField()

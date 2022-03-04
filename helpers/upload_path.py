@@ -6,7 +6,9 @@ def get_upload_path(instance, filename, mode):
     _, file_extension = os.path.splitext(filename)
     filename = str(random.getrandbits(64)) + file_extension
     upload_to = ""
-    if instance.profile:
+    if instance.publication:
+        upload_to = f"publications/{instance.publication.id}/"
+    elif instance.profile:
         upload_to += f"profile/${instance.profile.user.username}/"
     elif instance.community:
         upload_to += f"community/${instance.community.unique_id}/"
@@ -20,3 +22,7 @@ def upload_avatar_to(instance, filename):
 
 def upload_cover_to(instance, filename):
     return get_upload_path(instance, filename, "cover")
+
+
+def upload_image_to(instance, filename):
+    return get_upload_path(instance, filename, "image")
