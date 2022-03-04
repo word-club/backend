@@ -36,7 +36,9 @@ class Bookmark(models.Model):
             check += 1
         if self.comment:
             check += 1
-        if check != 0 and check > 1:
+        if check == 0:
+            raise ValidationError({"detail": "One of the key field must be specified"})
+        if check > 1:
             raise ValidationError({"detail": "Only one key field can be submitted"})
 
     class Meta:

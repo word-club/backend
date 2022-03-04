@@ -4,10 +4,25 @@ from django.core.exceptions import ValidationError
 from django.contrib.auth import get_user_model
 
 from comment.models import Comment
+from community.models import Community
 from publication.models import Publication
 
 
 class Share(models.Model):
+    user = models.ForeignKey(
+        get_user_model(),
+        on_delete=models.CASCADE,
+        related_name="shares",
+        editable=False,
+        null=True,
+    )
+    community = models.ForeignKey(
+        Community,
+        on_delete=models.CASCADE,
+        related_name="shares",
+        editable=False,
+        null=True,
+    )
     publication = models.ForeignKey(
         Publication,
         related_name="shares",
@@ -25,7 +40,7 @@ class Share(models.Model):
     created_by = models.ForeignKey(
         get_user_model(),
         on_delete=models.CASCADE,
-        related_name="shares",
+        related_name="my_shares",
         editable=False,
     )
 
@@ -35,12 +50,18 @@ class Share(models.Model):
 
     def clean(self):
         check = 0
+        if self.user:
+            check += 1
+        if self.community:
+            check += 1
         if self.publication:
             check += 1
         if self.comment:
             check += 1
-        if check == 0 and check > 1:
-            raise ValidationError({"detail": "Only one key field is allowed."})
+        if check == 0:
+            raise ValidationError({"detail": "One of the key field must be specified"})
+        if check > 1:
+            raise ValidationError({"detail": "Only one key field can be submitted"})
 
     class Meta:
         ordering = ["-created_at"]

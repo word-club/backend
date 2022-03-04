@@ -39,19 +39,21 @@ class Vote(models.Model):
             check += 1
         if self.comment:
             check += 1
+        if check == 0:
+            raise ValidationError({"detail": "One of the key field must be specified"})
         if check > 1:
-            raise ValidationError({"detail": "Only one key field is allowed."})
+            raise ValidationError({"detail": "Only one key field can be submitted"})
 
     class Meta:
         ordering = ["-created_at"]
         constraints = [
             UniqueConstraint(
-                fields=["publication", "created_by"],
+                fields=["up", "publication", "created_by"],
                 condition=models.Q(publication__isnull=False),
                 name="unique_publication_vote",
             ),
             UniqueConstraint(
-                fields=["comment", "created_by"],
+                fields=["up", "comment", "created_by"],
                 condition=models.Q(comment__isnull=False),
                 name="unique_comment_vote",
             ),
