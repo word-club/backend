@@ -1,26 +1,11 @@
-import os
-import random
 import uuid
 
-from django.contrib.auth import get_user_model
-from django.core.validators import FileExtensionValidator
-from django.core.exceptions import ValidationError
 from django.db import models
-from backend.settings import ALLOWED_IMAGES_EXTENSIONS
-from choices import COMMUNITY_TYPES, PROGRESS_STATES, COLOR_CHOICES
+from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
+
 from hashtag.models import Hashtag
-
-
-def upload_avatar_to(instance, filename):
-    _, file_extension = os.path.splitext(filename)
-    filename = str(random.getrandbits(64)) + file_extension
-    return f"communities/{instance.community.pk}/avatar/{filename}"
-
-
-def upload_cover_to(instance, filename):
-    _, file_extension = os.path.splitext(filename)
-    filename = str(random.getrandbits(64)) + file_extension
-    return f"communities/{instance.community.pk}/cover/{filename}"
+from choices import COMMUNITY_TYPES, PROGRESS_STATES, COLOR_CHOICES
 
 
 def validate_unique_id(value):
@@ -89,46 +74,6 @@ class CommunityCreateProgress(models.Model):
 
     class Meta:
         ordering = ["timestamp"]
-
-
-class CommunityAvatar(models.Model):
-    image = models.ImageField(
-        upload_to=upload_avatar_to,
-        validators=[FileExtensionValidator(ALLOWED_IMAGES_EXTENSIONS)],
-    )
-    community = models.OneToOneField(
-        "Community", on_delete=models.CASCADE, related_name="avatar", editable=False
-    )
-    created_by = models.ForeignKey(
-        get_user_model(),
-        on_delete=models.CASCADE,
-        related_name="created_community_avatars",
-        editable=False,
-    )
-    timestamp = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        ordering = ["-timestamp"]
-
-
-class CommunityCover(models.Model):
-    image = models.ImageField(
-        upload_to=upload_cover_to,
-        validators=[FileExtensionValidator(ALLOWED_IMAGES_EXTENSIONS)],
-    )
-    community = models.OneToOneField(
-        "Community", on_delete=models.CASCADE, related_name="cover", editable=False
-    )
-    created_by = models.ForeignKey(
-        get_user_model(),
-        on_delete=models.CASCADE,
-        related_name="created_community_covers",
-        editable=False,
-    )
-    timestamp = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        ordering = ["-timestamp"]
 
 
 class CommunityRule(models.Model):

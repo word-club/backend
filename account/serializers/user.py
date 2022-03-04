@@ -3,6 +3,8 @@ from rest_framework import serializers
 
 from account.models import *
 from account.serializers.follow import FollowUserSerializer
+from avatar.models import Avatar
+from avatar.serializers import ProfileAvatarSerializer
 from block.models import Block
 from block.serializers import BlockUserSerializer
 from bookmark.models import Bookmark
@@ -17,6 +19,7 @@ from community.serializer import (
     CommunityAdminSerializer,
     CommunitySubAdminSerializer,
 )
+from cover.serializers import ProfileCoverSerializer
 from globals import UserGlobalSerializer
 from hide.models import Hide
 from notification.serializers import NotificationReceiverSerializer
@@ -71,26 +74,6 @@ class UserPostSerializer(serializers.ModelSerializer):
             setattr(profile, attr, value)
         profile.save()
         return instance
-
-
-class ProfileAvatarSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ProfileAvatar
-        fields = "__all__"
-
-    def create(self, validated_data):
-        validated_data["profile"] = self.context["profile"]
-        return super().create(validated_data)
-
-
-class ProfileCoverSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ProfileCover
-        fields = "__all__"
-
-    def create(self, validated_data):
-        validated_data["profile"] = self.context["profile"]
-        return super().create(validated_data)
 
 
 class ProfileSerializer(serializers.ModelSerializer):
@@ -316,9 +299,9 @@ class MentionUserSerializer(serializers.ModelSerializer):
     @staticmethod
     def get_avatar(obj):
         try:
-            avatar = ProfileAvatar.objects.get(profile__user=obj)
+            avatar = Avatar.objects.get(profile__user=obj)
             return avatar.image.url
-        except ProfileAvatar.DoesNotExist:
+        except Avatar.DoesNotExist:
             return None
 
     class Meta:

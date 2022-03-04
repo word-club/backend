@@ -1,13 +1,12 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 
-from account.models import ProfileCover, ProfileAvatar
+from cover.models import Cover
+from avatar.models import Avatar
 from comment.models import Comment
 from community.models import (
     Community,
-    CommunityAvatar,
     CommunityTheme,
-    CommunityCover,
     CommunitySubscription,
     CommunityHashtag,
 )
@@ -29,17 +28,17 @@ class CommunityGlobalSerializer(serializers.ModelSerializer):
     @staticmethod
     def get_avatar(obj):
         try:
-            avatar = CommunityAvatar.objects.get(community=obj)
+            avatar = Avatar.objects.get(community=obj)
             return avatar.image.url
-        except CommunityAvatar.DoesNotExist:
+        except Avatar.DoesNotExist:
             return None
 
     @staticmethod
     def get_cover(obj):
         try:
-            cover = CommunityCover.objects.get(community=obj)
+            cover = Cover.objects.get(community=obj)
             return cover.image.url
-        except CommunityCover.DoesNotExist:
+        except Cover.DoesNotExist:
             return None
 
     @staticmethod
@@ -115,17 +114,17 @@ class UserGlobalSerializer(serializers.ModelSerializer):
     @staticmethod
     def get_avatar(obj):
         try:
-            cover = ProfileAvatar.objects.get(profile=obj.profile)
+            cover = Avatar.objects.get(profile=obj.profile)
             return cover.image.url
-        except ProfileAvatar.DoesNotExist:
+        except Avatar.DoesNotExist:
             return None
 
     @staticmethod
     def get_cover(obj):
         try:
-            cover = ProfileCover.objects.get(profile=obj.profile)
+            cover = Cover.objects.get(profile=obj.profile)
             return cover.image.url
-        except ProfileCover.DoesNotExist:
+        except Cover.DoesNotExist:
             return None
 
     @staticmethod

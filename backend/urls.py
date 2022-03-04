@@ -22,6 +22,8 @@ urlpatterns = [
     path("api/", include("vote.urls")),
     path("api/", include("bookmark.urls")),
     path("api/", include("block.urls")),
+    path("api/", include("avatar.urls")),
+    path("api/", include("cover.urls")),
     path("api/", include("administration.urls")),
     re_path(r"^media/(?P<path>.*)$", serve, {"document_root": settings.MEDIA_ROOT}),
     re_path(

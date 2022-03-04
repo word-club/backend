@@ -18,8 +18,6 @@ from community.models import (
     Community,
     CommunitySubscription,
     CommunityRule,
-    CommunityCover,
-    CommunityAvatar,
     CommunityHashtag,
     CommunityAdmin,
     CommunityAuthorizationCode,
@@ -148,30 +146,6 @@ class PatchDeleteCommunityRule(APIView):
         )
 
 
-class DeleteCommunityCover(APIView):
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsCommunityAdministrator]
-
-    def delete(self, request, pk):
-        cover = get_object_or_404(CommunityCover, pk=pk)
-        self.check_object_permissions(request, cover)
-        cover.image.delete()
-        cover.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
-
-class DeleteCommunityAvatar(APIView):
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsCommunityAdministrator]
-
-    def delete(self, request, pk):
-        avatar = get_object_or_404(CommunityAvatar, pk=pk)
-        self.check_object_permissions(request, avatar)
-        avatar.image.delete()
-        avatar.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
-
 class UnSubscribeCommunity(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsSubscriber]
@@ -218,46 +192,6 @@ class DisableNotificationsForACommunity(APIView):
         subscription.disable_notification = True
         subscription.save()
         return Response(status=status.HTTP_201_CREATED)
-
-
-class AddCommunityAvatar(APIView):
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsCommunityAdministrator]
-
-    def post(self, request, pk):
-        community = get_object_or_404(Community, pk=pk)
-        self.check_object_permissions(request, community)
-        context = {"community": community, "request": request}
-        serializer = CommunityAvatarSerializer(data=request.data, context=context)
-        if serializer.is_valid():
-            previous_avatar = CommunityAvatar.objects.filter(community=community)
-            [img.image.delete() for img in previous_avatar]
-            [img.delete() for img in previous_avatar]
-            serializer.save()
-            return Response(
-                CommunitySerializer(community).data, status=status.HTTP_201_CREATED
-            )
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-class AddCommunityCover(APIView):
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsCommunityAdministrator]
-
-    def post(self, request, pk):
-        community = get_object_or_404(Community, pk=pk)
-        self.check_object_permissions(request, community)
-        context = {"community": community, "request": request}
-        serializer = CommunityCoverSerializer(data=request.data, context=context)
-        if serializer.is_valid():
-            previous_cover = CommunityCover.objects.filter(community=community)
-            [img.image.delete() for img in previous_cover]
-            [img.delete() for img in previous_cover]
-            serializer.save()
-            return Response(
-                CommunitySerializer(community).data, status=status.HTTP_201_CREATED
-            )
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class AddCommunityHashtag(APIView):

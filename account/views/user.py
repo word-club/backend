@@ -6,7 +6,6 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 import helper
-from account.permissions import IsOwner
 from account.serializers.user import *
 
 

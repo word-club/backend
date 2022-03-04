@@ -8,10 +8,6 @@ from account.views.password import (
     ResetPasswordRequestCode,
     ConfirmResetPassword,
 )
-from account.views.profile import (
-    AddProfileCoverView,
-    AddProfileAvatarView,
-)
 from account.views.user import (
     RegisterUserView,
     UserViewSet,
@@ -43,8 +39,6 @@ urlpatterns += [
         ConfirmResetPassword.as_view(),
         name="confirm-reset-password",
     ),
-    path("profile/add-cover/", AddProfileCoverView.as_view()),
-    path("profile/add-avatar/", AddProfileAvatarView.as_view()),
     path("user/<int:pk>/follow/", FollowAUserView.as_view()),
     path("follower/<int:pk>/", UnFollowAUserView.as_view()),
     path("profile/filter/", ProfileListView.as_view({"get": "list"})),

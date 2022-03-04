@@ -4,29 +4,9 @@ from rest_framework import serializers
 from block.models import Block
 from block.serializers import BlockCommunitySerializer
 from community.models import *
+from avatar.serializers import CommunityAvatarSerializer
+from cover.serializers import CommunityCoverSerializer
 from report.serializers import ReportSerializer
-
-
-class CommunityAvatarSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = CommunityAvatar
-        exclude = ["community"]
-
-    def create(self, validated_data):
-        validated_data["created_by"] = self.context["request"].user
-        validated_data["community"] = self.context["community"]
-        return super().create(validated_data)
-
-
-class CommunityCoverSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = CommunityCover
-        exclude = ["community"]
-
-    def create(self, validated_data):
-        validated_data["created_by"] = self.context["request"].user
-        validated_data["community"] = self.context["community"]
-        return super().create(validated_data)
 
 
 class CommunityRuleSerializer(serializers.ModelSerializer):

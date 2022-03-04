@@ -61,6 +61,8 @@ LOCAL_APPS = [
     "report",
     "block",
     "bookmark",
+    "avatar",
+    "cover",
     "notification",
     "administration",
 ]

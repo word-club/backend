@@ -18,14 +18,6 @@ urlpatterns += [
         DisableNotificationsForACommunity.as_view(),
     ),
     path(
-        "community/<int:pk>/avatar/",
-        AddCommunityAvatar.as_view(),
-    ),
-    path(
-        "community/<int:pk>/cover/",
-        AddCommunityCover.as_view(),
-    ),
-    path(
         "community/<int:pk>/hashtag/",
         AddCommunityHashtag.as_view(),
     ),
@@ -44,14 +36,6 @@ urlpatterns += [
     path(
         "community-rule/<int:pk>/",
         PatchDeleteCommunityRule.as_view(),
-    ),
-    path(
-        "community-cover/<int:pk>/",
-        DeleteCommunityCover.as_view(),
-    ),
-    path(
-        "community-avatar/<int:pk>/",
-        DeleteCommunityAvatar.as_view(),
     ),
     path(
         "community-unsubscribe/<int:pk>/",

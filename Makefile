@@ -80,6 +80,10 @@ fresh-migrations:
 	make migrate
 	make make-migrations APP=report
 	make migrate
+	make make-migrations APP=avatar
+	make migrate
+	make make-migrations APP=cover
+	make migrate
 	make make-migrations APP=notification
 	make migrate
 	make make-migrations APP=administration

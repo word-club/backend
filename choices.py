@@ -37,3 +37,8 @@ REPORT_STATES = (
     ("resolved", "Resolved"),
     ("ignored", "Ignored"),
 )
+
+IMAGE_TYPES = (
+    ("avatar", "Avatar"),
+    ("cover", "Cover"),
+)
