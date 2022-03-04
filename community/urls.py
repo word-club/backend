@@ -1,7 +1,8 @@
 from django.urls import path
 from rest_framework.routers import DefaultRouter
 
-from community.filters import SubscribedCommunityFilter, CommunitySubscribersFilter
+from community.filters import (CommunitySubscribersFilter,
+                               SubscribedCommunityFilter)
 from community.views.views import *
 
 router = DefaultRouter()
@@ -12,19 +13,10 @@ app_name = "community"
 
 urlpatterns += [
     path("community/<int:pk>/", CommunityDetail.as_view()),
-    path("community/<int:pk>/report/", ReportACommunity.as_view()),
     path("community/<int:pk>/subscribe/", SubscribeToACommunity.as_view()),
     path(
         "community/<int:pk>/disable-notifications/",
         DisableNotificationsForACommunity.as_view(),
-    ),
-    path(
-        "community/<int:pk>/avatar/",
-        AddCommunityAvatar.as_view(),
-    ),
-    path(
-        "community/<int:pk>/cover/",
-        AddCommunityCover.as_view(),
     ),
     path(
         "community/<int:pk>/hashtag/",
@@ -45,22 +37,6 @@ urlpatterns += [
     path(
         "community-rule/<int:pk>/",
         PatchDeleteCommunityRule.as_view(),
-    ),
-    path(
-        "community-cover/<int:pk>/",
-        DeleteCommunityCover.as_view(),
-    ),
-    path(
-        "community-avatar/<int:pk>/",
-        DeleteCommunityAvatar.as_view(),
-    ),
-    path(
-        "community-report/<int:pk>/",
-        CommunityReportDetailView.as_view(),
-    ),
-    path(
-        "resolve-report/<int:pk>/",
-        ResolveReportView.as_view(),
     ),
     path(
         "community-unsubscribe/<int:pk>/",
@@ -91,15 +67,8 @@ urlpatterns += [
         AcceptRejectACommunitySubscriber.as_view(),
     ),
     path("community-subscriber/<int:pk>/ban/", BanUnBanACommunitySubscriber.as_view()),
-    path("community-progress/<int:pk>/complete/", SetProgressStepAsComplete.as_view()),
-    path("community-progress/<int:pk>/skip/", SetProgressStepAsSkipped.as_view()),
-    path(
-        "community/<int:pk>/complete-registration", CompleteRegistrationSteps.as_view()
-    ),
     path("subscribed-community/filter/", SubscribedCommunityFilter.as_view()),
     path("community/<int:pk>/subscriber-filter/", CommunitySubscribersFilter.as_view()),
-    path("community/<int:pk>/block/", BlockACommunity.as_view()),
-    path("community-block/<int:pk>/", UnBlockACommunity.as_view()),
     path("top-communities/", TopCommunitiesList.as_view()),
     path("community/<int:pk>/view/", ViewACommunity.as_view()),
 ]

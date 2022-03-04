@@ -1,36 +1,8 @@
-from comment.helper import *
-from globals import UserGlobalSerializer, PublicationForUserCommentSerializer
+from rest_framework import serializers
 
-
-class CommentImageSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = CommentImage
-        fields = "__all__"
-
-    def create(self, validated_data):
-        validated_data["comment"] = self.context["comment"]
-        return super().create(validated_data)
-
-
-class CommentImageUrlSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = CommentImageUrl
-        fields = "__all__"
-
-    def create(self, validated_data):
-        validated_data["comment"] = self.context["comment"]
-        return super().create(validated_data)
-
-
-class CommentReportSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ReportComment
-        fields = "__all__"
-
-    def create(self, validated_data):
-        validated_data["comment"] = self.context["comment"]
-        validated_data["created_by"] = self.context["request"].user
-        return super().create(validated_data)
+from comment.models import Comment
+from globals import PublicationForUserCommentSerializer, UserGlobalSerializer
+from image.serializers import CommentImageSerializer
 
 
 class CommentPostSerializer(serializers.ModelSerializer):
@@ -58,32 +30,7 @@ class ReplyPostSerializer(serializers.ModelSerializer):
 
 
 class ReplySerializer(serializers.ModelSerializer):
-    up_vote = serializers.SerializerMethodField()
-    down_vote = serializers.SerializerMethodField()
-    share_status = serializers.SerializerMethodField()
-    hidden_status = serializers.SerializerMethodField()
-    bookmark_status = serializers.SerializerMethodField()
     created_by = UserGlobalSerializer()
-
-    def get_up_vote(self, obj):
-        user = self.context["user"]
-        return get_my_upvote(user, obj)
-
-    def get_down_vote(self, obj):
-        user = self.context["user"]
-        return get_my_downvote(user, obj)
-
-    def get_share_status(self, obj):
-        user = self.context["user"]
-        return get_my_share_status(user, obj)
-
-    def get_hidden_status(self, obj):
-        user = self.context["user"]
-        return get_my_hidden_status(user, obj)
-
-    def get_bookmark_status(self, obj):
-        user = self.context["user"]
-        return get_my_bookmark_status(user, obj)
 
     class Meta:
         model = Comment
@@ -93,7 +40,6 @@ class ReplySerializer(serializers.ModelSerializer):
 class CommentForProfileSerializer(serializers.ModelSerializer):
     publication = PublicationForUserCommentSerializer()
     images = CommentImageSerializer(many=True, read_only=True)
-    image_urls = CommentImageUrlSerializer(many=True, read_only=True)
 
     class Meta:
         model = Comment
@@ -101,42 +47,9 @@ class CommentForProfileSerializer(serializers.ModelSerializer):
 
 
 class CommentSerializer(serializers.ModelSerializer):
-    replies = serializers.SerializerMethodField()
+    replies = ReplySerializer(many=True, read_only=True)
     images = CommentImageSerializer(many=True, read_only=True)
-    image_urls = CommentImageUrlSerializer(many=True, read_only=True)
     created_by = UserGlobalSerializer(read_only=True)
-
-    up_vote = serializers.SerializerMethodField()
-    down_vote = serializers.SerializerMethodField()
-    share_status = serializers.SerializerMethodField()
-    hidden_status = serializers.SerializerMethodField()
-    bookmark_status = serializers.SerializerMethodField()
-
-    def get_replies(self, obj):
-        replies = Comment.objects.filter(reply=obj)
-        return ReplySerializer(
-            replies, many=True, context={"user": self.context["user"]}
-        ).data
-
-    def get_up_vote(self, obj):
-        user = self.context["user"]
-        return get_my_upvote(user, obj)
-
-    def get_down_vote(self, obj):
-        user = self.context["user"]
-        return get_my_downvote(user, obj)
-
-    def get_share_status(self, obj):
-        user = self.context["user"]
-        return get_my_share_status(user, obj)
-
-    def get_hidden_status(self, obj):
-        user = self.context["user"]
-        return get_my_hidden_status(user, obj)
-
-    def get_bookmark_status(self, obj):
-        user = self.context["user"]
-        return get_my_bookmark_status(user, obj)
 
     class Meta:
         model = Comment

@@ -1,33 +1,11 @@
-import os
-import random
 import uuid
 
 from django.contrib.auth import get_user_model
-from django.core.validators import FileExtensionValidator
-from django.core.exceptions import ValidationError
 from django.db import models
-from backend.settings import ALLOWED_IMAGES_EXTENSIONS
-from choices import COMMUNITY_TYPES, PROGRESS_STATES, COLOR_CHOICES, REPORT_STATES
+
+from choices import COLOR_CHOICES, COMMUNITY_TYPES
+from community.validators import validate_unique_id
 from hashtag.models import Hashtag
-
-
-def upload_avatar_to(instance, filename):
-    _, file_extension = os.path.splitext(filename)
-    filename = str(random.getrandbits(64)) + file_extension
-    return f"communities/{instance.community.pk}/avatar/{filename}"
-
-
-def upload_cover_to(instance, filename):
-    _, file_extension = os.path.splitext(filename)
-    filename = str(random.getrandbits(64)) + file_extension
-    return f"communities/{instance.community.pk}/cover/{filename}"
-
-
-def validate_unique_id(value):
-    items_to_ignore = ["\\", " ", "#", "?", "/", "&", "^", "%", "@", "!"]
-    for item in items_to_ignore:
-        if item in value:
-            raise ValidationError(", ".join(items_to_ignore) + " are not allowed.")
 
 
 class CommunityAdmin(models.Model):
@@ -45,10 +23,11 @@ class CommunityAdmin(models.Model):
         related_name="created_community_admins",
         editable=False,
     )
-    timestamp = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        ordering = ["-timestamp"]
+        ordering = ["-created_at"]
         unique_together = [["user", "community"]]
 
 
@@ -67,68 +46,12 @@ class CommunitySubAdmin(models.Model):
         related_name="created_community_sub_admins",
         editable=False,
     )
-    timestamp = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        ordering = ["-timestamp"]
+        ordering = ["-created_at"]
         unique_together = [["user", "community"]]
-
-
-class CommunityCreateProgress(models.Model):
-    community = models.ForeignKey(
-        "Community",
-        on_delete=models.CASCADE,
-        related_name="create_progress",
-        editable=False,
-    )
-    state = models.CharField(max_length=64, choices=PROGRESS_STATES)
-    is_completed = models.BooleanField(default=False)
-    is_skipped = models.BooleanField(default=False)
-
-    timestamp = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        ordering = ["timestamp"]
-
-
-class CommunityAvatar(models.Model):
-    image = models.ImageField(
-        upload_to=upload_avatar_to,
-        validators=[FileExtensionValidator(ALLOWED_IMAGES_EXTENSIONS)],
-    )
-    community = models.OneToOneField(
-        "Community", on_delete=models.CASCADE, related_name="avatar", editable=False
-    )
-    created_by = models.ForeignKey(
-        get_user_model(),
-        on_delete=models.CASCADE,
-        related_name="created_community_avatars",
-        editable=False,
-    )
-    timestamp = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        ordering = ["-timestamp"]
-
-
-class CommunityCover(models.Model):
-    image = models.ImageField(
-        upload_to=upload_cover_to,
-        validators=[FileExtensionValidator(ALLOWED_IMAGES_EXTENSIONS)],
-    )
-    community = models.OneToOneField(
-        "Community", on_delete=models.CASCADE, related_name="cover", editable=False
-    )
-    created_by = models.ForeignKey(
-        get_user_model(),
-        on_delete=models.CASCADE,
-        related_name="created_community_covers",
-        editable=False,
-    )
-    timestamp = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        ordering = ["-timestamp"]
 
 
 class CommunityRule(models.Model):
@@ -140,13 +63,14 @@ class CommunityRule(models.Model):
     created_by = models.ForeignKey(
         get_user_model(),
         on_delete=models.CASCADE,
-        related_name="created_community_rules",
+        related_name="my_community_rules",
         editable=False,
     )
-    timestamp = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        ordering = ["timestamp"]
+        ordering = ["-created_at"]
         unique_together = [["community", "title"]]
 
 
@@ -170,55 +94,15 @@ class CommunitySubscription(models.Model):
     approved_at = models.DateTimeField(null=True, editable=False)
 
     is_banned = models.BooleanField(default=False, editable=False)
+    ban_reason = models.TextField(null=True, editable=False)
     banned_at = models.DateTimeField(null=True, editable=False)
 
-    timestamp = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        ordering = ["-timestamp"]
+        ordering = ["-created_at"]
         unique_together = [["subscriber", "community"]]
-
-
-class CommunityReport(models.Model):
-    reason = models.TextField()
-    created_by = models.ForeignKey(
-        get_user_model(),
-        on_delete=models.CASCADE,
-        related_name="reported_communities",
-        editable=False,
-    )
-    community = models.ForeignKey(
-        "Community", on_delete=models.CASCADE, related_name="reports", editable=False
-    )
-    timestamp = models.DateTimeField(auto_now=True)
-    state = models.CharField(default="pending", max_length=8, choices=REPORT_STATES, editable=False)
-    resolve_text = models.TextField(null=True, editable=False)
-    resolved_by = models.ForeignKey(
-        get_user_model(),
-        on_delete=models.CASCADE,
-        related_name="resolved_community_reports",
-        null=True,
-        editable=False
-    )
-    resolved_at = models.DateTimeField(null=True, editable=False)
-
-    # is seen by the administrator
-    is_seen = models.BooleanField(default=False, editable=False)
-
-    class Meta:
-        ordering = ["-timestamp"]
-
-
-class CommunityHashtag(models.Model):
-    tag = models.ForeignKey(
-        Hashtag, related_name="communities", on_delete=models.CASCADE
-    )
-    community = models.ForeignKey(
-        "Community", related_name="hashtags", on_delete=models.CASCADE, editable=False
-    )
-
-    class Meta:
-        unique_together = [["tag", "community"]]
 
 
 class CommunityAuthorizationCode(models.Model):
@@ -235,15 +119,16 @@ class CommunityAuthorizationCode(models.Model):
         related_name="requested_community_authorization_codes",
         editable=False,
     )
-    timestamp = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        ordering = ["-timestamp"]
+        ordering = ["-created_at"]
 
 
 class CommunityTheme(models.Model):
     color = models.CharField(choices=COLOR_CHOICES, max_length=32, default="primary")
-    to_call_subscriber = models.CharField(max_length=64, default="Subscribers")
+    subscriber_nickname = models.CharField(max_length=64, default="Subscribers")
     state_after_subscription = models.CharField(max_length=64, default="Awesome")
     community = models.OneToOneField(
         "Community",
@@ -254,24 +139,11 @@ class CommunityTheme(models.Model):
     created_by = models.ForeignKey(
         get_user_model(),
         on_delete=models.CASCADE,
-        related_name="added_themes",
+        related_name="my_community_themes",
         editable=False,
     )
-    timestamp = models.DateTimeField(auto_now_add=True)
-
-
-class BlockCommunity(models.Model):
-    reason = models.TextField()
-    community = models.ForeignKey(
-        "Community", related_name="blocked_by", on_delete=models.CASCADE, editable=False
-    )
-    created_by = models.ForeignKey(
-        get_user_model(),
-        on_delete=models.CASCADE,
-        related_name="blocked_communities",
-        editable=False,
-    )
-    timestamp = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
 
 class Community(models.Model):
@@ -281,39 +153,40 @@ class Community(models.Model):
     name = models.CharField(max_length=64, unique=True)
     description = models.CharField(max_length=256, null=True)
     email = models.EmailField(unique=True, null=True)
+    quote = models.TextField(null=True)
+    welcome_text = models.TextField(null=True)
+
+    view_globally = models.BooleanField(default=True)
+    contains_adult_content = models.BooleanField(default=False)
+    type = models.CharField(max_length=64, choices=COMMUNITY_TYPES)
+
+    tags = models.ManyToManyField(
+        Hashtag,
+        null=True,
+        related_name="communities",
+    )
 
     is_authorized = models.BooleanField(default=False, editable=False)
     authorized_at = models.DateTimeField(blank=True, null=True, editable=False)
-    type = models.CharField(max_length=64, choices=COMMUNITY_TYPES)
-
-    completed_registration_steps = models.BooleanField(default=False, editable=False)
-
-    contains_adult_content = models.BooleanField(default=False)
 
     created_by = models.ForeignKey(
         get_user_model(),
         on_delete=models.CASCADE,
-        related_name="created_communities",
+        related_name="my_communities",
         editable=False,
     )
-    date_of_registration = models.DateTimeField(auto_now_add=True)
-
-    timestamp = models.DateTimeField(auto_now=True)
-
-    quote = models.TextField(null=True)
-    welcome_text = models.TextField(null=True)
 
     popularity = models.PositiveIntegerField(default=0, editable=False)
     dislikes = models.PositiveIntegerField(default=0, editable=False)
     discussions = models.PositiveIntegerField(default=0, editable=False)
     supports = models.PositiveBigIntegerField(default=0, editable=False)
-
     views = models.PositiveBigIntegerField(default=0, editable=False)
 
-    view_globally = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        ordering = ["-timestamp"]
+        ordering = ["-created_at"]
 
     @property
     def admins(self):
@@ -322,3 +195,18 @@ class Community(models.Model):
     @property
     def sub_admins(self):
         return CommunitySubAdmin.objects.filter(community=self.id).distinct()
+
+    @property
+    def theme(self):
+        return CommunityTheme.objects.get(community=self.id).distinct()
+
+    @property
+    def rules(self):
+        return CommunityRule.objects.filter(community=self.id).distinct()
+
+    @property
+    def subscriptions(self):
+        return CommunitySubscription.objects.filter(community=self.id).distinct()
+
+    def __str__(self):
+        return self.name

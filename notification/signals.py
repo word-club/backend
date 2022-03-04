@@ -4,8 +4,8 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 
 from notification.models import NotificationTo
-from notification.serializers import NotificationSerializer, NotificationToSerializer
-
+from notification.serializers import (NotificationSerializer,
+                                      NotificationToSerializer)
 
 # @receiver(post_save, sender=NotificationTo)
 # def broadcast_notifications(sender, instance, created, **kwargs):
@@ -23,5 +23,5 @@ from notification.serializers import NotificationSerializer, NotificationToSeria
 #             }
 #         )
 
-# TODO create notification from other models signals
+# TODO create notification from other models signals.py
 # TODO broadcast notification from here when NotificationTo obj is created

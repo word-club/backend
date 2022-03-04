@@ -1,29 +1,14 @@
 from django.urls import path
 from rest_framework.routers import DefaultRouter
 
-from account.views.auth import LoginView, LogoutView, AdminInspect
-from account.views.follow import FollowUserViewSet, FollowAUserView, UnFollowAUserView
-from account.views.password import (
-    UpdatePassword,
-    ResetPasswordRequestCode,
-    ConfirmResetPassword,
-)
-from account.views.profile import (
-    AddProfileCoverView,
-    AddProfileAvatarView,
-)
-from account.views.user import (
-    RegisterUserView,
-    UserViewSet,
-    DeleteReport,
-    BlockAUser,
-    ReportAUser,
-    UnBlockAUser,
-    GetMeView,
-    ProfileListView,
-    MentionList,
-    RetrieveUserByUsername,
-)
+from account.views.auth import AdminInspect, LoginView, LogoutView
+from account.views.follow import (FollowAUserView, FollowUserViewSet,
+                                  UnFollowAUserView)
+from account.views.password import (ConfirmResetPassword,
+                                    ResetPasswordRequestCode, UpdatePassword)
+from account.views.user import (GetMeView, MentionList, ProfileListView,
+                                RegisterUserView, RetrieveUserByUsername,
+                                UserViewSet)
 
 router = DefaultRouter()
 router.register(r"users", UserViewSet, basename="user")
@@ -47,14 +32,8 @@ urlpatterns += [
         ConfirmResetPassword.as_view(),
         name="confirm-reset-password",
     ),
-    path("profile/add-cover/", AddProfileCoverView.as_view()),
-    path("profile/add-avatar/", AddProfileAvatarView.as_view()),
     path("user/<int:pk>/follow/", FollowAUserView.as_view()),
     path("follower/<int:pk>/", UnFollowAUserView.as_view()),
-    path("user/<int:pk>/report/", ReportAUser.as_view()),
-    path("user/<int:pk>/block/", BlockAUser.as_view()),
-    path("block/<int:pk>/", UnBlockAUser.as_view()),
-    path("report/<int:pk>/", DeleteReport.as_view()),
     path("profile/filter/", ProfileListView.as_view({"get": "list"})),
     path("mention-list/", MentionList.as_view()),
     path("user/<str:username>/", RetrieveUserByUsername.as_view()),

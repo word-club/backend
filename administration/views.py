@@ -1,13 +1,12 @@
-from rest_framework import viewsets, serializers, mixins
-from rest_framework.response import Response
+from rest_framework import mixins, serializers, status, viewsets
 from rest_framework.authentication import TokenAuthentication
+from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework import status
 
-from administration.models import Administration, PageView
-from account.permissions import IsSuperUser
 from account.models import Profile
+from account.permissions import IsSuperUser
 from account.serializers.user import UserRetrieveSerializer
+from administration.models import Administration, PageView
 from community.models import Community
 from community.serializer import CommunityRetrieveSerializer
 

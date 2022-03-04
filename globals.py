@@ -1,22 +1,19 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 
-from account.models import ProfileCover, ProfileAvatar
+from cover.models import Cover
+from avatar.models import Avatar
 from comment.models import Comment
 from community.models import (
     Community,
-    CommunityAvatar,
     CommunityTheme,
-    CommunityCover,
     CommunitySubscription,
-    CommunityHashtag,
 )
 from publication.models import (
     Publication,
-    PublicationUpVote,
-    PublicationShare,
-    PublicationDownVote,
 )
+from share.models import Share
+from vote.models import Vote
 
 
 class CommunityGlobalSerializer(serializers.ModelSerializer):
@@ -30,17 +27,17 @@ class CommunityGlobalSerializer(serializers.ModelSerializer):
     @staticmethod
     def get_avatar(obj):
         try:
-            avatar = CommunityAvatar.objects.get(community=obj)
+            avatar = Avatar.objects.get(community=obj)
             return avatar.image.url
-        except CommunityAvatar.DoesNotExist:
+        except Avatar.DoesNotExist:
             return None
 
     @staticmethod
     def get_cover(obj):
         try:
-            cover = CommunityCover.objects.get(community=obj)
+            cover = Cover.objects.get(community=obj)
             return cover.image.url
-        except CommunityCover.DoesNotExist:
+        except Cover.DoesNotExist:
             return None
 
     @staticmethod
@@ -64,14 +61,6 @@ class CommunityGlobalSerializer(serializers.ModelSerializer):
     def get_subscribers_count(obj):
         subscribers = CommunitySubscription.objects.filter(community=obj).count()
         return subscribers
-
-    @staticmethod
-    def get_hashtags(obj):
-        tags = CommunityHashtag.objects.filter(community=obj)
-        dataset = []
-        for tag in tags:
-            dataset.append({"id": tag.id, "tag": tag.tag.id, "name": tag.tag.tag})
-        return dataset
 
     class Meta:
         model = Community
@@ -116,17 +105,17 @@ class UserGlobalSerializer(serializers.ModelSerializer):
     @staticmethod
     def get_avatar(obj):
         try:
-            cover = ProfileAvatar.objects.get(profile=obj.profile)
+            cover = Avatar.objects.get(profile=obj.profile)
             return cover.image.url
-        except ProfileAvatar.DoesNotExist:
+        except Avatar.DoesNotExist:
             return None
 
     @staticmethod
     def get_cover(obj):
         try:
-            cover = ProfileCover.objects.get(profile=obj.profile)
+            cover = Cover.objects.get(profile=obj.profile)
             return cover.image.url
-        except ProfileCover.DoesNotExist:
+        except Cover.DoesNotExist:
             return None
 
     @staticmethod
@@ -136,9 +125,9 @@ class UserGlobalSerializer(serializers.ModelSerializer):
         for pub in publications:
             comments = Comment.objects.filter(publication=pub).count()
 
-            up_votes = PublicationUpVote.objects.filter(publication=pub).count()
-            down_votes = PublicationDownVote.objects.filter(publication=pub).count()
-            shares = PublicationShare.objects.filter(publication=pub).count()
+            up_votes = Vote.objects.filter(publication=pub, up=True).count()
+            down_votes = Vote.objects.filter(publication=pub, up=False).count()
+            shares = Share.objects.filter(publication=pub).count()
             count += comments + up_votes + down_votes + shares
         return count
 

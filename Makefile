@@ -36,7 +36,7 @@ black:
 
 lint:
 	black .
-	isort .
+	isort **/*.py
 
 clean-migrations:
 	rm -rf **/migrations
@@ -61,12 +61,32 @@ new-admin:
 fresh-migrations:
 	make clean-migrations
 	make make-migrations APP=account
+	make migrate
 	make make-migrations APP=hashtag
+	make migrate
 	make make-migrations APP=community
 	make migrate
 	make make-migrations APP=publication
 	make migrate
 	make make-migrations APP=comment
+	make migrate
+	make make-migrations APP=vote
+	make migrate
+	make make-migrations APP=share
+	make migrate
+	make make-migrations APP=bookmark
+	make migrate
+	make make-migrations APP=hide
+	make migrate
+	make make-migrations APP=report
+	make migrate
+	make make-migrations APP=avatar
+	make migrate
+	make make-migrations APP=cover
+	make migrate
+	make make-migrations APP=image
+	make migrate
+	make make-migrations APP=link
 	make migrate
 	make make-migrations APP=notification
 	make migrate
@@ -74,3 +94,6 @@ fresh-migrations:
 	make migrate
 
 fresh: clean-db-migration fresh-migrations new-admin
+
+test:
+	$(PYTHON) manage.py test $(TEST)
