@@ -2,7 +2,7 @@ from django.contrib.auth import get_user_model
 from django.db import models
 
 from comment.models import Comment
-from community.models import Community, CommunitySubscription
+from community.models import Community, Subscription
 from publication.models import Publication
 
 
@@ -41,7 +41,7 @@ class Notification(models.Model):
     # report
 
     subscription = models.ForeignKey(
-        CommunitySubscription,
+        Subscription,
         blank=True,
         null=True,
         on_delete=models.CASCADE,

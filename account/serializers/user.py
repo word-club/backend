@@ -13,12 +13,9 @@ from comment.serializers import (
     CommentSerializer,
     CommentForProfileSerializer,
 )
-from community.models import CommunitySubscription
-from community.serializer import (
-    CommunitySerializer,
-    CommunityAdminSerializer,
-    CommunitySubAdminSerializer,
-)
+from community.models import Subscription
+from community.serializers.community import CommunitySerializer
+from community.serializers.moderator import ModeratorSerializer
 from cover.serializers import ProfileCoverSerializer
 from globals import UserGlobalSerializer
 from hide.models import Hide
@@ -147,8 +144,7 @@ class UserInfoSerializer(serializers.ModelSerializer):
 
     created_communities = CommunitySerializer(many=True, read_only=True)
     subscribed_communities = serializers.SerializerMethodField()
-    managed_communities = CommunityAdminSerializer(many=True, read_only=True)
-    sub_managed_communities = CommunitySubAdminSerializer(many=True, read_only=True)
+    managed_communities = ModeratorSerializer(many=True, read_only=True)
 
     received_notifications = NotificationReceiverSerializer(many=True, read_only=True)
 
@@ -253,7 +249,7 @@ class UserInfoSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def get_subscribed_communities(obj):
-        items = CommunitySubscription.objects.filter(subscriber=obj)
+        items = Subscription.objects.filter(subscriber=obj)
         communities = []
         [communities.append(item.community) for item in items]
         return CommunitySerializer(

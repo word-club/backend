@@ -9,7 +9,7 @@ from rest_framework.views import APIView
 import helper
 from account.permissions import IsOwner
 from community.helper import check_community_law
-from community.permissions import IsCommunityAdministrator
+from community.permissions import IsCommunityModerator
 from helpers.twitter_oembed import TwitterEmbedSerializer, TwitterOEmbedData
 from publication.serializers import *
 
@@ -97,7 +97,7 @@ class AddPublicationView(APIView):
 
 class RetrieveUpdatePublicationView(APIView):
     authentication_classes = [TokenAuthentication]
-    permission_classes = [IsOwner | IsCommunityAdministrator]
+    permission_classes = [IsOwner | IsCommunityModerator]
 
     @staticmethod
     def get(request, pk):
@@ -141,7 +141,7 @@ class RetrieveUpdatePublicationView(APIView):
 
 class PublishPublicationView(APIView):
     authentication_classes = [TokenAuthentication]
-    permission_classes = [IsOwner | IsCommunityAdministrator]
+    permission_classes = [IsOwner | IsCommunityModerator]
 
     def post(self, request, pk):
         publication = get_object_or_404(Publication, pk=pk)
@@ -200,7 +200,7 @@ class GetTwitterEmbed(APIView):
 
 class PublicationPinView(APIView):
     authentication_classes = [TokenAuthentication]
-    permission_classes = [IsOwner | IsCommunityAdministrator]
+    permission_classes = [IsOwner | IsCommunityModerator]
 
     def patch(self, request, pk=None):
         publication = get_object_or_404(Publication, pk=pk)

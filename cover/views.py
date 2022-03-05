@@ -8,7 +8,7 @@ from rest_framework.views import APIView
 from account.models import Profile
 from account.permissions import IsOwner
 from community.models import Community
-from community.permissions import IsCommunityAdministrator
+from community.permissions import IsCommunityModerator
 from cover.models import Cover
 from cover.serializers import (CommunityCoverSerializer, CoverSerializer,
                                ProfileCoverSerializer)
@@ -31,7 +31,7 @@ class AddProfileCoverView(APIView):
 
 class AddCommunityCoverView(APIView):
     authentication_classes = [TokenAuthentication]
-    permission_classes = [IsCommunityAdministrator]
+    permission_classes = [IsCommunityModerator]
 
     def post(self, request):
         community = get_object_or_404(Community, user=request.user)

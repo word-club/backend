@@ -11,7 +11,7 @@ from avatar.models import Avatar
 from avatar.serializers import (AvatarSerializer, CommunityAvatarSerializer,
                                 ProfileAvatarSerializer)
 from community.models import Community
-from community.permissions import IsCommunityAdministrator
+from community.permissions import IsCommunityModerator
 
 
 class AddProfileAvatarView(APIView):
@@ -31,7 +31,7 @@ class AddProfileAvatarView(APIView):
 
 class AddCommunityAvatarView(APIView):
     authentication_classes = [TokenAuthentication]
-    permission_classes = [IsCommunityAdministrator]
+    permission_classes = [IsCommunityModerator]
 
     def post(self, request):
         community = get_object_or_404(Community, user=request.user)

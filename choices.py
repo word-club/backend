@@ -30,7 +30,7 @@ REPORT_STATES = (
     ("ignored", "Ignored"),
 )
 
-IMAGE_TYPES = (
-    ("avatar", "Avatar"),
-    ("cover", "Cover"),
+MOD_CHOICES = (
+    ("mod", "Moderator"),
+    ("sub", "Sub Moderator"),
 )
