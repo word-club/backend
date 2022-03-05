@@ -4,14 +4,29 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.authtoken.models import Token
 
 import helper
 from account.permissions import IsOwner
 from community.helper import check_community_law
 from community.permissions import IsCommunityModerator
 from helpers.twitter_oembed import TwitterEmbedSerializer, TwitterOEmbedData
+from hide.models import Hide
 from publication.helper import check_publication_update_date_limit
 from publication.serializers import *
+
+
+def get_user_from_auth_header(request):
+    auth_header = request.headers.get("Authorization", False)
+    if auth_header:
+        token = auth_header.split(" ")[1]
+        try:
+            token_instance = Token.objects.get(key=token)
+            return token_instance.user
+        except Token.DoesNotExist:
+            return None
+    else:
+        return None
 
 
 class PublicationListView(mixins.ListModelMixin, viewsets.GenericViewSet):
@@ -31,12 +46,17 @@ class PublicationListView(mixins.ListModelMixin, viewsets.GenericViewSet):
         filterset, sort_string = helper.get_viewset_filterset(
             self.request, self.filterset_fields, "published_at"
         )
-        return Publication.objects.filter(**filterset).order_by(sort_string)
+        user = get_user_from_auth_header(self.request)
+
+        queryset = Publication.objects.filter(**filterset).order_by(sort_string)
+        hidden_publications = []
+        if user:
+            hides = Hide.objects.filter(publication__isnull=False)
+            [hidden_publications.append(hide.publication.id) for hide in hides]
+        return queryset.exclude(id__in=hidden_publications)
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
-        auth = self.request.headers.get("Authorization", False)
-        context["user"] = self.request.user if auth else None
         context["depth"] = self.request.query_params.get("depth", 0)
         return context
 
