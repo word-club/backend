@@ -57,6 +57,5 @@ class CoverDetail(APIView):
     def delete(self, request, pk):
         cover = get_object_or_404(Cover, pk=pk)
         self.check_object_permissions(request, cover)
-        cover.image.delete()
         cover.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)

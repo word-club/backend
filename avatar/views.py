@@ -57,6 +57,5 @@ class AvatarDetail(APIView):
     def delete(self, request, pk):
         avatar = get_object_or_404(Avatar, pk=pk)
         self.check_object_permissions(request, avatar)
-        avatar.image.delete()
         avatar.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)

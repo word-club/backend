@@ -73,6 +73,6 @@ def decrease_supports(vote):
         instance.community.save()
 
 
-def notify_author(instance, created):
+def notify_author(instance):
     # TODO
     pass

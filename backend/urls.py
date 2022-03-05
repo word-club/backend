@@ -24,6 +24,7 @@ urlpatterns = [
     path("api/", include("block.urls")),
     path("api/", include("avatar.urls")),
     path("api/", include("cover.urls")),
+    path("api/", include("image.urls")),
     path("api/", include("link.urls")),
     path("api/", include("auth_code.urls")),
     path("api/", include("administration.urls")),

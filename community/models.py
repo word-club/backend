@@ -26,6 +26,7 @@ class Community(models.Model):
 
     tags = models.ManyToManyField(
         Hashtag,
+        blank=True,
         related_name="communities",
     )
 
