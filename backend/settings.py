@@ -3,7 +3,6 @@ Django settings for backend project.
 """
 import os
 from pathlib import Path
-
 from dotenv import load_dotenv
 
 # load environment
@@ -43,8 +42,8 @@ INTERNAL_APPS = [
 
 EXTERNAL_APPS = [
     # "channels",
+    "oauth2_provider",
     "rest_framework",
-    "rest_framework.authtoken",
     "phonenumber_field",
     "django_filters",
     "corsheaders",
@@ -149,19 +148,29 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+# Oauth2 configuration
+OAUTH2_PROVIDER = {
+    # this is the list of available scopes
+    'SCOPES': {
+        'read': 'Read scope',
+        'write': 'Write scope',
+        'groups': 'Access to your groups'
+    }
+}
+
 
 # Django REST Framework Configuration
-
 REST_FRAMEWORK = {
     "DEFAULT_RENDERER_CLASSES": [
         "rest_framework.renderers.JSONRenderer",
         "rest_framework.renderers.BrowsableAPIRenderer",
     ],
-    "DEFAULT_AUTHENTICATION_CLASSES": [
-        "rest_framework.authentication.TokenAuthentication",
-        "rest_framework.authentication.BasicAuthentication",
-    ],
-    "DEFAULT_PERMISSION_CLASSES": [],
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
+    ),
+    "DEFAULT_PERMISSION_CLASSES": (
+        "rest_framework.permissions.IsAuthenticated",
+    ),
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 15,
     "DEFAULT_FILTER_BACKENDS": (
