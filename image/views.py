@@ -1,3 +1,4 @@
+from django.core.exceptions import ValidationError
 from rest_framework import status
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.generics import get_object_or_404
@@ -23,7 +24,10 @@ class AddPublicationImageView(APIView):
         context = {"publication": publication, "request": request}
         serializer = PublicationImageSerializer(data=request.data, context=context)
         if serializer.is_valid():
-            serializer.save()
+            try:
+                serializer.save()
+            except ValidationError as e:
+                return Response(e.message_dict, status=status.HTTP_400_BAD_REQUEST)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -38,7 +42,10 @@ class AddCommentImageView(APIView):
         context = {"comment": comment, "request": request}
         serializer = CommentImageSerializer(data=request.data, context=context)
         if serializer.is_valid():
-            serializer.save()
+            try:
+                serializer.save()
+            except ValidationError as e:
+                return Response(e.message_dict, status=status.HTTP_400_BAD_REQUEST)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -56,7 +63,5 @@ class ImageDetail(APIView):
     def delete(self, request, pk):
         image = get_object_or_404(Image, pk=pk)
         self.check_object_permissions(request, image)
-        if image.image:
-            image.image.delete()
         image.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)

@@ -9,18 +9,19 @@ from rest_framework.views import APIView
 from account.permissions import IsOwner
 from comment.models import Comment
 from publication.models import Publication
+from publication.permissions import IsPublished
 from share.models import Share
 from share.serializers import ShareSerializer
 
 
 class AddPublicationShare(APIView):
     authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsPublished]
 
-    @staticmethod
-    def post(request, pk):
+    def post(self, request, pk):
         publication = get_object_or_404(Publication, pk=pk)
-        context = {"publication": publication, "request": request}
+        self.check_object_permissions(request, publication)
+        context = {"publication": publication, "request": request, "comment": None}
         serializer = ShareSerializer(data=request.data, context=context)
         if serializer.is_valid():
             serializer.save()
@@ -30,11 +31,12 @@ class AddPublicationShare(APIView):
 
 class AddCommentShare(APIView):
     authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsPublished]
 
     def post(self, request, pk):
         comment = get_object_or_404(Comment, pk=pk)
-        context = {"comment": comment, "request": request}
+        self.check_object_permissions(request, comment.publication)
+        context = {"comment": comment, "request": request, "publication": None}
         serializer = ShareSerializer(data=request.data, context=context)
         if serializer.is_valid():
             serializer.save()
@@ -45,6 +47,12 @@ class AddCommentShare(APIView):
 class ShareDetail(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated, IsOwner]
+
+    def get(self, request, pk):
+        share = get_object_or_404(Share, pk=pk)
+        self.check_object_permissions(request, share)
+        serializer = ShareSerializer(share)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     def patch(self, request, pk):
         share = get_object_or_404(Share, pk=pk)

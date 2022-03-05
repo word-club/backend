@@ -8,7 +8,7 @@ from publication.views import (AddPublicationView, GetTwitterEmbed,
                                RetrieveUpdatePublicationView, ViewAPublication)
 
 router = DefaultRouter()
-router.register(r"s/publication", PublicationListView, basename="publication-list")
+router.register(r"wc-publication", PublicationListView, basename="publication-list")
 
 urlpatterns = router.urls
 

@@ -1,3 +1,4 @@
+from django.utils import timezone
 from rest_framework import status, viewsets
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.generics import get_object_or_404
@@ -7,30 +8,10 @@ from rest_framework.views import APIView
 
 import helper
 from account.permissions import IsOwner
+from comment.helper import check_comment_update_date_limit
 from comment.serializers import *
-from publication.permissions import IsPublicationAuthor
-
-
-def check_comment_update_date_limit(obj):
-    """
-    :param obj: Comment instance
-    :return: void if comment date limit is not reached
-        Response(403) if publication update date limit reached
-    """
-    now = timezone.now()
-    if not obj.published_at:
-        return
-    diff = now - obj.created_at
-    limit = Administration.objects.first()
-    if diff.days > limit.comment_update_limit:
-        return Response(
-            {
-                "detail": "Sorry, you cannot update the comment after {} days.".format(
-                    limit.comment_update_limit
-                )
-            },
-            status=status.HTTP_403_FORBIDDEN,
-        )
+from publication.models import Publication
+from publication.permissions import IsPublicationAuthor, IsPublished
 
 
 class CommentViewSet(viewsets.ModelViewSet):
@@ -50,19 +31,19 @@ class CommentViewSet(viewsets.ModelViewSet):
         context["user"] = self.request.user
         return context
 
-    def retrieve(self, request, pk=None):
-        comment = get_object_or_404(Comment, pk=pk)
+    def retrieve(self, request, *args, **kwargs):
+        comment = self.get_object()
         serializer = CommentSerializer(comment, context={"user": self.request.user})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class AddPublicationComment(APIView):
     authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsPublished]
 
-    @staticmethod
-    def post(request, pk):
+    def post(self, request, pk):
         publication = get_object_or_404(Publication, pk=pk)
+        self.check_object_permissions(request, publication)
         context = {"publication": publication, "request": request}
         serializer = CommentPostSerializer(data=request.data, context=context)
         if serializer.is_valid():
@@ -90,8 +71,6 @@ class CommentDetail(APIView):
     def delete(self, request, pk):
         comment = get_object_or_404(Comment, pk=pk)
         self.check_object_permissions(request, comment)
-        comment_images = CommentImage.objects.filter(comment=comment)
-        [img.image.delete() for img in comment_images]
         comment.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
@@ -120,6 +99,8 @@ class CommentPinView(APIView):
         if comment.is_pinned:
             return Response(status=status.HTTP_200_OK)
         comment.is_pinned = True
+        comment.pinned_at = timezone.now()
+        comment.pinned_by = request.user
         comment.save()
         return Response(status=status.HTTP_201_CREATED)
 

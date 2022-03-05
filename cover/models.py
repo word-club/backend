@@ -13,8 +13,6 @@ from helpers.upload_path import upload_cover_to
 class Cover(models.Model):
     image = models.ImageField(
         upload_to=upload_cover_to,
-        null=True,
-        blank=True,
         validators=[FileExtensionValidator(ALLOWED_IMAGES_EXTENSIONS)],
     )
     profile = models.ForeignKey(
@@ -41,18 +39,6 @@ class Cover(models.Model):
         editable=False,
     )
 
-    def save(self, *args, **kwargs):
-        check = 0
-        if self.community:
-            check += 1
-        if self.profile:
-            check += 1
-        if check == 0:
-            raise ValidationError({"detail": "One of the key field must be specified"})
-        if check > 1:
-            raise ValidationError({"detail": "Only one key field can be submitted"})
-        return super().save(*args, **kwargs)
-
     class Meta:
         ordering = ["-created_at"]
         constraints = [
@@ -67,3 +53,20 @@ class Cover(models.Model):
                 name="unique_profile_active_cover",
             ),
         ]
+
+    def save(self, *args, **kwargs):
+        check = 0
+        if self.community:
+            check += 1
+        if self.profile:
+            check += 1
+        if check == 0:
+            raise ValidationError({"detail": "One of the key field must be specified"})
+        if check > 1:
+            raise ValidationError({"detail": "Only one key field can be submitted"})
+        return super().save(*args, **kwargs)
+
+    def delete(self, using=None, keep_parents=False):
+        if self.image:
+            self.image.delete()
+        super().delete(using, keep_parents)

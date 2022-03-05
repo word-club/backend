@@ -6,12 +6,15 @@ def get_upload_path(instance, filename, mode):
     _, file_extension = os.path.splitext(filename)
     filename = str(random.getrandbits(64)) + file_extension
     upload_to = ""
-    if instance.publication:
-        upload_to = f"publications/{instance.publication.id}/"
+    if instance.__class__.__name__ == "Image":
+        if instance.publication:
+            upload_to = f"publications/{instance.publication.id}/"
+        elif instance.comment:
+            upload_to = f"publications/{instance.comment.id}/"
     elif instance.profile:
         upload_to += f"profile/${instance.profile.user.username}/"
     elif instance.community:
-        upload_to += f"community/${instance.community.unique_id}/"
+        upload_to += f"community/${instance.community.id}/"
     upload_to += f"{mode}/{filename}"
     return upload_to
 

@@ -6,15 +6,15 @@ from comment.views import (AddPublicationComment, CommentDetail,
                            CommentPinView, CommentViewSet, ReplyCommentView)
 
 router = DefaultRouter()
-router.register(r"comment-view", CommentViewSet, basename="comment")
+router.register(r"wc-comment", CommentViewSet, basename="comment")
 urlpatterns = router.urls
 
 app_name = "comment"
 
 urlpatterns += [
-    path("publication/<str:pk>/comment/", AddPublicationComment.as_view()),
-    path("comment/<str:pk>/", CommentDetail.as_view()),
-    path("comment/<str:pk>/reply/", ReplyCommentView.as_view()),
-    path("comment/<str:pk>/pin/", CommentPinView.as_view()),
-    path("comment-filter/", CommentFilter.as_view()),
+    path("publication/<int:pk>/comment/", AddPublicationComment.as_view()),
+    path("comment/<int:pk>/", CommentDetail.as_view()),
+    path("comment/<int:pk>/reply/", ReplyCommentView.as_view()),
+    path("comment/<int:pk>/pin/", CommentPinView.as_view()),
+    path("comment/filter/", CommentFilter.as_view()),
 ]

@@ -31,13 +31,12 @@ class CommunityViewSet(
         "type",
         "is_authorized",
         "contains_adult_content",
-        "completed_registration_steps",
         "created_by",
     ]
 
     def get_queryset(self):
         filterset, sort_string = helper.get_viewset_filterset(
-            self.request, self.filterset_fields, "date_of_registration"
+            self.request, self.filterset_fields, "created_at"
         )
         return Community.objects.filter(
             ~Q(type__exact="private"),
@@ -46,12 +45,7 @@ class CommunityViewSet(
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
-        depth = 0
-        try:
-            depth = int(self.request.query_params.get("depth", 0))
-        except ValueError:
-            pass
-        context["depth"] = depth
+        context["depth"] = self.request.query_params.get("depth", 0)
         return context
 
 

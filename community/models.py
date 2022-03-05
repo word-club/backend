@@ -22,10 +22,11 @@ class Community(models.Model):
 
     view_globally = models.BooleanField(default=True)
     contains_adult_content = models.BooleanField(default=False)
-    type = models.CharField(max_length=64, choices=COMMUNITY_TYPES)
+    type = models.CharField(max_length=64, choices=COMMUNITY_TYPES, default="public")
 
     tags = models.ManyToManyField(
         Hashtag,
+        blank=True,
         related_name="communities",
     )
 

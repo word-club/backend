@@ -87,33 +87,11 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = get_user_model()
-        fields = "__all__"
+        exclude = ["password"]
 
 
 class UserRetrieveSerializer(serializers.ModelSerializer):
     profile = ProfileSerializer(read_only=True)
-    is_followed = serializers.SerializerMethodField()
-    is_blocked = serializers.SerializerMethodField()
-
-    def get_is_followed(self, obj):
-        # context "user" is the requester
-        user = self.context["user"]
-        if type(user) == get_user_model():
-            try:
-                follow = FollowUser.objects.get(created_by=user, user=obj)
-                return FollowUserSerializer(follow).data
-            except FollowUser.DoesNotExist:
-                return False
-
-    def get_is_blocked(self, obj):
-        # context "user" is the requester
-        user = self.context["user"]
-        if type(user) == get_user_model():
-            try:
-                block = Block.objects.get(created_by=user, user=obj)
-                return BlockUserSerializer(block).data
-            except Block.DoesNotExist:
-                return False
 
     class Meta:
         model = get_user_model()

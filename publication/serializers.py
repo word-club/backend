@@ -15,11 +15,7 @@ class PublicationFormSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         validated_data["created_by"] = self.context["user"]
-        publication = Publication.objects.create(**validated_data)
-        # TODO: link hashtags to the publication
-        # for hashtag in hashtags:
-        # publication.hash_tags.add(hashtag)
-        return publication
+        return super().create(validated_data)
 
 
 class PublicationSerializer(serializers.ModelSerializer):

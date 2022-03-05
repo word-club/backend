@@ -1,5 +1,3 @@
-import uuid
-
 from django.contrib.auth import get_user_model
 from django.db import models
 
@@ -8,7 +6,6 @@ from publication.models import Publication
 
 
 class Comment(models.Model):
-    id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
     comment = models.TextField()
     publication = models.ForeignKey(
         Publication,
@@ -30,13 +27,21 @@ class Comment(models.Model):
     discussions = models.PositiveBigIntegerField(default=0, editable=False)
 
     is_pinned = models.BooleanField(default=False, editable=False)
-
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    pinned_at = models.DateTimeField(null=True, editable=False)
+    pinned_by = models.ForeignKey(
+        get_user_model(),
+        on_delete=models.CASCADE,
+        related_name="my_pinned_comments",
+        editable=False,
+        null=True,
+    )
 
     reply = models.ForeignKey(
         "self", null=True, on_delete=models.CASCADE, related_name="replies"
     )
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         ordering = ["-created_at"]

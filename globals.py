@@ -9,6 +9,7 @@ from community.models import (
     Theme,
     Subscription,
 )
+from hashtag.serializers import HashtagSerializer
 from publication.models import (
     Publication,
 )
@@ -17,7 +18,7 @@ from vote.models import Vote
 
 
 class CommunityGlobalSerializer(serializers.ModelSerializer):
-    hashtags = serializers.SerializerMethodField()
+    tags = HashtagSerializer(many=True)
     avatar = serializers.SerializerMethodField(allow_null=True)
     cover = serializers.SerializerMethodField(allow_null=True)
     theme = serializers.SerializerMethodField()
@@ -27,7 +28,7 @@ class CommunityGlobalSerializer(serializers.ModelSerializer):
     @staticmethod
     def get_avatar(obj):
         try:
-            avatar = Avatar.objects.get(community=obj)
+            avatar = Avatar.objects.get(community=obj, is_active=True)
             return avatar.image.url
         except Avatar.DoesNotExist:
             return None
@@ -35,7 +36,7 @@ class CommunityGlobalSerializer(serializers.ModelSerializer):
     @staticmethod
     def get_cover(obj):
         try:
-            cover = Cover.objects.get(community=obj)
+            cover = Cover.objects.get(community=obj, is_active=True)
             return cover.image.url
         except Cover.DoesNotExist:
             return None
@@ -46,7 +47,7 @@ class CommunityGlobalSerializer(serializers.ModelSerializer):
             theme = Theme.objects.get(community=obj)
             return {
                 "color": theme.color,
-                "to_call_subscriber": theme.to_call_subscriber,
+                "to_call_subscriber": theme.subscriber_nickname,
                 "state_after_subscription": theme.state_after_subscription,
             }
         except Theme.DoesNotExist:
@@ -67,14 +68,14 @@ class CommunityGlobalSerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "unique_id",
-            "date_of_registration",
+            "created_at",
             "name",
             "quote",
             "avatar",
             "cover",
             "theme",
             "rating",
-            "hashtags",
+            "tags",
             "subscribers_count",
         ]
 
@@ -105,7 +106,7 @@ class UserGlobalSerializer(serializers.ModelSerializer):
     @staticmethod
     def get_avatar(obj):
         try:
-            cover = Avatar.objects.get(profile=obj.profile)
+            cover = Avatar.objects.get(profile=obj.profile, is_active=True)
             return cover.image.url
         except Avatar.DoesNotExist:
             return None
@@ -113,7 +114,7 @@ class UserGlobalSerializer(serializers.ModelSerializer):
     @staticmethod
     def get_cover(obj):
         try:
-            cover = Cover.objects.get(profile=obj.profile)
+            cover = Cover.objects.get(profile=obj.profile, is_active=True)
             return cover.image.url
         except Cover.DoesNotExist:
             return None

@@ -35,8 +35,8 @@ def notify_community(instance, created):
         notification = Notification.objects.create(
             subject="subscription", community=instance.community, subscription=instance
         )
-        admins = instance.community.admins
+        admins = instance.community.moderators
         send_notification(admins, notification)
-        sub_admins = instance.community.sub_admins
+        sub_admins = instance.community.sub_moderators
         send_notification(sub_admins, notification)
     pass

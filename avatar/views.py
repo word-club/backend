@@ -33,8 +33,8 @@ class AddCommunityAvatarView(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsCommunityModerator]
 
-    def post(self, request):
-        community = get_object_or_404(Community, user=request.user)
+    def post(self, request, pk):
+        community = get_object_or_404(Community, pk=pk)
         self.check_object_permissions(request, community)
         context = {"community": community, "request": request}
         serializer = CommunityAvatarSerializer(data=request.data, context=context)
@@ -54,9 +54,18 @@ class AvatarDetail(APIView):
         serializer = AvatarSerializer(avatar)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+    def patch(self, request, pk):
+        """
+        toggle active status
+        """
+        cover = get_object_or_404(Avatar, pk=pk)
+        self.check_object_permissions(request, cover)
+        cover.is_active = not cover.is_active
+        cover.save()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
     def delete(self, request, pk):
         avatar = get_object_or_404(Avatar, pk=pk)
         self.check_object_permissions(request, avatar)
-        avatar.image.delete()
         avatar.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)

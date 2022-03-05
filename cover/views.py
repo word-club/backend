@@ -33,8 +33,8 @@ class AddCommunityCoverView(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsCommunityModerator]
 
-    def post(self, request):
-        community = get_object_or_404(Community, user=request.user)
+    def post(self, request, pk):
+        community = get_object_or_404(Community, pk=pk)
         self.check_object_permissions(request, community)
         context = {"community": community, "request": request}
         serializer = CommunityCoverSerializer(data=request.data, context=context)
@@ -54,9 +54,18 @@ class CoverDetail(APIView):
         serializer = CoverSerializer(cover)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+    def patch(self, request, pk):
+        """
+        toggle active status
+        """
+        cover = get_object_or_404(Cover, pk=pk)
+        self.check_object_permissions(request, cover)
+        cover.is_active = not cover.is_active
+        cover.save()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
     def delete(self, request, pk):
         cover = get_object_or_404(Cover, pk=pk)
         self.check_object_permissions(request, cover)
-        cover.image.delete()
         cover.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)

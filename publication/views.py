@@ -1,7 +1,6 @@
 from django.utils import timezone
 from rest_framework import mixins, status, viewsets
 from rest_framework.authentication import TokenAuthentication
-from rest_framework.authtoken.models import Token
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -11,29 +10,8 @@ from account.permissions import IsOwner
 from community.helper import check_community_law
 from community.permissions import IsCommunityModerator
 from helpers.twitter_oembed import TwitterEmbedSerializer, TwitterOEmbedData
+from publication.helper import check_publication_update_date_limit
 from publication.serializers import *
-
-
-def check_publication_update_date_limit(obj):
-    """
-    :param obj: Publication instance
-    :return: void if publication is not published yet
-        Response(403) if publication update date limit reached
-    """
-    now = timezone.now()
-    if not obj.published_at:
-        return
-    diff = now - obj.published_at
-    limit = Administration.objects.first()
-    if diff.days > limit.publication_update_limit:
-        return Response(
-            {
-                "detail": "Sorry, you cannot update the publication after {} days.".format(
-                    limit.publication_update_limit
-                )
-            },
-            status=status.HTTP_403_FORBIDDEN,
-        )
 
 
 class PublicationListView(mixins.ListModelMixin, viewsets.GenericViewSet):
@@ -43,7 +21,7 @@ class PublicationListView(mixins.ListModelMixin, viewsets.GenericViewSet):
     filterset_fields = [
         "created_by",
         "is_published",
-        "timestamp",
+        "created_at",
         "type",
         "community",
         "is_pinned",
@@ -57,23 +35,9 @@ class PublicationListView(mixins.ListModelMixin, viewsets.GenericViewSet):
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
-
-        depth = 0
-        try:
-            depth = int(self.request.query_params.get("depth", 0))
-        except ValueError:
-            pass
-        try:
-            auth_header = self.request.headers.get("Authorization")
-            if auth_header != "null" and auth_header:
-                token = auth_header.split(" ")[1]
-                token_instance = Token.objects.get(key=token)
-                context["user"] = token_instance.user
-            else:
-                context["user"] = None
-        except ValueError:
-            pass
-        context["depth"] = depth
+        auth = self.request.headers.get("Authorization", False)
+        context["user"] = self.request.user if auth else None
+        context["depth"] = self.request.query_params.get("depth", 0)
         return context
 
 
@@ -205,6 +169,11 @@ class PublicationPinView(APIView):
     def patch(self, request, pk=None):
         publication = get_object_or_404(Publication, pk=pk)
         self.check_object_permissions(request, publication)
+        if not publication.is_published:
+            return Response(
+                {"detail": ["Publication not published yet."]},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
         if publication.is_pinned:
             return Response(status=status.HTTP_200_OK)
         publication.is_pinned = True
