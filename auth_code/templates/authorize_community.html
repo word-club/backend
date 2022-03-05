@@ -10,10 +10,9 @@
             <a
                 class="action-text"
                 type="POST"
-                href="{% if request.is_secure %}https{% else %}http{% endif %}://{{ domain }}{% url 'community:confirm-authorize-community' code=code %}">
+                href="{% if request.is_secure %}https{% else %}http{% endif %}://{{ domain }}{% url 'auth_code:confirm-authorize-community' code=code %}">
                 <h5 class="waves-effect waves-light">Click here to proceed.<i class="fas fa-lock-open ml-2"></i></h5>
             </a>
-            <a href="http://localhost:8080/#/register-community/authorization/{{ code }}">Confirm Authorization</a>
         </div>
     </body>
 </html>

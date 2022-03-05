@@ -50,16 +50,6 @@ urlpatterns += [
         "community-admin/<int:pk>/",
         RemoveCommunityAdmin.as_view(),
     ),
-    path(
-        "authorize-community/<int:pk>/request/",
-        RequestCommunityAuthorization.as_view(),
-        name="authorize-community",
-    ),
-    path(
-        "authorize-community/<str:code>/confirm/",
-        ConfirmCommunityAuthorization.as_view(),
-        name="confirm-authorize-community",
-    ),
     path("community/<int:pk>/theme/", AddCommunityTheme.as_view()),
     path("community-theme/<int:pk>/", UpdateCommunityTheme.as_view()),
     path(

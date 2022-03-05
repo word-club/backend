@@ -88,6 +88,8 @@ fresh-migrations:
 	make migrate
 	make make-migrations APP=link
 	make migrate
+	make make-migrations APP=auth_code
+	make migrate
 	make make-migrations APP=notification
 	make migrate
 	make make-migrations APP=administration

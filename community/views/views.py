@@ -19,7 +19,6 @@ from community.models import (
     CommunitySubscription,
     CommunityRule,
     CommunityAdmin,
-    CommunityAuthorizationCode,
     CommunityTheme,
 )
 from community.permissions import (
@@ -252,69 +251,6 @@ class RemoveCommunityAdmin(APIView):
         self.check_object_permissions(request, community_admin)
         community_admin.delete()
         return Response(status=status.HTTP_200_OK)
-
-
-class RequestCommunityAuthorization(APIView):
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsCommunityAdministrator]
-
-    def post(self, request, pk):
-        community = get_object_or_404(Community, pk=pk)
-        self.check_object_permissions(request, community)
-        if not community.email:
-            return Response(
-                status=status.HTTP_400_BAD_REQUEST,
-                data={"detail": "Community does not have email set."},
-            )
-        if community.is_authorized:
-            return Response(
-                status=status.HTTP_204_NO_CONTENT,
-                data={"detail": "Community is already authorized."},
-            )
-        codes = CommunityAuthorizationCode.objects.filter(
-            community=community, created_by=request.user
-        )
-        [code.delete() for code in codes]  # delete every pre-requested codes
-        code = CommunityAuthorizationCode.objects.create(
-            community=community, created_by=request.user
-        )
-        mail_subject = "Authorize Community"
-        message = render_to_string(
-            "authorize_community.html",
-            {
-                "request": request,
-                "user": request.user,
-                "domain": get_current_site(request).domain,
-                "code": code.code,
-            },
-        )
-        send_mail(
-            mail_subject,
-            message="AuthorizeCommunity",
-            from_email=settings.EMAIL_HOST_USER,
-            recipient_list=[community.email],
-            html_message=message,
-        )
-        return Response(status=status.HTTP_200_OK)
-
-
-class ConfirmCommunityAuthorization(APIView):
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsCommunityAdministrator]
-
-    def post(self, request, code):
-        community_authorize_code = get_object_or_404(
-            CommunityAuthorizationCode, code=code
-        )
-        self.check_object_permissions(request, community_authorize_code)
-        community_to_authorize = community_authorize_code.community
-        community_to_authorize.is_authorized = True
-        community_to_authorize.authorized_at = timezone.now()
-        community_to_authorize.save()
-        community_authorize_code.delete()
-        return Response(
-            CommunitySerializer(community_to_authorize).data, status=status.HTTP_200_OK
-        )
 
 
 class AddCommunityTheme(APIView):

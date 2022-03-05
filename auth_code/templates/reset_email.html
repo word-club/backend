@@ -24,13 +24,10 @@
 	</nav>
 	<div class="space"></div>
 	<div class="card card-cascade wider">
-		<!-- Card image -->
 		<div class="view view-cascade gradient-card-header peach-gradient">
 
-			<!-- Title -->
 			<h2 class="card-header-title white-text mb-3"><i class="fas fa-user-lock mr-2"></i>Reset Password</h2>
 			<hr/>
-			<!-- Text -->
 			<p id="greet" class="white-text">
 				Hi,&nbsp;
 				<span class="font-weight-bold white-text">{{ user }}</span>&nbsp;!</p>
@@ -43,11 +40,12 @@
 			<div class="space"></div>
 			<hr/>
 
-			<!-- Text -->
 			<p class="card-text">
 				<a class="action-text"
-					href="{% if request.is_secure %}https{% else %}http{% endif %}://localhost:8000{% url 'account:reset-password-confirm' code=code %}">
-					<h5 class="waves-effect waves-light">Click here to proceed.<i class="fas fa-lock-open ml-2"></i></h5>
+					href="{% if request.is_secure %}https{% else %}http{% endif %}://{{ domain }}{% url 'auth_code:reset-password-confirm' code=code %}"
+				>
+					<i class="fas fa-lock-open mr-2"></i>
+					<b>Reset Password</b>
 				</a>
 			</p>
 		</div>
@@ -56,7 +54,7 @@
 	<p id="foot-note">
 		<i class="fas fa-exclamation-triangle"></i>
 		&nbsp;&nbsp;
-		<span>Ignore this message if its not you.</span>
+		<span>Ignore this message if it's not you.</span>
 	</p>
 	{% endautoescape %}
 </div>

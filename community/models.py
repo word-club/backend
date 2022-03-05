@@ -1,5 +1,3 @@
-import uuid
-
 from django.contrib.auth import get_user_model
 from django.db import models
 
@@ -103,27 +101,6 @@ class CommunitySubscription(models.Model):
     class Meta:
         ordering = ["-created_at"]
         unique_together = [["subscriber", "community"]]
-
-
-class CommunityAuthorizationCode(models.Model):
-    code = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
-    community = models.ForeignKey(
-        "Community",
-        editable=False,
-        on_delete=models.CASCADE,
-        related_name="authorization_codes",
-    )
-    created_by = models.ForeignKey(
-        get_user_model(),
-        on_delete=models.CASCADE,
-        related_name="requested_community_authorization_codes",
-        editable=False,
-    )
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        ordering = ["-created_at"]
 
 
 class CommunityTheme(models.Model):

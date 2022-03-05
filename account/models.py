@@ -1,5 +1,3 @@
-import uuid
-
 from django.contrib.auth import get_user_model
 from django.db import models
 
@@ -28,17 +26,6 @@ class Profile(models.Model):
     dislikes = models.PositiveIntegerField(default=0, editable=False)
     discussions = models.PositiveIntegerField(default=0, editable=False)
     supports = models.PositiveBigIntegerField(default=0, editable=False)
-
-    class Meta:
-        ordering = ["-timestamp"]
-
-
-class ResetPasswordCode(models.Model):
-    user = models.ForeignKey(
-        get_user_model(), on_delete=models.CASCADE, related_name="reset_password_codes"
-    )
-    code = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
-    timestamp = models.DateTimeField(auto_now=True)
 
     class Meta:
         ordering = ["-timestamp"]

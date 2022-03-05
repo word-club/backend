@@ -66,6 +66,7 @@ LOCAL_APPS = [
     "cover",
     "image",
     "link",
+    "auth_code",
     "notification",
     "administration",
 ]
@@ -88,7 +89,7 @@ ROOT_URLCONF = "backend.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": ["account", "community"],
+        "DIRS": ["auth_code"],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
