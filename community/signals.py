@@ -3,7 +3,7 @@ from django.dispatch import receiver
 from django.utils import timezone
 
 from community.helper import notify_community
-from community.models import Community, Moderator, Theme, Subscription
+from community.models import Community, Moderator, Subscription, Theme
 
 
 def set_writer_as_mod(instance, writer):

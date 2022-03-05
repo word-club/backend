@@ -3,13 +3,18 @@ from rest_framework.routers import DefaultRouter
 
 from community.filters import (CommunitySubscribersFilter,
                                SubscribedCommunityFilter, TopCommunitiesList)
-from community.views.community import CommunityViewSet, CommunityDetail, ViewACommunity
+from community.views.community import (CommunityDetail, CommunityViewSet,
+                                       ViewACommunity)
 from community.views.hashtag import AddCommunityHashtag, RemoveCommunityHashtag
-from community.views.moderator import ModeratorDetail, AddModerator, AddSubModerator
+from community.views.moderator import (AddModerator, AddSubModerator,
+                                       ModeratorDetail)
 from community.views.rule import AddCommunityRule, PatchDeleteCommunityRule
-from community.views.subscription import SubscribeToACommunity, DisableNotificationsForACommunity, \
-    RemoveCommunityDisableNotification, AcceptRejectACommunitySubscriber, \
-    BanUnBanACommunitySubscriber, SubscriptionDetail
+from community.views.subscription import (AcceptRejectACommunitySubscriber,
+                                          BanUnBanACommunitySubscriber,
+                                          DisableNotificationsForACommunity,
+                                          RemoveCommunityDisableNotification,
+                                          SubscribeToACommunity,
+                                          SubscriptionDetail)
 from community.views.theme import AddCommunityTheme, UpdateCommunityTheme
 
 router = DefaultRouter()

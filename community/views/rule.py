@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.generics import get_object_or_404
 
+from community.serializers.rule import RuleSerializer
 from community.sub_models.rule import Rule
 from community.models import Community
 from community.permissions import IsCommunityModerator
@@ -16,9 +17,7 @@ class PatchDeleteCommunityRule(APIView):
     def patch(self, request, pk):
         rule = get_object_or_404(Rule, pk=pk)
         self.check_object_permissions(request, rule)
-        serializer = RuleSerializer(
-            instance=rule, data=request.data, partial=True
-        )
+        serializer = RuleSerializer(instance=rule, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)

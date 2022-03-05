@@ -2,13 +2,12 @@ from django.contrib.auth import get_user_model
 from django.db import models
 
 from choices import COMMUNITY_TYPES
-from community.validators import validate_unique_id
-from hashtag.models import Hashtag
-
 from community.sub_models.moderator import Moderator
 from community.sub_models.rule import Rule
-from community.sub_models.theme import Theme
 from community.sub_models.subscription import Subscription
+from community.sub_models.theme import Theme
+from community.validators import validate_unique_id
+from hashtag.models import Hashtag
 
 
 class Community(models.Model):

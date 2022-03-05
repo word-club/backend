@@ -9,10 +9,7 @@ class Moderator(models.Model):
     is_accepted = models.BooleanField(default=False, editable=False)
     accepted_at = models.DateTimeField(null=True, editable=False)
     community = models.ForeignKey(
-        "Community",
-        on_delete=models.CASCADE,
-        related_name="moderators",
-        editable=False
+        "Community", on_delete=models.CASCADE, related_name="moderators", editable=False
     )
     user = models.ForeignKey(
         get_user_model(),

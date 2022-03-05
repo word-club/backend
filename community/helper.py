@@ -5,9 +5,7 @@ from notification.models import Notification, NotificationTo
 def check_community_law(community, user):
     if community:
         try:
-            subscriber = Subscription.objects.get(
-                subscriber=user, community=community
-            )
+            subscriber = Subscription.objects.get(subscriber=user, community=community)
             if subscriber.is_banned:
                 return True, {
                     "detail": "Subscriber is banned for the selected community."

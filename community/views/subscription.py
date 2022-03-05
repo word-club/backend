@@ -10,6 +10,7 @@ from rest_framework.generics import get_object_or_404
 from account.permissions import IsOwner
 from community.models import Community
 from community.permissions import IsSubscriber, IsNotASubscriber, IsCommunityModerator
+from community.serializers.subscription import SubscriptionSerializer
 from community.sub_models.subscription import Subscription
 
 

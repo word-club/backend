@@ -96,4 +96,3 @@ class ViewACommunity(APIView):
         community.save()
         serializer = RetrieveSerializer(community, read_only=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
-

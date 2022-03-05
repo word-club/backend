@@ -6,10 +6,7 @@ class Rule(models.Model):
     title = models.CharField(max_length=64)
     description = models.TextField()
     community = models.ForeignKey(
-        "Community",
-        on_delete=models.CASCADE,
-        related_name="rules",
-        editable=False
+        "Community", on_delete=models.CASCADE, related_name="rules", editable=False
     )
     created_by = models.ForeignKey(
         get_user_model(),

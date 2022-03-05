@@ -55,4 +55,3 @@ class ModeratorDetail(APIView):
         self.check_object_permissions(request, moderator)
         moderator.delete()
         return Response(status=status.HTTP_200_OK)
-

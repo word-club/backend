@@ -25,4 +25,3 @@ class SubscribeCommunitySerializer(serializers.ModelSerializer):
             validated_data["is_approved"] = True
             validated_data["approved_at"] = timezone.now()
         return super().create(validated_data)
-
