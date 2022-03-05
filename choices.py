@@ -30,6 +30,11 @@ REPORT_STATES = (
     ("ignored", "Ignored"),
 )
 
+RESOLVE_REPORT_STATES = (
+    ("resolved", "Resolved"),
+    ("ignored", "Ignored"),
+)
+
 MOD_CHOICES = (
     ("mod", "Moderator"),
     ("sub", "Sub Moderator"),

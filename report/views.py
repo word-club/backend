@@ -14,6 +14,9 @@ from publication.models import Publication
 from report.models import Report
 from report.serializers import ReportSerializer, ResolveReportSerializer
 
+# TODO: check for last resolved report
+# TODO: if previous report is unresolved, do not allow to report again
+
 
 class AddUserReport(APIView):
     """
@@ -28,6 +31,10 @@ class AddUserReport(APIView):
         user = get_object_or_404(get_user_model(), pk=pk)
         context = {
             "user": user,
+            "community": False,
+            "publication": False,
+            "comment": False,
+            "share": False,
             "request": request,
         }
         serializer = ReportSerializer(data=request.data, context=context)
@@ -49,7 +56,11 @@ class AddCommunityReport(APIView):
     def post(request, pk):
         community = get_object_or_404(Community, pk=pk)
         context = {
+            "user": False,
             "community": community,
+            "publication": False,
+            "comment": False,
+            "share": False,
             "request": request,
         }
         serializer = ReportSerializer(data=request.data, context=context)
@@ -71,7 +82,11 @@ class AddPublicationReport(APIView):
     def post(request, pk):
         publication = get_object_or_404(Publication, pk=pk)
         context = {
+            "user": False,
+            "community": False,
             "publication": publication,
+            "comment": False,
+            "share": False,
             "request": request,
         }
         serializer = ReportSerializer(data=request.data, context=context)
@@ -93,7 +108,11 @@ class AddCommentReport(APIView):
     def post(request, pk):
         comment = get_object_or_404(Comment, pk=pk)
         context = {
+            "user": False,
+            "community": False,
+            "publication": False,
             "comment": comment,
+            "share": False,
             "request": request,
         }
         serializer = ReportSerializer(data=request.data, context=context)
@@ -115,6 +134,10 @@ class AddShareReport(APIView):
     def post(request, pk):
         share = get_object_or_404(Comment, pk=pk)
         context = {
+            "user": False,
+            "community": False,
+            "publication": False,
+            "comment": False,
             "share": share,
             "request": request,
         }
@@ -158,6 +181,11 @@ class ReportDetail(APIView):
 class ResolveAReport(APIView):
     """
     Resolve a report from the database.
+
+    :returns
+        - HTTP_200_OK: If the report is resolved.
+        - HTTP_400_BAD_REQUEST: If the report is already resolved.
+        - HTTP_400_BAD_REQUEST: If the report is not resolved.
     """
 
     authentication_classes = [TokenAuthentication]
@@ -167,16 +195,16 @@ class ResolveAReport(APIView):
         report = get_object_or_404(Report, pk=pk)
         self.check_object_permissions(request, report)
 
-        if not report.is_pending:
+        if not report.is_pending():
             return Response(
-                {"detail": "Report is already resolved"},
+                {"detail": ["Report is already resolved"]},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        serializer = ResolveReportSerializer(report, data=request.data)
+        serializer = ResolveReportSerializer(data=request.data)
         if serializer.is_valid():
             report.resolve_text = serializer.validated_data.get("resolve_text")
-            report.state = serializer.validated_data.get("state")
+            report.status = serializer.validated_data.get("status")
             report.resolved_by = request.user
             report.resolved_at = timezone.now()
             report.save()
@@ -186,7 +214,12 @@ class ResolveAReport(APIView):
 
 class UnResolveAReport(APIView):
     """
-    Unresolve a report from the database.
+    Un resolves a report from the database.
+    Sets report state back to pending.
+
+    :returns:
+        - HTTP_200_OK if report is successfully unresolved
+        - HTTP_400_BAD_REQUEST if report is already resolved
     """
 
     authentication_classes = [TokenAuthentication]
@@ -196,14 +229,14 @@ class UnResolveAReport(APIView):
         report = get_object_or_404(Report, pk=pk)
         self.check_object_permissions(request, report)
 
-        if report.is_pending:
+        if report.is_pending():
             return Response(
-                {"detail": "This report is not resolved."},
+                {"detail": ["This report is not resolved yet."]},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
         report.resolve_text = None
-        report.state = "pending"
+        report.status = "pending"
         report.resolved_by = None
         report.resolved_at = None
         report.save()

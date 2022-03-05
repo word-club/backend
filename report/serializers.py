@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from choices import REPORT_STATES
+from choices import RESOLVE_REPORT_STATES
 from report.models import Report
 
 
@@ -27,4 +27,4 @@ class ReportSerializer(serializers.ModelSerializer):
 
 class ResolveReportSerializer(serializers.Serializer):
     resolve_text = serializers.CharField(max_length=1000, required=True)
-    state = serializers.ChoiceField(required=True, choices=REPORT_STATES)
+    status = serializers.ChoiceField(required=True, choices=RESOLVE_REPORT_STATES)
