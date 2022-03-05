@@ -9,6 +9,7 @@ from account.permissions import IsOwner
 from bookmark.models import Bookmark
 from bookmark.serializers import BookmarkSerializer
 from comment.models import Comment
+from community.models import Community
 from publication.models import Publication
 
 
@@ -25,6 +26,24 @@ class AddPublicationBookmark(APIView):
         publication = get_object_or_404(Publication, pk=pk)
         _, created = Bookmark.objects.get_or_create(
             publication=publication, created_by=request.user
+        )
+        http_status = status.HTTP_201_CREATED if created else status.HTTP_200_OK
+        return Response(status=http_status)
+
+
+class AddCommunityBookmark(APIView):
+    """
+    Add a bookmark to a community
+    """
+
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    @staticmethod
+    def post(request, pk):
+        community = get_object_or_404(Community, pk=pk)
+        _, created = Bookmark.objects.get_or_create(
+            community=community, created_by=request.user
         )
         http_status = status.HTTP_201_CREATED if created else status.HTTP_200_OK
         return Response(status=http_status)
