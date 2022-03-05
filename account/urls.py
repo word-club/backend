@@ -18,9 +18,9 @@ urlpatterns = router.urls
 
 urlpatterns += [
     path("me/", GetMeView.as_view()),
-    path("register/", RegisterUserView.as_view()),
-    path("wc-sign-in/", LoginView.as_view(), name="user-login"),
-    path("logout/", LogoutView.as_view(), name="user-logout"),
+    path("wc-register/", RegisterUserView.as_view()),
+    path("wc-signin/", LoginView.as_view(), name="user-login"),
+    path("wc-signout/", LogoutView.as_view(), name="user-logout"),
     path("update-password/", UpdatePassword.as_view(), name="update-password"),
     path(
         "reset-password/",

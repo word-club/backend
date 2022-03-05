@@ -162,7 +162,6 @@ class Community(models.Model):
 
     tags = models.ManyToManyField(
         Hashtag,
-        null=True,
         related_name="communities",
     )
 

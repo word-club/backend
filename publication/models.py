@@ -28,7 +28,6 @@ class Publication(models.Model):
 
     tags = models.ManyToManyField(
         Hashtag,
-        null=True,
         related_name="publications",
     )
 

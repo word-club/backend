@@ -10,6 +10,7 @@ from django.views.static import serve
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api-auth/", include("rest_framework.urls")),
+    path("", include("oauth2.urls")),
     path("api/", include("hashtag.urls")),
     path("api/", include("account.urls")),
     path("api/", include("community.urls")),
