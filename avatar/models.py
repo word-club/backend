@@ -13,8 +13,6 @@ from helpers.upload_path import upload_avatar_to
 class Avatar(models.Model):
     image = models.ImageField(
         upload_to=upload_avatar_to,
-        null=True,
-        blank=True,
         validators=[FileExtensionValidator(ALLOWED_IMAGES_EXTENSIONS)],
     )
 
@@ -34,13 +32,16 @@ class Avatar(models.Model):
     )
 
     is_active = models.BooleanField(default=False, editable=False)
-    created_at = models.DateTimeField(auto_now_add=True)
+
     created_by = models.ForeignKey(
         get_user_model(),
         related_name="my_avatars",
         on_delete=models.CASCADE,
         editable=False,
     )
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         ordering = ["-created_at"]

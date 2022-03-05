@@ -12,7 +12,7 @@ class AvatarSerializer(serializers.ModelSerializer):
 class ProfileAvatarSerializer(serializers.ModelSerializer):
     class Meta:
         model = Avatar
-        exclude = ("community",)
+        exclude = ("profile", "community")
 
     def create(self, validated_data):
         validated_data["profile"] = self.context["profile"]
@@ -23,7 +23,7 @@ class ProfileAvatarSerializer(serializers.ModelSerializer):
 class CommunityAvatarSerializer(serializers.ModelSerializer):
     class Meta:
         model = Avatar
-        exclude = ("profile",)
+        exclude = ("profile", "community")
 
     def create(self, validated_data):
         validated_data["community"] = self.context["community"]

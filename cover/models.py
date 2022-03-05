@@ -13,8 +13,6 @@ from helpers.upload_path import upload_cover_to
 class Cover(models.Model):
     image = models.ImageField(
         upload_to=upload_cover_to,
-        null=True,
-        blank=True,
         validators=[FileExtensionValidator(ALLOWED_IMAGES_EXTENSIONS)],
     )
     profile = models.ForeignKey(
