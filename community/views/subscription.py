@@ -89,10 +89,10 @@ class AcceptRejectACommunitySubscriber(APIView):
                 status=status.HTTP_403_FORBIDDEN,
             )
         else:
-            if subscription.is_accepted:
+            if subscription.is_approved:
                 return Response({"detail": "Subscriber already accepted."})
             else:
-                subscription.is_accepted = True
+                subscription.is_approved = True
                 subscription.accepted_at = timezone.now()
                 subscription.save()
                 return Response(status=status.HTTP_200_OK)

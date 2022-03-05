@@ -7,7 +7,6 @@ class ModeratorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Moderator
         exclude = ["community"]
-        depth = 1
 
     def create(self, validated_data):
         validated_data["role"] = self.context["request"].role

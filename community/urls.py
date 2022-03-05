@@ -5,7 +5,7 @@ from community.filters import (CommunitySubscribersFilter,
                                SubscribedCommunityFilter, TopCommunitiesList)
 from community.views.community import (CommunityDetail, CommunityViewSet,
                                        ViewACommunity)
-from community.views.hashtag import AddCommunityHashtag, RemoveCommunityHashtag
+from community.views.hashtag import UpdateCommunityHashtag
 from community.views.moderator import (AddModerator, AddSubModerator,
                                        ModeratorDetail)
 from community.views.rule import AddCommunityRule, PatchDeleteCommunityRule
@@ -18,7 +18,7 @@ from community.views.subscription import (AcceptRejectACommunitySubscriber,
 from community.views.theme import AddCommunityTheme, UpdateCommunityTheme
 
 router = DefaultRouter()
-router.register(r"community-view", CommunityViewSet, basename="community")
+router.register(r"wc-community", CommunityViewSet, basename="community")
 urlpatterns = router.urls
 
 app_name = "community"
@@ -32,7 +32,7 @@ urlpatterns += [
     ),
     path(
         "community/<int:pk>/hashtag/",
-        AddCommunityHashtag.as_view(),
+        UpdateCommunityHashtag.as_view(),
     ),
     path(
         "community/<int:pk>/rule/",
@@ -57,10 +57,6 @@ urlpatterns += [
     path(
         "subscription/<int:pk>/",
         SubscriptionDetail.as_view(),
-    ),
-    path(
-        "community-hashtag/<int:pk>/",
-        RemoveCommunityHashtag.as_view(),
     ),
     path(
         "moderator/<int:pk>/",
