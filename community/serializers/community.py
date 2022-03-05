@@ -14,8 +14,8 @@ from report.serializers import ReportSerializer
 class CommunitySerializer(serializers.ModelSerializer):
     tags = HashtagSerializer(many=True, read_only=True)
     rules = RuleSerializer(many=True, read_only=True)
-    avatar = CommunityAvatarSerializer(many=False, read_only=True)
-    cover = CommunityCoverSerializer(many=False, read_only=True)
+    avatars = CommunityAvatarSerializer(many=True, read_only=True)
+    covers = CommunityCoverSerializer(many=True, read_only=True)
     theme = ThemeSerializer(read_only=True)
     moderators = ModeratorSerializer(many=True, read_only=True)
 
@@ -39,8 +39,8 @@ class RetrieveSerializer(serializers.ModelSerializer):
 
     theme = ThemeSerializer(read_only=True)
     rules = RuleSerializer(many=True, read_only=True)
-    cover = CommunityCoverSerializer(many=False, read_only=True)
-    avatar = CommunityAvatarSerializer(many=False, read_only=True)
+    covers = CommunityCoverSerializer(many=False, read_only=True)
+    avatars = CommunityAvatarSerializer(many=False, read_only=True)
     tags = HashtagSerializer(many=True, read_only=True)
     moderators = ModeratorSerializer(many=True, read_only=True)
     subscriptions = SubscriptionSerializer(many=True, read_only=True)

@@ -42,6 +42,7 @@ clean-migrations:
 	rm -rf **/migrations
 
 clean-db:
+	rm -rf media
 	rm -rf db.sqlite3
 
 clean-env:

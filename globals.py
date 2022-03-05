@@ -28,7 +28,7 @@ class CommunityGlobalSerializer(serializers.ModelSerializer):
     @staticmethod
     def get_avatar(obj):
         try:
-            avatar = Avatar.objects.get(community=obj)
+            avatar = Avatar.objects.get(community=obj, is_active=True)
             return avatar.image.url
         except Avatar.DoesNotExist:
             return None
@@ -36,7 +36,7 @@ class CommunityGlobalSerializer(serializers.ModelSerializer):
     @staticmethod
     def get_cover(obj):
         try:
-            cover = Cover.objects.get(community=obj)
+            cover = Cover.objects.get(community=obj, is_active=True)
             return cover.image.url
         except Cover.DoesNotExist:
             return None
@@ -106,7 +106,7 @@ class UserGlobalSerializer(serializers.ModelSerializer):
     @staticmethod
     def get_avatar(obj):
         try:
-            cover = Avatar.objects.get(profile=obj.profile)
+            cover = Avatar.objects.get(profile=obj.profile, is_active=True)
             return cover.image.url
         except Avatar.DoesNotExist:
             return None
@@ -114,7 +114,7 @@ class UserGlobalSerializer(serializers.ModelSerializer):
     @staticmethod
     def get_cover(obj):
         try:
-            cover = Cover.objects.get(profile=obj.profile)
+            cover = Cover.objects.get(profile=obj.profile, is_active=True)
             return cover.image.url
         except Cover.DoesNotExist:
             return None
