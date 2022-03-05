@@ -15,7 +15,7 @@ from auth_code.serializers import (ResetNewPasswordSerializer,
                                    ResetPasswordEmailSerializer)
 from backend import settings
 from community.models import Community
-from community.permissions import IsCommunityAdministrator
+from community.permissions import IsCommunityModerator
 
 
 class ResetPasswordRequestCode(APIView):
@@ -100,7 +100,7 @@ class ConfirmResetPassword(APIView):
 
 class RequestCommunityAuthorization(APIView):
     authentication_classes = [TokenAuthentication]
-    permission_classes = [IsCommunityAdministrator]
+    permission_classes = [IsCommunityModerator]
 
     def post(self, request, pk):
         community = get_object_or_404(Community, pk=pk)
@@ -185,7 +185,7 @@ class RequestUserAuthorization(APIView):
 
 class ConfirmCommunityAuthorization(APIView):
     authentication_classes = [TokenAuthentication]
-    permission_classes = [IsCommunityAdministrator]
+    permission_classes = [IsCommunityModerator]
 
     def post(self, request, code):
         code = get_object_or_404(AuthorizationCode, code=code)

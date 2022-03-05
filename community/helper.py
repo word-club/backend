@@ -1,13 +1,11 @@
-from community.models import CommunitySubscription
+from community.models import Subscription
 from notification.models import Notification, NotificationTo
 
 
 def check_community_law(community, user):
     if community:
         try:
-            subscriber = CommunitySubscription.objects.get(
-                subscriber=user, community=community
-            )
+            subscriber = Subscription.objects.get(subscriber=user, community=community)
             if subscriber.is_banned:
                 return True, {
                     "detail": "Subscriber is banned for the selected community."
@@ -16,7 +14,7 @@ def check_community_law(community, user):
                 if not subscriber.is_approved:
                     return True, {"detail": "Subscriber is not approved yet."}
             return False, None
-        except CommunitySubscription.DoesNotExist:
+        except Subscription.DoesNotExist:
             return True, {
                 "detail": "Please subscribe the community first to add publication."
             }
@@ -33,7 +31,7 @@ def send_notification(receivers, notification, threshold=1):
 
 def notify_community(instance, created):
     # TODO: if subscription, notify community admin, sub admin
-    if instance.__class__.__name__ == "CommunitySubscription":
+    if instance.__class__.__name__ == "Subscription":
         notification = Notification.objects.create(
             subject="subscription", community=instance.community, subscription=instance
         )

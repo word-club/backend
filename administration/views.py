@@ -8,7 +8,7 @@ from account.permissions import IsSuperUser
 from account.serializers.user import UserRetrieveSerializer
 from administration.models import Administration, PageView
 from community.models import Community
-from community.serializer import CommunityRetrieveSerializer
+from community.serializers.community import RetrieveSerializer
 
 
 class AdministrationSerializer(serializers.ModelSerializer):
@@ -138,7 +138,7 @@ class TopView(APIView):
 
         return Response(
             {
-                "communities": CommunityRetrieveSerializer(
+                "communities": RetrieveSerializer(
                     communities, many=True, context=context
                 ).data,
                 "users": UserRetrieveSerializer(users, many=True, context=context).data,

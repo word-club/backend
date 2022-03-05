@@ -6,8 +6,8 @@ from avatar.models import Avatar
 from comment.models import Comment
 from community.models import (
     Community,
-    CommunityTheme,
-    CommunitySubscription,
+    Theme,
+    Subscription,
 )
 from publication.models import (
     Publication,
@@ -43,13 +43,13 @@ class CommunityGlobalSerializer(serializers.ModelSerializer):
     @staticmethod
     def get_theme(obj):
         try:
-            theme = CommunityTheme.objects.get(community=obj)
+            theme = Theme.objects.get(community=obj)
             return {
                 "color": theme.color,
                 "to_call_subscriber": theme.to_call_subscriber,
                 "state_after_subscription": theme.state_after_subscription,
             }
-        except CommunityTheme.DoesNotExist:
+        except Theme.DoesNotExist:
             return "primary"
 
     @staticmethod
@@ -59,7 +59,7 @@ class CommunityGlobalSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def get_subscribers_count(obj):
-        subscribers = CommunitySubscription.objects.filter(community=obj).count()
+        subscribers = Subscription.objects.filter(community=obj).count()
         return subscribers
 
     class Meta:
