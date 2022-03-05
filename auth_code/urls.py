@@ -1,7 +1,10 @@
 from django.urls import path
 
-from auth_code.views import ResetPasswordRequestCode, ConfirmResetPassword, RequestCommunityAuthorization, \
-    ConfirmCommunityAuthorization, RequestUserAuthorization, ConfirmUserAuthorization
+from auth_code.views import (ConfirmCommunityAuthorization,
+                             ConfirmResetPassword, ConfirmUserAuthorization,
+                             RequestCommunityAuthorization,
+                             RequestUserAuthorization,
+                             ResetPasswordRequestCode)
 
 urlpatterns = [
     path(

@@ -19,16 +19,16 @@ class Profile(models.Model):
     content_visibility = models.BooleanField(default=True)
     communities_visibility = models.BooleanField(default=True)
 
-    created_at = models.DateTimeField(auto_now_add=True)
-    timestamp = models.DateTimeField(auto_now=True)
-
     popularity = models.PositiveIntegerField(default=0, editable=False)
     dislikes = models.PositiveIntegerField(default=0, editable=False)
     discussions = models.PositiveIntegerField(default=0, editable=False)
     supports = models.PositiveBigIntegerField(default=0, editable=False)
 
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
     class Meta:
-        ordering = ["-timestamp"]
+        ordering = ["-created_at"]
 
 
 class FollowUser(models.Model):
@@ -44,8 +44,9 @@ class FollowUser(models.Model):
         related_name="following",
         editable=False,
     )
-    timestamp = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        ordering = ["-timestamp"]
+        ordering = ["-created_at"]
         unique_together = [["created_by", "user"]]

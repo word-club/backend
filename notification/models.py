@@ -11,7 +11,6 @@ class Notification(models.Model):
 
     subject = models.CharField(max_length=64)
     description = models.CharField(max_length=255, blank=True, null=True)
-    timestamp = models.DateTimeField(auto_now_add=True)
 
     publication = models.ForeignKey(
         Publication,
@@ -39,6 +38,8 @@ class Notification(models.Model):
     # share
     # bookmark
     # follow
+    # report
+
     subscription = models.ForeignKey(
         CommunitySubscription,
         blank=True,
@@ -46,10 +47,11 @@ class Notification(models.Model):
         on_delete=models.CASCADE,
         related_name="notifications",
     )
-    # report
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        ordering = ["-timestamp"]
+        ordering = ["-created_at"]
 
 
 class NotificationTo(models.Model):
@@ -66,7 +68,8 @@ class NotificationTo(models.Model):
         editable=False,
     )
 
-    timestamp = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        ordering = ["-timestamp"]
+        ordering = ["-created_at"]

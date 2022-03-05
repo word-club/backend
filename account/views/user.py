@@ -17,8 +17,8 @@ class UserViewSet(
     viewsets.GenericViewSet,
 ):
     queryset = get_user_model().objects.all().order_by("-date_joined")
-    permission_classes = [IsAdminUser]
     authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAdminUser]
 
     def get_serializer_class(self):
         if self.action in ["list", "delete"]:

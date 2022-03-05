@@ -11,18 +11,6 @@ from account.permissions import IsOwner
 from account.serializers.follow import FollowUserSerializer
 
 
-class FollowUserViewSet(
-    mixins.ListModelMixin, mixins.DestroyModelMixin, viewsets.GenericViewSet
-):
-    queryset = FollowUser.objects.all()
-    authentication_classes = [TokenAuthentication]
-    serializer_class = FollowUserSerializer
-    filterset_fields = ["user", "created_by"]
-
-    def get_permissions(self):
-        return [IsOwner] if self.action == "delete" else [IsAuthenticated]
-
-
 class FollowAUserView(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]

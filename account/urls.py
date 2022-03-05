@@ -2,8 +2,7 @@ from django.urls import path
 from rest_framework.routers import DefaultRouter
 
 from account.views.auth import AdminInspect, LoginView, LogoutView
-from account.views.follow import (FollowAUserView, FollowUserViewSet,
-                                  UnFollowAUserView)
+from account.views.follow import FollowAUserView, UnFollowAUserView
 from account.views.password import UpdatePassword
 from account.views.user import (GetMeView, MentionList, ProfileListView,
                                 RegisterUserView, RetrieveUserByUsername,
@@ -11,7 +10,6 @@ from account.views.user import (GetMeView, MentionList, ProfileListView,
 
 router = DefaultRouter()
 router.register(r"users", UserViewSet, basename="user")
-router.register(r"follower", FollowUserViewSet, basename="follower")
 
 urlpatterns = router.urls
 

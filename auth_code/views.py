@@ -1,21 +1,21 @@
-from django.utils import timezone
-from django.core.mail import send_mail
 from django.contrib.auth import get_user_model
-from django.template.loader import render_to_string
 from django.contrib.sites.shortcuts import get_current_site
-
+from django.core.mail import send_mail
+from django.template.loader import render_to_string
+from django.utils import timezone
 from rest_framework import status
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework.generics import get_object_or_404
 from rest_framework.authentication import TokenAuthentication
+from rest_framework.generics import get_object_or_404
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from account.permissions import IsOwner
+from auth_code.models import AuthorizationCode, ResetPasswordCode
+from auth_code.serializers import (ResetNewPasswordSerializer,
+                                   ResetPasswordEmailSerializer)
 from backend import settings
 from community.models import Community
 from community.permissions import IsCommunityAdministrator
-from auth_code.models import ResetPasswordCode, AuthorizationCode
-from auth_code.serializers import ResetPasswordEmailSerializer, ResetNewPasswordSerializer
 
 
 class ResetPasswordRequestCode(APIView):
@@ -159,14 +159,10 @@ class RequestUserAuthorization(APIView):
                 status=status.HTTP_204_NO_CONTENT,
                 data={"detail": "User is already authorized."},
             )
-        codes = AuthorizationCode.objects.filter(
-            user=user, created_by=request.user
-        )
+        codes = AuthorizationCode.objects.filter(user=user, created_by=request.user)
         # delete every pre-requested codes
         [code.delete() for code in codes]
-        code = AuthorizationCode.objects.create(
-            user=user, created_by=request.user
-        )
+        code = AuthorizationCode.objects.create(user=user, created_by=request.user)
         mail_subject = "Authorize User"
         message = render_to_string(
             "authorize_user.html",
@@ -192,9 +188,7 @@ class ConfirmCommunityAuthorization(APIView):
     permission_classes = [IsCommunityAdministrator]
 
     def post(self, request, code):
-        code = get_object_or_404(
-            AuthorizationCode, code=code
-        )
+        code = get_object_or_404(AuthorizationCode, code=code)
         self.check_object_permissions(request, code)
         community_to_authorize = code.community
         community_to_authorize.is_authorized = True
@@ -209,9 +203,7 @@ class ConfirmUserAuthorization(APIView):
     permission_classes = [IsOwner]
 
     def post(self, request, code):
-        code = get_object_or_404(
-            AuthorizationCode, code=code
-        )
+        code = get_object_or_404(AuthorizationCode, code=code)
         self.check_object_permissions(request, code)
         user_to_authorize = code.user.profile
         user_to_authorize.is_authorized = True
