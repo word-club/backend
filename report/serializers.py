@@ -28,3 +28,9 @@ class ReportSerializer(serializers.ModelSerializer):
 class ResolveReportSerializer(serializers.Serializer):
     resolve_text = serializers.CharField(max_length=1000, required=True)
     status = serializers.ChoiceField(required=True, choices=RESOLVE_REPORT_STATES)
+
+
+class MyReportSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Report
+        exclude = ("created_by",)

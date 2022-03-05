@@ -58,17 +58,6 @@ class RegisterUserView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class MentionList(APIView):
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
-
-    @staticmethod
-    def get(request):
-        users = get_user_model().objects.all()
-        serializer = MentionUserSerializer(users, many=True, read_only=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-
 class RetrieveUserByUsername(APIView):
     authentication_classes = []
     permission_classes = []

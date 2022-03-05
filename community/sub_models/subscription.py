@@ -6,7 +6,7 @@ class Subscription(models.Model):
     subscriber = models.ForeignKey(
         get_user_model(),
         on_delete=models.CASCADE,
-        related_name="subscribed_communities",
+        related_name="my_subscriptions",
         editable=False,
     )
     community = models.ForeignKey(

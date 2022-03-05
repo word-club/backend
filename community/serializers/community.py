@@ -11,6 +11,12 @@ from hashtag.serializers import HashtagSerializer
 from report.serializers import ReportSerializer
 
 
+class MyCommunitySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Community
+        exclude = ["created_by"]
+
+
 class CommunitySerializer(serializers.ModelSerializer):
     tags = HashtagSerializer(many=True, read_only=True)
     rules = RuleSerializer(many=True, read_only=True)

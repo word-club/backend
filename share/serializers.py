@@ -3,6 +3,12 @@ from rest_framework import serializers
 from share.models import Share
 
 
+class MyShareSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Share
+        exclude = ("created_by",)
+
+
 class ShareSerializer(serializers.ModelSerializer):
     class Meta:
         model = Share

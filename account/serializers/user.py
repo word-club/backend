@@ -1,30 +1,23 @@
 from django.contrib.auth.password_validation import validate_password
+from django.contrib.auth import get_user_model
+
 from rest_framework import serializers
 
-from account.models import *
-from account.serializers.follow import FollowUserSerializer
-from avatar.models import Avatar
+from account.models import Profile
+from account.serializers.follow import FollowingSerializer, FollowerSerializer
 from avatar.serializers import ProfileAvatarSerializer
-from block.models import Block
-from block.serializers import BlockUserSerializer
-from bookmark.models import Bookmark
-from comment.models import Comment
-from comment.serializers import (
-    CommentSerializer,
-    CommentForProfileSerializer,
-)
-from community.models import Subscription
-from community.serializers.community import CommunitySerializer
-from community.serializers.moderator import ModeratorSerializer
+from bookmark.serializers import MyBookmarkSerializer
+from comment.serializers import MyCommentSerializer
+from community.serializers.community import MyCommunitySerializer
+from community.serializers.moderator import MyModeratorSerializer
+from community.serializers.subscription import MySubscriptionSerializer
 from cover.serializers import ProfileCoverSerializer
-from globals import UserGlobalSerializer
-from hide.models import Hide
-from notification.serializers import NotificationReceiverSerializer
-from publication.models import Publication
-from publication.serializers import PublicationSerializer
-from report.serializers import ReportSerializer
-from share.serializers import ShareSerializer
-from vote.models import Vote
+from hide.serializers import MyHideSerializer
+from notification.serializers import MyNotificationSerializer
+from publication.serializers import MyPublicationSerializer
+from report.serializers import MyReportSerializer
+from share.serializers import MyShareSerializer
+from vote.serializers import MyVoteSerializer
 
 
 class ProfilePostSerializer(serializers.ModelSerializer):
@@ -74,8 +67,8 @@ class UserPostSerializer(serializers.ModelSerializer):
 
 
 class ProfileSerializer(serializers.ModelSerializer):
-    avatar = ProfileAvatarSerializer(read_only=True)
-    cover = ProfileCoverSerializer(read_only=True)
+    avatars = ProfileAvatarSerializer(read_only=True, many=True)
+    covers = ProfileCoverSerializer(read_only=True, many=True)
 
     class Meta:
         model = Profile
@@ -100,184 +93,22 @@ class UserRetrieveSerializer(serializers.ModelSerializer):
 
 class UserInfoSerializer(serializers.ModelSerializer):
     profile = ProfileSerializer(read_only=True)
-    followers = serializers.SerializerMethodField()
-    following = serializers.SerializerMethodField()
+    followers = FollowerSerializer(many=True, read_only=True)
+    following = FollowingSerializer(many=True, read_only=True)
 
-    published_publications = serializers.SerializerMethodField()
-    drafts = serializers.SerializerMethodField()
-    saved_publications = serializers.SerializerMethodField()
-    up_voted_publications = serializers.SerializerMethodField()
-    down_voted_publications = serializers.SerializerMethodField()
-    hidden_publications = serializers.SerializerMethodField()
-    # TODO: add serializer with publication instance
-    shared_publications = ShareSerializer(many=True, read_only=True)
+    my_publications = MyPublicationSerializer(many=True, read_only=True)
+    my_votes = MyVoteSerializer(many=True, read_only=True)
+    my_shares = MyShareSerializer(many=True, read_only=True)
+    my_bookmarks = MyBookmarkSerializer(many=True, read_only=True)
+    my_comments = MyCommentSerializer(many=True, read_only=True)
+    my_reports = MyReportSerializer(many=True, read_only=True)
+    my_hides = MyHideSerializer(many=True, read_only=True)
+    my_communities = MyCommunitySerializer(many=True, read_only=True)
+    my_subscriptions = MySubscriptionSerializer(many=True, read_only=True)
+    managed_communities = MyModeratorSerializer(many=True, read_only=True)
 
-    comments = serializers.SerializerMethodField()
-    up_voted_comments = serializers.SerializerMethodField()
-    down_voted_comments = serializers.SerializerMethodField()
-    added_reports = ReportSerializer(many=True, read_only=True)
-    hidden_comments = serializers.SerializerMethodField()
-    saved_comments = serializers.SerializerMethodField()
-    shared_comments = ShareSerializer(many=True, read_only=True)
-
-    created_communities = CommunitySerializer(many=True, read_only=True)
-    subscribed_communities = serializers.SerializerMethodField()
-    managed_communities = ModeratorSerializer(many=True, read_only=True)
-
-    received_notifications = NotificationReceiverSerializer(many=True, read_only=True)
-
-    @staticmethod
-    def get_published_publications(obj):
-        return PublicationSerializer(
-            Publication.objects.filter(created_by=obj, is_published=True),
-            many=True,
-            read_only=True,
-            context={"user": obj},
-        ).data
-
-    @staticmethod
-    def get_drafts(obj):
-        return PublicationSerializer(
-            Publication.objects.filter(created_by=obj, is_published=False),
-            many=True,
-            read_only=True,
-            context={"user": obj},
-        ).data
-
-    @staticmethod
-    def get_saved_publications(obj):
-        bookmarks = Bookmark.objects.filter(created_by=obj, publication__isnull=False)
-        publications = []
-        [publications.append(bookmark.publication) for bookmark in bookmarks]
-        return PublicationSerializer(
-            publications, many=True, read_only=True, context={"user": obj}
-        ).data
-
-    @staticmethod
-    def get_up_voted_publications(obj):
-        items = Vote.objects.filter(created_by=obj, up=True, publication__isnull=False)
-        publications = []
-        [publications.append(item.publication) for item in items]
-        return PublicationSerializer(
-            publications, read_only=True, many=True, context={"user": obj}
-        ).data
-
-    @staticmethod
-    def get_down_voted_publications(obj):
-        items = Vote.objects.filter(created_by=obj, up=False, publication__isnull=False)
-        publications = []
-        [publications.append(item.publication) for item in items]
-        return PublicationSerializer(
-            publications, read_only=True, many=True, context={"user": obj}
-        ).data
-
-    @staticmethod
-    def get_hidden_publications(obj):
-        items = Hide.objects.filter(created_by=obj, publication__isnull=False)
-        publications = []
-        [publications.append(item.publication) for item in items]
-        return PublicationSerializer(
-            publications, read_only=True, many=True, context={"user": obj}
-        ).data
-
-    @staticmethod
-    def get_comments(obj):
-        return CommentForProfileSerializer(
-            Comment.objects.filter(created_by=obj),
-            many=True,
-            read_only=True,
-            context={"user": obj},
-        ).data
-
-    @staticmethod
-    def get_up_voted_comments(obj):
-        items = Vote.objects.filter(created_by=obj, up=True, comment__isnull=False)
-        comments = []
-        [comments.append(item.comment) for item in items]
-        return CommentSerializer(
-            comments, many=True, read_only=True, context={"user": obj}
-        ).data
-
-    @staticmethod
-    def get_down_voted_comments(obj):
-        items = Vote.objects.filter(created_by=obj, up=False, comment__isnull=False)
-        comments = []
-        [comments.append(item.comment) for item in items]
-        return CommentSerializer(
-            comments, many=True, read_only=True, context={"user": obj}
-        ).data
-
-    @staticmethod
-    def get_hidden_comments(obj):
-        items = Hide.objects.filter(created_by=obj, comment__isnull=False)
-        comments = []
-        [comments.append(item.comment) for item in items]
-        return CommentSerializer(
-            comments, many=True, read_only=True, context={"user": obj}
-        ).data
-
-    @staticmethod
-    def get_saved_comments(obj):
-        items = Bookmark.objects.filter(created_by=obj, comment__isnull=False)
-        comments = []
-        [comments.append(item.comment) for item in items]
-        return CommentSerializer(
-            comments, many=True, read_only=True, context={"user": obj}
-        ).data
-
-    @staticmethod
-    def get_subscribed_communities(obj):
-        items = Subscription.objects.filter(subscriber=obj)
-        communities = []
-        [communities.append(item.community) for item in items]
-        return CommunitySerializer(
-            communities,
-            many=True,
-            read_only=True,
-        ).data
-
-    @staticmethod
-    def get_followers(obj):
-        followers = FollowUser.objects.filter(user=obj)
-        users = []
-        [users.append(item.created_by) for item in followers]
-        return UserGlobalSerializer(users, many=True, read_only=True).data
-
-    @staticmethod
-    def get_following(obj):
-        follows = FollowUser.objects.filter(created_by=obj)
-        users = []
-        [users.append(item.user) for item in follows]
-        return UserGlobalSerializer(users, many=True, read_only=True).data
+    received_notifications = MyNotificationSerializer(many=True, read_only=True)
 
     class Meta:
         model = get_user_model()
         fields = "__all__"
-
-
-class MentionUserSerializer(serializers.ModelSerializer):
-    name = serializers.SerializerMethodField()
-    avatar = serializers.SerializerMethodField()
-    username = serializers.SerializerMethodField()
-
-    @staticmethod
-    def get_username(obj):
-        return obj.username
-
-    @staticmethod
-    def get_name(obj):
-        if obj.first_name and obj.last_name:
-            return "{} {}".format(obj.first_name, obj.last_name)
-        return obj.username
-
-    @staticmethod
-    def get_avatar(obj):
-        try:
-            avatar = Avatar.objects.get(profile__user=obj)
-            return avatar.image.url
-        except Avatar.DoesNotExist:
-            return None
-
-    class Meta:
-        model = get_user_model()
-        fields = ["id", "name", "username", "avatar"]

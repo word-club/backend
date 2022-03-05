@@ -17,7 +17,7 @@ class Comment(models.Model):
     created_by = models.ForeignKey(
         get_user_model(),
         on_delete=models.CASCADE,
-        related_name="comments",
+        related_name="my_comments",
         editable=False,
     )
 

@@ -12,7 +12,7 @@ class CoverSerializer(serializers.ModelSerializer):
 class ProfileCoverSerializer(serializers.ModelSerializer):
     class Meta:
         model = Cover
-        exclude = ("community",)
+        exclude = ("community", "profile")
 
     def create(self, validated_data):
         validated_data["profile"] = self.context["profile"]

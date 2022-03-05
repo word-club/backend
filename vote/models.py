@@ -25,7 +25,7 @@ class Vote(models.Model):
     created_by = models.ForeignKey(
         get_user_model(),
         on_delete=models.CASCADE,
-        related_name="votes",
+        related_name="my_votes",
         editable=False,
     )
 

@@ -52,7 +52,7 @@ class Report(models.Model):
     created_by = models.ForeignKey(
         get_user_model(),
         on_delete=models.CASCADE,
-        related_name="added_reports",
+        related_name="my_reports",
         editable=False,
     )
     created_at = models.DateTimeField(auto_now_add=True)

@@ -46,6 +46,12 @@ class CommentForProfileSerializer(serializers.ModelSerializer):
         exclude = ["created_by"]
 
 
+class MyCommentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Comment
+        exclude = ["created_by"]
+
+
 class CommentSerializer(serializers.ModelSerializer):
     replies = ReplySerializer(many=True, read_only=True)
     images = CommentImageSerializer(many=True, read_only=True)

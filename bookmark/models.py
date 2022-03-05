@@ -69,5 +69,5 @@ class Bookmark(models.Model):
                 fields=["community", "created_by"],
                 condition=models.Q(community__isnull=False),
                 name="unique_community_user_bookmark",
-            )
+            ),
         ]

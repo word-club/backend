@@ -1,8 +1,8 @@
 # vote signal helper functions
 
 
-def add_popularity(vote):
-    instance = vote.publication if vote.publication else vote.comment
+def add_popularity(trigger):
+    instance = trigger.publication or trigger.comment
     instance.popularity += 1
     instance.save()
     instance.created_by.profile.popularity += 1
@@ -13,7 +13,7 @@ def add_popularity(vote):
 
 
 def add_supports(vote):
-    instance = vote.publication if vote.publication else vote.comment
+    instance = vote.publication or vote.comment
     instance.supports += 1
     instance.save()
     instance.created_by.profile.supports += 1
@@ -24,7 +24,7 @@ def add_supports(vote):
 
 
 def add_dislikes(vote):
-    instance = vote.publication if vote.publication else vote.comment
+    instance = vote.publication or vote.comment
     instance.dislikes += 1
     instance.save()
     instance.created_by.profile.dislikes += 1
@@ -35,7 +35,7 @@ def add_dislikes(vote):
 
 
 def decrease_popularity(vote):
-    instance = vote.publication if vote.publication else vote.comment
+    instance = vote.publication or vote.comment
     if instance.popularity > 0:
         instance.popularity -= 1
         instance.save()
@@ -48,7 +48,7 @@ def decrease_popularity(vote):
 
 
 def decrease_dislikes(vote):
-    instance = vote.publication if vote.publication else vote.comment
+    instance = vote.publication or vote.comment
     if instance.dislikes > 0:
         instance.dislikes -= 1
         instance.save()
@@ -61,7 +61,7 @@ def decrease_dislikes(vote):
 
 
 def decrease_supports(vote):
-    instance = vote.publication if vote.publication else vote.comment
+    instance = vote.publication or vote.comment
     if instance.supports > 0:
         instance.supports -= 1
         instance.save()

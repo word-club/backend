@@ -17,9 +17,9 @@ class NotificationSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class NotificationReceiverSerializer(serializers.ModelSerializer):
+class MyNotificationSerializer(serializers.ModelSerializer):
     notification = NotificationSerializer(read_only=True)
 
     class Meta:
         model = NotificationTo
-        fields = "__all__"
+        exclude = ("user",)

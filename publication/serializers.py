@@ -29,3 +29,15 @@ class PublicationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Publication
         fields = "__all__"
+
+
+class MyPublicationSerializer(serializers.ModelSerializer):
+    community = CommunityGlobalSerializer()
+    comments = CommentSerializer(many=True, read_only=True)
+    links = LinkInfoSerializer(read_only=True)
+    images = PublicationImageSerializer(read_only=True, many=True)
+    tags = HashtagSerializer(read_only=True, many=True)
+
+    class Meta:
+        model = Publication
+        exclude = ("created_by",)
