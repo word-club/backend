@@ -70,3 +70,20 @@ class IsNotASubscriber(permissions.BasePermission):
             return False
         except Subscription.DoesNotExist:
             return True
+
+
+class IsNotBannedSubscriber(permissions.BasePermission):
+    def has_object_permission(self, request, view, obj):
+        user = request.user
+        if user.__class__.__name__ == "AnonymousUser":
+            return True
+        community = obj
+        if not check_models(user, community):
+            return False
+        try:
+            subscription = Subscription.objects.get(
+                community=community, subscriber=user
+            )
+            return not subscription.is_banned
+        except Subscription.DoesNotExist:
+            return True

@@ -10,7 +10,7 @@ from rest_framework.generics import get_object_or_404
 import helper
 from community.models import Community
 from community.permissions import (
-    IsCommunityModerator,
+    IsCommunityModerator, IsNotBannedSubscriber,
 )
 from community.serializers.community import (
     CommunitySerializer,
@@ -25,6 +25,7 @@ class CommunityViewSet(
     viewsets.GenericViewSet,
 ):
     authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated, IsNotBannedSubscriber]
     serializer_class = CommunitySerializer
     search_fields = ["name"]
     filterset_fields = [
@@ -81,11 +82,11 @@ class CommunityDetail(APIView):
 
 class ViewACommunity(APIView):
     authentication_classes = []
-    permission_classes = []
+    permission_classes = [IsNotBannedSubscriber]
 
-    @staticmethod
-    def post(request, pk=None):
+    def get(self, request, pk=None):
         community = get_object_or_404(Community, pk=pk)
+        self.check_object_permissions(request, community)
         community.views += 1
         community.save()
         serializer = RetrieveSerializer(community, read_only=True)
