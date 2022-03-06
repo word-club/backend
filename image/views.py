@@ -9,8 +9,11 @@ from rest_framework.views import APIView
 from account.permissions import IsOwner
 from comment.models import Comment
 from image.models import Image
-from image.serializers import (CommentImageSerializer, ImageSerializer,
-                               PublicationImageSerializer)
+from image.serializers import (
+    CommentImageSerializer,
+    ImageSerializer,
+    PublicationImageSerializer,
+)
 from publication.models import Publication
 
 

@@ -2,8 +2,13 @@ from django.urls import path
 from rest_framework.routers import DefaultRouter
 
 from comment.filter import CommentFilter
-from comment.views import (AddPublicationComment, CommentDetail,
-                           CommentPinView, CommentViewSet, ReplyCommentView)
+from comment.views import (
+    AddPublicationComment,
+    CommentDetail,
+    CommentPinView,
+    CommentViewSet,
+    ReplyCommentView,
+)
 
 router = DefaultRouter()
 router.register(r"wc-comment", CommentViewSet, basename="comment")

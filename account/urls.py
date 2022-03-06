@@ -5,8 +5,13 @@ from account.views.auth import AdminInspect, LoginView, LogoutView
 from account.views.follow import FollowAUserView, UnFollowAUserView
 from account.views.mention import MentionList
 from account.views.password import UpdatePassword
-from account.views.user import (GetMeView, ProfileListView, RegisterUserView,
-                                RetrieveUserByUsername, UserViewSet)
+from account.views.user import (
+    GetMeView,
+    ProfileListView,
+    RegisterUserView,
+    RetrieveUserByUsername,
+    UserViewSet,
+)
 
 router = DefaultRouter()
 router.register(r"users", UserViewSet, basename="user")

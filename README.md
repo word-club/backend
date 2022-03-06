@@ -5,7 +5,7 @@
 - a community/publication feeds system.
 - built using Django, DRF and Django Channels
 
-## Fresh Start
+## Fresh start with developer environment
 To run a raw backend version with a SQLite database
 ```shell script
 make fresh

@@ -5,7 +5,7 @@ from django.db import models
 from django.db.models import UniqueConstraint
 
 from account.models import Profile
-from backend.settings import ALLOWED_IMAGES_EXTENSIONS
+from backend.settings.base import ALLOWED_IMAGES_EXTENSIONS
 from community.models import Community
 from helpers.upload_path import upload_cover_to
 

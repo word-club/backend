@@ -1,20 +1,23 @@
 from django.urls import path
 from rest_framework.routers import DefaultRouter
 
-from community.filters import (CommunitySubscribersFilter,
-                               SubscribedCommunityFilter, TopCommunitiesList)
-from community.views.community import (CommunityDetail, CommunityViewSet,
-                                       ViewACommunity)
+from community.filters import (
+    CommunitySubscribersFilter,
+    SubscribedCommunityFilter,
+    TopCommunitiesList,
+)
+from community.views.community import CommunityDetail, CommunityViewSet, ViewACommunity
 from community.views.hashtag import UpdateCommunityHashtag
-from community.views.moderator import (AddModerator, AddSubModerator,
-                                       ModeratorDetail)
+from community.views.moderator import AddModerator, AddSubModerator, ModeratorDetail
 from community.views.rule import AddCommunityRule, PatchDeleteCommunityRule
-from community.views.subscription import (AcceptRejectACommunitySubscriber,
-                                          BanUnBanACommunitySubscriber,
-                                          DisableNotificationsForACommunity,
-                                          RemoveCommunityDisableNotification,
-                                          SubscribeToACommunity,
-                                          SubscriptionDetail)
+from community.views.subscription import (
+    AcceptRejectACommunitySubscriber,
+    BanUnBanACommunitySubscriber,
+    DisableNotificationsForACommunity,
+    RemoveCommunityDisableNotification,
+    SubscribeToACommunity,
+    SubscriptionDetail,
+)
 from community.views.theme import AddCommunityTheme, UpdateCommunityTheme
 
 router = DefaultRouter()

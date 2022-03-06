@@ -8,8 +8,11 @@ from rest_framework.views import APIView
 from account.models import Profile
 from account.permissions import IsOwner
 from avatar.models import Avatar
-from avatar.serializers import (AvatarSerializer, CommunityAvatarSerializer,
-                                ProfileAvatarSerializer)
+from avatar.serializers import (
+    AvatarSerializer,
+    CommunityAvatarSerializer,
+    ProfileAvatarSerializer,
+)
 from community.models import Community
 from community.permissions import IsCommunityModerator
 

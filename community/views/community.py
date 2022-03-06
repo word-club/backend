@@ -10,7 +10,8 @@ from rest_framework.generics import get_object_or_404
 import helper
 from community.models import Community
 from community.permissions import (
-    IsCommunityModerator, IsNotBannedSubscriber,
+    IsCommunityModerator,
+    IsNotBannedSubscriber,
 )
 from community.serializers.community import (
     CommunitySerializer,
