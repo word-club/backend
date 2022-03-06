@@ -1,13 +1,10 @@
-# vote signal helper functions
-
-
 def add_popularity(trigger):
     instance = trigger.publication or trigger.comment
     instance.popularity += 1
     instance.save()
     instance.created_by.profile.popularity += 1
     instance.created_by.profile.save()
-    if instance.community:
+    if hasattr(instance, "community") and instance.community:
         instance.community.popularity += 1
         instance.community.save()
 
@@ -18,7 +15,7 @@ def add_supports(vote):
     instance.save()
     instance.created_by.profile.supports += 1
     instance.created_by.profile.save()
-    if instance.community:
+    if hasattr(instance, "community") and instance.community:
         instance.community.supports += 1
         instance.community.save()
 
@@ -29,7 +26,7 @@ def add_dislikes(vote):
     instance.save()
     instance.created_by.profile.dislikes += 1
     instance.created_by.profile.save()
-    if instance.community:
+    if hasattr(instance, "community") and instance.community:
         instance.community.dislikes += 1
         instance.community.save()
 
@@ -42,7 +39,11 @@ def decrease_popularity(vote):
     if instance.created_by.profile.popularity > 0:
         instance.created_by.profile.popularity -= 1
         instance.created_by.profile.save()
-    if instance.community and instance.community.popularity > 0:
+    if (
+        hasattr(instance, "community")
+        and instance.community
+        and instance.community.popularity > 0
+    ):
         instance.community.popularity -= 1
         instance.community.save()
 
@@ -55,7 +56,11 @@ def decrease_dislikes(vote):
     if instance.created_by.profile.dislikes > 0:
         instance.created_by.profile.dislikes -= 1
         instance.created_by.profile.save()
-    if instance.community and instance.community.dislikes > 0:
+    if (
+        hasattr(instance, "community")
+        and instance.community
+        and instance.community.dislikes > 0
+    ):
         instance.community.dislikes -= 1
         instance.community.save()
 
@@ -68,7 +73,11 @@ def decrease_supports(vote):
     if instance.created_by.profile.supports > 0:
         instance.created_by.profile.supports -= 1
         instance.created_by.profile.save()
-    if instance.community and instance.community.supports > 0:
+    if (
+        hasattr(instance, "community")
+        and instance.community
+        and instance.community.supports > 0
+    ):
         instance.community.supports -= 1
         instance.community.save()
 

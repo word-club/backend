@@ -14,7 +14,7 @@ from community.serializers.subscription import SubscriptionSerializer
 from community.sub_models.subscription import Subscription
 
 
-class RemoveCommunityDisableNotification(APIView):
+class RemoveDisableNotification(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated, IsOwner]
 
@@ -61,7 +61,7 @@ class SubscribeToACommunity(APIView):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
-class DisableNotificationsForACommunity(APIView):
+class DisableNotifications(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated, IsSubscriber]
 

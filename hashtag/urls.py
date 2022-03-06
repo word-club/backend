@@ -4,6 +4,6 @@ from hashtag.views import HashtagViewSet
 
 router = DefaultRouter()
 
-router.register(r"hash-tag", HashtagViewSet, basename="hashtag")
+router.register(r"hashtag", HashtagViewSet, basename="hashtag")
 
 urlpatterns = router.urls
