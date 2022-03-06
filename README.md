@@ -6,24 +6,30 @@
 - built using Django, DRF and Django Channels
 
 ## Fresh Start
-To run a raw backend version with SQLite DB
+To run a raw backend version with a SQLite database
 ```shell script
 make fresh
 ```
 
+### Authentication
 
-## Apps
-- administration  : I
-- account         : I
-- hashtag         : I
-- images          : I
-- files           : I
-- publication     : II
-- community       : II
-- comment         : III
-- upvote          : IIV
-- downvote        : IIV
-- bookmark        : IIV
-- share           : IIV
-- report          : IIV
-- notification    : V
+We have some public APIs which works without any authentications but for the critical APIs `Token Authentication` system is used.
+
+## Available Apps
+
+| Apps           | Level |
+| -------------- | ----- |
+| administration | I     |
+| account        | I     |
+| hashtag        | I     |
+| community      | II    |
+| publication    | III   |
+| comment        | IV    |
+| image          | IV    |
+| vote           | IV    |
+| bookmark       | IV    |
+| share          | IV    |
+| hide           | IV    |
+| block          | IV    |
+| report         | IV    |
+| notification   | V     |
