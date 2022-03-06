@@ -42,7 +42,7 @@ We use GitHub issues to track public bugs. Report a bug by [opening a new issue]
 People *love* thorough bug reports. I'm not even kidding.
 
 ## Use a Consistent Coding Style
-We use `black` library for linting and `isort` library for imports management in all of the python files.
+We use [black](https://pypi.org/project/black/) library for linting.
 
 ## License
 By contributing, you agree that your contributions will be licensed under its GNU General Public License.
