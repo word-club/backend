@@ -39,6 +39,7 @@ EXTERNAL_APPS = [
 ]
 
 LOCAL_APPS = [
+    "administration",
     "account",
     "hashtag",
     "community",
@@ -56,7 +57,6 @@ LOCAL_APPS = [
     "link",
     "auth_code",
     "notification",
-    "administration",
 ]
 
 INSTALLED_APPS = INTERNAL_APPS + EXTERNAL_APPS + LOCAL_APPS
