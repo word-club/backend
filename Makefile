@@ -3,6 +3,7 @@ SHELL=/bin/bash
 ADMIN_EMAIL := admin@test.com
 ADMIN_USERNAME := admin
 ADMIN_PASSWORD := admin
+SETTINGS := backend.settings.dev
 
 start-app:
 	django-admin startapp $(APP)
@@ -17,10 +18,13 @@ migrate:
 	$(PYTHON) manage.py migrate
 
 serve:
-	$(PYTHON) manage.py runserver $(BASE_URL)
+	$(PYTHON) manage.py runserver $(BASE_URL) --settings=$(SETTINGS)
 
-serve-d:
-	$(PYTHON) manage.py runserver $(BASE_URL) &
+dev:
+	$(PYTHON) manage.py runserver $(BASE_URL) --settings=backend.settings.dev
+
+prod:
+	$(PYTHON) manage.py runserver $(BASE_URL) --settings=backend.settings.prod
 
 shell:
 	$(PYTHON) manage.py shell

@@ -1,5 +1,5 @@
 """
-Django settings for backend project.
+Django base settings for the word club backend project
 """
 import os
 from pathlib import Path
@@ -10,7 +10,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 
 # SECURITY WARNING: keep the secret key used in production secret!
@@ -19,19 +19,7 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("DEBUG")
 
-ALLOWED_HOSTS = [
-    "localhost",
-    "wordclub.foodswipe.com.np",
-]
-
-# SECURITY WARNING: don't include unknown hosts
-CORS_ALLOWED_ORIGIN_REGEXES = [
-    r"^http:\/\/localhost\:8080$",
-    r"https?:\/\/wc.foodswipe.com.np$",
-]
-
 # Application definition
-
 INTERNAL_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -105,32 +93,6 @@ TEMPLATES = [
 WSGI_APPLICATION = "backend.wsgi.application"
 
 
-# Database
-# https://docs.djangoproject.com/en/3.1/ref/settings/#databases
-
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
-    }
-}
-
-# postgresql configuration
-# -------------------------------------------------------------
-
-# DATABASES = {
-#     'default': {
-#         'ENGINE'  : 'django.db.backends.postgresql_psycopg2',
-#         'NAME'    : os.getenv("DB_NAME"),
-#         'USER'    : os.getenv("DB_USER"),
-#         'PASSWORD': os.getenv("DB_PASSWORD"),
-#         'HOST'    : 'localhost',
-#         'PORT'    : '',
-#     }
-# }
-# -------------------------------------------------------------
-
-
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators
 
@@ -195,23 +157,6 @@ STATIC_ROOT = os.path.join(BASE_DIR, "static/")
 
 MEDIA_ROOT = os.path.join(BASE_DIR, "media/")
 
-
-# Email Server Configuration
-# https://docs.djangoproject.com/en/3.2/topics/email/
-# https://docs.djangoproject.com/en/3.2/topics/email/#email-backends
-
-EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-# EMAIL_USE_TLS = True
-# EMAIL_HOST = "smtp.gmail.com"
-# EMAIL_PORT = 587
-# EMAIL_HOST_USER = os.getenv("HOST_EMAIL")
-# EMAIL_HOST_PASSWORD = os.getenv("HOST_PASSWORD")
-# -----------------------------------------------------
-# temporary configuration for mailhog local mail server
-EMAIL_HOST = "127.0.0.1"
-EMAIL_PORT = 1025
-EMAIL_HOST_USER = "foo@bar.com"
-# -----------------------------------------------------
 
 ALLOWED_IMAGES_EXTENSIONS = ["png", "jpg", "jpeg", "gif", "bmp", "tiff", "JPG"]
 MAX_UPLOAD_IMAGE_SIZE = 70000

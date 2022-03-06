@@ -9,7 +9,7 @@ from django.utils.timezone import utc
 from rest_framework import serializers
 
 # from administration.models import Administration
-from backend.settings import ALLOWED_IMAGES_EXTENSIONS, MAX_UPLOAD_IMAGE_SIZE
+from backend.settings.base import ALLOWED_IMAGES_EXTENSIONS, MAX_UPLOAD_IMAGE_SIZE
 from publication.validators import check_bool_query, validate_date_string
 
 now = timezone.now()
