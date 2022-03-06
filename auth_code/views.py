@@ -11,8 +11,10 @@ from rest_framework.views import APIView
 
 from account.permissions import IsOwner
 from auth_code.models import AuthorizationCode, ResetPasswordCode
-from auth_code.serializers import (ResetNewPasswordSerializer,
-                                   ResetPasswordEmailSerializer)
+from auth_code.serializers import (
+    ResetNewPasswordSerializer,
+    ResetPasswordEmailSerializer,
+)
 from backend import settings
 from community.models import Community
 from community.permissions import IsCommunityModerator

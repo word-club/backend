@@ -32,15 +32,11 @@ shell:
 collect-static:
 	$(PYTHON) manage.py collectstatic
 
-isort:
-	isort .
-
 black:
 	black .
 
 lint:
 	black .
-	isort **/*.py
 
 lint-with-flake8:
 	flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
@@ -49,9 +45,6 @@ lint-with-flake8:
 
 black-check:
 	if ! black --check .; then black --diff .; exit 1; fi
-
-isort-check:
-	if ! isort -c **/*.py; then isort --diff **/*.py; exit 1; fi
 
 clean-migrations:
 	rm -rf **/migrations

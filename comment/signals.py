@@ -1,8 +1,11 @@
 from django.db.models.signals import post_delete, post_save
 from django.dispatch import receiver
 
-from comment.helper import (add_pub_discussions, decrease_pub_discussions,
-                            notify_post_subscribers)
+from comment.helper import (
+    add_pub_discussions,
+    decrease_pub_discussions,
+    notify_post_subscribers,
+)
 from comment.models import Comment
 
 

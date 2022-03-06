@@ -1,7 +1,11 @@
 from django.urls import path
 
-from bookmark.views import (AddCommentBookmark, AddCommunityBookmark,
-                            AddPublicationBookmark, BookmarkDetail)
+from bookmark.views import (
+    AddCommentBookmark,
+    AddCommunityBookmark,
+    AddPublicationBookmark,
+    BookmarkDetail,
+)
 
 urlpatterns = [
     path("publication/<int:pk>/bookmark/", AddPublicationBookmark.as_view()),

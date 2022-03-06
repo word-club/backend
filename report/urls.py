@@ -1,8 +1,15 @@
 from django.urls import path
 
-from report.views import (AddCommentReport, AddCommunityReport,
-                          AddPublicationReport, AddShareReport, AddUserReport,
-                          ReportDetail, ResolveAReport, UnResolveAReport)
+from report.views import (
+    AddCommentReport,
+    AddCommunityReport,
+    AddPublicationReport,
+    AddShareReport,
+    AddUserReport,
+    ReportDetail,
+    ResolveAReport,
+    UnResolveAReport,
+)
 
 urlpatterns = [
     path("user/<int:pk>/report/", AddUserReport.as_view()),

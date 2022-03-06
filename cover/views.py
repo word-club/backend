@@ -10,8 +10,11 @@ from account.permissions import IsOwner
 from community.models import Community
 from community.permissions import IsCommunityModerator
 from cover.models import Cover
-from cover.serializers import (CommunityCoverSerializer, CoverSerializer,
-                               ProfileCoverSerializer)
+from cover.serializers import (
+    CommunityCoverSerializer,
+    CoverSerializer,
+    ProfileCoverSerializer,
+)
 
 
 class AddProfileCoverView(APIView):

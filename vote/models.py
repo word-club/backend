@@ -1,7 +1,7 @@
 from django.contrib.auth import get_user_model
-from django.db.models import UniqueConstraint
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.db.models import UniqueConstraint
 
 from comment.models import Comment
 from publication.models import Publication
@@ -10,7 +10,7 @@ from publication.models import Publication
 class Vote(models.Model):
     publication = models.ForeignKey(
         Publication,
-        related_name='votes',
+        related_name="votes",
         on_delete=models.CASCADE,
         editable=False,
         null=True,

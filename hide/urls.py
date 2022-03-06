@@ -1,7 +1,12 @@
 from django.urls import path
 
-from hide.views import (HideAComment, HideACommunity, HideAPublication,
-                        HideAUser, HideDetail)
+from hide.views import (
+    HideAComment,
+    HideACommunity,
+    HideAPublication,
+    HideAUser,
+    HideDetail,
+)
 
 urlpatterns = [
     path("publication/<int:pk>/hide/", HideAPublication.as_view()),
