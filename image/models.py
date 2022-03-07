@@ -49,22 +49,16 @@ class Image(models.Model):
             if self.image:
                 check += 1
             if check == 0:
-                raise ValidationError(
-                    {"detail": "One of the image field must be specified"}
-                )
+                raise ValidationError({"detail": "One of the image field must be specified"})
             if check > 1:
-                raise ValidationError(
-                    {"detail": "Only one image field can be submitted"}
-                )
+                raise ValidationError({"detail": "Only one image field can be submitted"})
             check = 0
             if self.publication:
                 check += 1
             if self.comment:
                 check += 1
             if check == 0:
-                raise ValidationError(
-                    {"detail": "One of the key field must be specified"}
-                )
+                raise ValidationError({"detail": "One of the key field must be specified"})
             if check > 1:
                 raise ValidationError({"detail": "Only one key field can be submitted"})
         return super().save(*args, **kwargs)

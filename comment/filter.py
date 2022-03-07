@@ -45,14 +45,10 @@ class CommentFilter(APIView):
             for item in comments:
                 comment_id = str(item.id)
                 reactions = get_comment_reactions(item)
-                serializer = CommentSerializer(
-                    item, context={"user": request.user}, read_only=True
-                )
+                serializer = CommentSerializer(item, context={"user": request.user}, read_only=True)
                 dataset[comment_id] = OrderedDict()
                 dataset[comment_id]["popularity"] = reactions["total"]
-                dataset[comment_id]["support"] = (
-                    reactions["up_votes"] + reactions["shares"]
-                )
+                dataset[comment_id]["support"] = reactions["up_votes"] + reactions["shares"]
                 dataset[comment_id]["discussions"] = reactions["replies"]
                 dataset[comment_id]["unix"] = int(item.created_at.strftime("%s"))
                 dataset[comment_id]["data"] = serializer.data

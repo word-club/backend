@@ -11,9 +11,7 @@ from hashtag.models import Hashtag
 
 
 class Community(models.Model):
-    unique_id = models.CharField(
-        max_length=64, unique=True, validators=[validate_unique_id]
-    )
+    unique_id = models.CharField(max_length=64, unique=True, validators=[validate_unique_id])
     name = models.CharField(max_length=64, unique=True)
     description = models.CharField(max_length=256, null=True)
     email = models.EmailField(unique=True, null=True)

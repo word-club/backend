@@ -24,9 +24,7 @@ class AdministrationViewSet(
         instance = Administration.objects.first()
         if not instance:
             instance = Administration.objects.create()
-        return Response(
-            AdministrationSerializer(instance).data, status=status.HTTP_200_OK
-        )
+        return Response(AdministrationSerializer(instance).data, status=status.HTTP_200_OK)
 
     def create(self, request, *args, **kwargs):
         instance = Administration.objects.first()
@@ -41,9 +39,7 @@ class AdministrationViewSet(
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class PageViewViewSet(
-    mixins.ListModelMixin, mixins.UpdateModelMixin, viewsets.GenericViewSet
-):
+class PageViewViewSet(mixins.ListModelMixin, mixins.UpdateModelMixin, viewsets.GenericViewSet):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsSuperUser]
     serializer_class = PageViewSerializer
@@ -109,9 +105,7 @@ class TopView(APIView):
             popularity__gte=limit,
         ).order_by("-popularity")[:count]
 
-        profiles = Profile.objects.filter(popularity__gte=limit).order_by(
-            "-popularity"
-        )[:count]
+        profiles = Profile.objects.filter(popularity__gte=limit).order_by("-popularity")[:count]
         users = []
         [users.append(profile.user) for profile in profiles]
 
@@ -125,9 +119,7 @@ class TopView(APIView):
 
         return Response(
             {
-                "communities": RetrieveSerializer(
-                    communities, many=True, context=context
-                ).data,
+                "communities": RetrieveSerializer(communities, many=True, context=context).data,
                 "users": UserRetrieveSerializer(users, many=True, context=context).data,
                 "commentators": UserRetrieveSerializer(
                     commentators, many=True, context=context

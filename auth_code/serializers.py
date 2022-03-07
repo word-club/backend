@@ -17,7 +17,5 @@ class ResetNewPasswordSerializer(serializers.Serializer):
 
     def validate(self, data):
         if data["new_password"] != data["confirm_password"]:
-            raise serializers.ValidationError(
-                "New password must match with confirm password."
-            )
+            raise serializers.ValidationError("New password must match with confirm password.")
         return data

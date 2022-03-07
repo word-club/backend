@@ -8,7 +8,7 @@ from community.sub_models.subscription import Subscription
 class MySubscriptionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Subscription
-        exclude = ("created_by",)
+        exclude = ("subscriber",)
 
 
 class SubscriptionSerializer(serializers.ModelSerializer):

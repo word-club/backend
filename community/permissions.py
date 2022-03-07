@@ -36,9 +36,7 @@ class IsSubscriber(permissions.BasePermission):
         if not check_models(user, community):
             return False
         try:
-            subscription = Subscription.objects.get(
-                community=community, subscriber=user
-            )
+            subscription = Subscription.objects.get(community=community, subscriber=user)
             return not subscription.is_banned
         except Subscription.DoesNotExist:
             return False
@@ -51,9 +49,7 @@ class IsApprovedSubscriber(permissions.BasePermission):
         if not check_models(user, community):
             return False
         try:
-            subscription = Subscription.objects.get(
-                community=community, subscriber=user
-            )
+            subscription = Subscription.objects.get(community=community, subscriber=user)
             return subscription.is_approved
         except Subscription.DoesNotExist:
             return False
@@ -81,9 +77,7 @@ class IsNotBannedSubscriber(permissions.BasePermission):
         if not check_models(user, community):
             return False
         try:
-            subscription = Subscription.objects.get(
-                community=community, subscriber=user
-            )
+            subscription = Subscription.objects.get(community=community, subscriber=user)
             return not subscription.is_banned
         except Subscription.DoesNotExist:
             return True

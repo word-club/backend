@@ -1,7 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.db import models
 
-from administration.models import Administration
 from choices import PUBLICATION_TYPE_CHOICES
 from community.models import Community
 from hashtag.models import Hashtag
@@ -22,9 +21,7 @@ class Publication(models.Model):
 
     views = models.PositiveBigIntegerField(default=0, editable=False)
 
-    type = models.CharField(
-        max_length=32, choices=PUBLICATION_TYPE_CHOICES, default="editor"
-    )
+    type = models.CharField(max_length=32, choices=PUBLICATION_TYPE_CHOICES, default="editor")
 
     tags = models.ManyToManyField(
         Hashtag,

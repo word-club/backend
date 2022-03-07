@@ -53,9 +53,7 @@ class PublicationFilter(APIView):
 
     @staticmethod
     def get(request):
-        ascending_filter = check_bool_query(
-            request.query_params.get("asc")
-        )  # expects 1|0
+        ascending_filter = check_bool_query(request.query_params.get("asc"))  # expects 1|0
         sort_by = check_sort_by_query(request.query_params.get("sort_by"))
 
         dataset = OrderedDict()
@@ -70,9 +68,7 @@ class PublicationFilter(APIView):
                 )
                 dataset[item.id] = OrderedDict()
                 dataset[item.id]["popularity"] = reactions["total"]
-                dataset[item.id]["support"] = (
-                    reactions["up_votes"] + reactions["shares"]
-                )
+                dataset[item.id]["support"] = reactions["up_votes"] + reactions["shares"]
                 dataset[item.id]["discussions"] = reactions["comments"]
                 dataset[item.id]["unix"] = int(item.published_at.strftime("%s"))
                 dataset[item.id]["data"] = serializer.data

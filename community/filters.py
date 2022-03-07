@@ -70,6 +70,4 @@ class CommunitySubscribersFilter(APIView):
             )
         users = []
         [users.append(subscription.subscriber) for subscription in valid_subscriptions]
-        return Response(
-            UserGlobalSerializer(users, many=True).data, status=status.HTTP_200_OK
-        )
+        return Response(UserGlobalSerializer(users, many=True).data, status=status.HTTP_200_OK)

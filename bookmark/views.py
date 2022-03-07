@@ -42,9 +42,7 @@ class AddCommunityBookmark(APIView):
     @staticmethod
     def post(request, pk):
         community = get_object_or_404(Community, pk=pk)
-        _, created = Bookmark.objects.get_or_create(
-            community=community, created_by=request.user
-        )
+        _, created = Bookmark.objects.get_or_create(community=community, created_by=request.user)
         http_status = status.HTTP_201_CREATED if created else status.HTTP_200_OK
         return Response(status=http_status)
 
@@ -60,9 +58,7 @@ class AddCommentBookmark(APIView):
     @staticmethod
     def post(request, pk):
         comment = get_object_or_404(Comment, pk=pk)
-        _, created = Bookmark.objects.get_or_create(
-            comment=comment, created_by=request.user
-        )
+        _, created = Bookmark.objects.get_or_create(comment=comment, created_by=request.user)
         http_status = status.HTTP_201_CREATED if created else status.HTTP_200_OK
         return Response(status=http_status)
 
