@@ -15,11 +15,11 @@ install:
 
 .PHONY: make-migrations
 make-migrations:
-	$(PYTHON) manage.py makemigrations $(APP)
+	$(PYTHON) manage.py makemigrations $(APP) --settings=$(SETTINGS)
 
 .PHONY: migrate
 migrate:
-	$(PYTHON) manage.py migrate
+	$(PYTHON) manage.py migrate --settings=$(SETTINGS)
 
 .PHONY: serve
 serve:
@@ -35,11 +35,11 @@ prod:
 
 .PHONY: shell
 shell:
-	$(PYTHON) manage.py shell
+	$(PYTHON) manage.py shell --settings=$(SETTINGS)
 
 .PHONY: collect-static
 collect-static:
-	$(PYTHON) manage.py collectstatic
+	$(PYTHON) manage.py collectstatic --settings=$(SETTINGS)
 
 .PHONY: black
 black:
@@ -80,11 +80,11 @@ clean-db-migration: clean-db clean-migrations
 
 .PHONY: create-superuser
 create-superuser:
-	$(PYTHON) manage.py createsuperuser
+	$(PYTHON) manage.py createsuperuser --settings=$(SETTINGS)
 
 .PHONY: new-admin
 new-admin:
-	DJANGO_SUPERUSER_PASSWORD=$(ADMIN_PASSWORD) $(PYTHON) manage.py createsuperuser --username $(ADMIN_USERNAME) --email $(ADMIN_EMAIL) --noinput
+	DJANGO_SUPERUSER_PASSWORD=$(ADMIN_PASSWORD) $(PYTHON) manage.py createsuperuser --username $(ADMIN_USERNAME) --email $(ADMIN_EMAIL) --noinput --settings=$(SETTINGS)
 
 .PHONY: fresh-migrations
 fresh-migrations:

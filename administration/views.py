@@ -1,4 +1,4 @@
-from rest_framework import mixins, serializers, status, viewsets
+from rest_framework import mixins, status, viewsets
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -7,14 +7,9 @@ from account.models import Profile
 from account.permissions import IsSuperUser
 from account.serializers.user import UserRetrieveSerializer
 from administration.models import Administration, PageView
+from administration.serializers import AdministrationSerializer, PageViewSerializer
 from community.models import Community
 from community.serializers.community import RetrieveSerializer
-
-
-class AdministrationSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Administration
-        exclude = ["id"]
 
 
 class AdministrationViewSet(
@@ -46,12 +41,6 @@ class AdministrationViewSet(
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class PageViewSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = PageView
-        exclude = ["id"]
-
-
 class PageViewViewSet(
     mixins.ListModelMixin, mixins.UpdateModelMixin, viewsets.GenericViewSet
 ):
@@ -81,12 +70,12 @@ class PageViewViewSet(
             )
 
         # fetch query param
-        homepage = request.query_params.get("homepage")
-        publications = request.query_params.get("publications")
-        community = request.query_params.get("community")
-        profile = request.query_params.get("profile")
-        settings = request.query_params.get("settings")
-        administration = request.query_params.get("administration")
+        homepage = request.query_params.get("homepage", None)
+        publications = request.query_params.get("publications", None)
+        community = request.query_params.get("community", None)
+        profile = request.query_params.get("profile", None)
+        settings = request.query_params.get("settings", None)
+        administration = request.query_params.get("administration", None)
 
         # if query param is available and true when parsed to integer then add count
         if homepage and bool(int(homepage)):
@@ -112,11 +101,9 @@ class PageViewViewSet(
 class TopView(APIView):
     @staticmethod
     def get(request):
-        # TODO: replace with next line
         administration, created = Administration.objects.get_or_create(id=1)
         count = administration.top_count
-        # limit = administration.popularity_threshold
-        limit = 0
+        limit = administration.popularity_threshold
         communities = Community.objects.filter(
             type__in=["public", "restricted"],
             popularity__gte=limit,

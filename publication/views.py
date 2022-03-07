@@ -169,9 +169,11 @@ class PublishPublicationView(APIView):
 
 class GetTwitterEmbed(APIView):
     authentication_classes = []
+    permission_classes = []
 
-    def post(self, request):
-        source = request.data.get("source")
+    @staticmethod
+    def get(request):
+        source = request.query_params.get("source", None)
         if not source:
             return Response(status=status.HTTP_400_BAD_REQUEST)
         serializer = TwitterEmbedSerializer(

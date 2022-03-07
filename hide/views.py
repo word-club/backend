@@ -8,7 +8,6 @@ from rest_framework.views import APIView
 
 from account.permissions import IsOwner
 from comment.models import Comment
-from community.models import Community
 from hide.models import Hide
 from hide.serializers import HideSerializer
 from publication.models import Publication
@@ -46,23 +45,6 @@ class HideAComment(APIView):
         user = request.user
         comment = get_object_or_404(Comment, pk=pk)
         _, created = Hide.objects.get_or_create(created_by=user, comment=comment)
-        http_status = status.HTTP_201_CREATED if created else status.HTTP_200_OK
-        return Response(status=http_status)
-
-
-class HideACommunity(APIView):
-    """
-    Hide a community
-    """
-
-    authentication_classes = (TokenAuthentication,)
-    permission_classes = (IsAuthenticated,)
-
-    @staticmethod
-    def post(request, pk):
-        user = request.user
-        community = get_object_or_404(Community, pk=pk)
-        _, created = Hide.objects.get_or_create(created_by=user, community=community)
         http_status = status.HTTP_201_CREATED if created else status.HTTP_200_OK
         return Response(status=http_status)
 

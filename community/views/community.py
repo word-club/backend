@@ -21,7 +21,6 @@ from community.serializers.community import (
 
 class CommunityViewSet(
     mixins.ListModelMixin,
-    mixins.RetrieveModelMixin,
     mixins.CreateModelMixin,
     viewsets.GenericViewSet,
 ):

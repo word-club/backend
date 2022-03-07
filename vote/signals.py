@@ -1,7 +1,7 @@
 from django.db.models.signals import post_delete, post_save
 from django.dispatch import receiver
 
-from helpers.vote_signals import (
+from helpers.update_reactions import (
     add_popularity,
     add_supports,
     decrease_popularity,
