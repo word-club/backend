@@ -35,7 +35,7 @@ prod:
 
 .PHONY: shell
 shell:
-	$(PYTHON) manage.py shell
+	$(PYTHON) manage.py shell --settings=$(SETTINGS)
 
 .PHONY: collect-static
 collect-static:
