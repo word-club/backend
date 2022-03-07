@@ -13,9 +13,7 @@ class HideTest(TestCase):
             comment="comment",
             created_by=self.actor,
         )
-        self.publication = Publication.objects.create(
-            title="Test", created_by=self.actor
-        )
+        self.publication = Publication.objects.create(title="Test", created_by=self.actor)
 
     def test_no_key_field_provided(self):
         try:
@@ -23,9 +21,7 @@ class HideTest(TestCase):
             raise Exception("Hey, it has passed!")
         except Exception as e:
             self.assertEqual("ValidationError", e.__class__.__name__)
-            self.assertEqual(
-                e.message_dict, {"detail": ["One of the key field must be specified"]}
-            )
+            self.assertEqual(e.message_dict, {"detail": ["One of the key field must be specified"]})
 
     def test_multiple_key_provided(self):
         try:
@@ -37,9 +33,7 @@ class HideTest(TestCase):
             raise Exception("Hey, it has passed!")
         except Exception as e:
             self.assertEqual("ValidationError", e.__class__.__name__)
-            self.assertEqual(
-                e.message_dict, {"detail": ["Only one key field can be submitted"]}
-            )
+            self.assertEqual(e.message_dict, {"detail": ["Only one key field can be submitted"]})
 
     def test_unique_publication_hide_for_a_user(self):
         try:

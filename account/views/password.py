@@ -19,9 +19,7 @@ class UpdatePassword(APIView):
         """
         Update password for authenticated user
         """
-        serializer = UpdatePasswordSerializer(
-            data=request.data, context={"request": request}
-        )
+        serializer = UpdatePasswordSerializer(data=request.data, context={"request": request})
         if serializer.is_valid(raise_exception=True):
             username = request.user.username
             password = serializer.validated_data["password"]

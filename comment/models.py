@@ -36,9 +36,7 @@ class Comment(models.Model):
         null=True,
     )
 
-    reply = models.ForeignKey(
-        "self", null=True, on_delete=models.CASCADE, related_name="replies"
-    )
+    reply = models.ForeignKey("self", null=True, on_delete=models.CASCADE, related_name="replies")
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

@@ -19,9 +19,7 @@ class BlockACommunity(APIView):
     @staticmethod
     def post(request, pk):
         community = get_object_or_404(Community, pk=pk)
-        block, created = Block.objects.get_or_create(
-            community=community, created_by=request.user
-        )
+        block, created = Block.objects.get_or_create(community=community, created_by=request.user)
         http_status = status.HTTP_201_CREATED if created else status.HTTP_200_OK
         return Response(status=http_status)
 

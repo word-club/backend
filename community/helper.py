@@ -7,17 +7,13 @@ def check_community_law(community, user):
         try:
             subscriber = Subscription.objects.get(subscriber=user, community=community)
             if subscriber.is_banned:
-                return True, {
-                    "detail": "Subscriber is banned for the selected community."
-                }
+                return True, {"detail": "Subscriber is banned for the selected community."}
             if community.type != "public":
                 if not subscriber.is_approved:
                     return True, {"detail": "Subscriber is not approved yet."}
             return False, None
         except Subscription.DoesNotExist:
-            return True, {
-                "detail": "Please subscribe the community first to add publication."
-            }
+            return True, {"detail": "Please subscribe the community first to add publication."}
 
 
 def send_notification(receivers, notification, threshold=1):

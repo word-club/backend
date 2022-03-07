@@ -21,9 +21,7 @@ class Publication(models.Model):
 
     views = models.PositiveBigIntegerField(default=0, editable=False)
 
-    type = models.CharField(
-        max_length=32, choices=PUBLICATION_TYPE_CHOICES, default="editor"
-    )
+    type = models.CharField(max_length=32, choices=PUBLICATION_TYPE_CHOICES, default="editor")
 
     tags = models.ManyToManyField(
         Hashtag,

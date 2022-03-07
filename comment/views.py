@@ -60,9 +60,7 @@ class CommentDetail(APIView):
         comment = get_object_or_404(Comment, pk=pk)
         check_comment_update_date_limit(comment)
         self.check_object_permissions(request, comment)
-        serializer = CommentSerializer(
-            comment, data=request.data, context={"request": request}
-        )
+        serializer = CommentSerializer(comment, data=request.data, context={"request": request})
         if serializer.is_valid():
             serializer.save()
             return Response(status=status.HTTP_204_NO_CONTENT)

@@ -18,9 +18,7 @@ class UpdateCommunityHashtag(APIView):
         community = get_object_or_404(Community, pk=pk)
         self.check_object_permissions(request, community)
 
-        serializer = PostCommunityHashtagSerializer(
-            community, data=request.data, partial=True
-        )
+        serializer = PostCommunityHashtagSerializer(community, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)

@@ -36,9 +36,7 @@ class ResetPasswordRequestCode(APIView):
                 user = get_user_model().objects.get(email=email)
 
                 current_site = get_current_site(request)
-                code_object, created = ResetPasswordCode.objects.get_or_create(
-                    user=user
-                )
+                code_object, created = ResetPasswordCode.objects.get_or_create(user=user)
                 if not created:
                     code_object.delete()
                     code_object = ResetPasswordCode.objects.create(user=user)
@@ -64,9 +62,7 @@ class ResetPasswordRequestCode(APIView):
                     status=status.HTTP_202_ACCEPTED,
                 )
             except get_user_model().DoesNotExist:
-                return Response(
-                    {"detail": "User not found."}, status=status.HTTP_400_BAD_REQUEST
-                )
+                return Response({"detail": "User not found."}, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -89,13 +85,9 @@ class ConfirmResetPassword(APIView):
                 user.set_password(password)
                 user.save()
                 reset_password_code.delete()
-                return Response(
-                    {"message": "Reset password success."}, status=status.HTTP_200_OK
-                )
+                return Response({"message": "Reset password success."}, status=status.HTTP_200_OK)
             except ResetPasswordCode.DoesNotExist:
-                return Response(
-                    {"detail": "Code not found."}, status=status.HTTP_404_NOT_FOUND
-                )
+                return Response({"detail": "Code not found."}, status=status.HTTP_404_NOT_FOUND)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -117,13 +109,9 @@ class RequestCommunityAuthorization(APIView):
                 status=status.HTTP_204_NO_CONTENT,
                 data={"detail": "Community is already authorized."},
             )
-        codes = AuthorizationCode.objects.filter(
-            community=community, created_by=request.user
-        )
+        codes = AuthorizationCode.objects.filter(community=community, created_by=request.user)
         [code.delete() for code in codes]  # delete every pre-requested codes
-        code = AuthorizationCode.objects.create(
-            community=community, created_by=request.user
-        )
+        code = AuthorizationCode.objects.create(community=community, created_by=request.user)
         mail_subject = "Authorize Community"
         message = render_to_string(
             "authorize_community.html",

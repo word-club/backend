@@ -19,9 +19,7 @@ class FollowAUserView(APIView):
     def post(request, pk):
         to_follow = get_object_or_404(get_user_model(), pk=pk)
         follow = FollowUser.objects.create(user=to_follow, created_by=request.user)
-        return Response(
-            FollowUserSerializer(follow).data, status=status.HTTP_201_CREATED
-        )
+        return Response(FollowUserSerializer(follow).data, status=status.HTTP_201_CREATED)
 
 
 class UnFollowAUserView(APIView):

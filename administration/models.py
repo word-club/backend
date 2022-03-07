@@ -3,9 +3,7 @@ from django.db import models
 
 
 class Administration(models.Model):
-    publication_update_limit = models.PositiveIntegerField(
-        default=30, help_text="in days"
-    )
+    publication_update_limit = models.PositiveIntegerField(default=30, help_text="in days")
     popularity_threshold = models.PositiveIntegerField(default=15)
     comment_update_limit = models.PositiveIntegerField(default=30, help_text="in days")
     top_count = models.PositiveIntegerField(default=50)

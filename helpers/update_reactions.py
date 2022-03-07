@@ -39,11 +39,7 @@ def decrease_popularity(vote):
     if instance.created_by.profile.popularity > 0:
         instance.created_by.profile.popularity -= 1
         instance.created_by.profile.save()
-    if (
-        hasattr(instance, "community")
-        and instance.community
-        and instance.community.popularity > 0
-    ):
+    if hasattr(instance, "community") and instance.community and instance.community.popularity > 0:
         instance.community.popularity -= 1
         instance.community.save()
 
@@ -56,11 +52,7 @@ def decrease_dislikes(vote):
     if instance.created_by.profile.dislikes > 0:
         instance.created_by.profile.dislikes -= 1
         instance.created_by.profile.save()
-    if (
-        hasattr(instance, "community")
-        and instance.community
-        and instance.community.dislikes > 0
-    ):
+    if hasattr(instance, "community") and instance.community and instance.community.dislikes > 0:
         instance.community.dislikes -= 1
         instance.community.save()
 
@@ -73,11 +65,7 @@ def decrease_supports(vote):
     if instance.created_by.profile.supports > 0:
         instance.created_by.profile.supports -= 1
         instance.created_by.profile.save()
-    if (
-        hasattr(instance, "community")
-        and instance.community
-        and instance.community.supports > 0
-    ):
+    if hasattr(instance, "community") and instance.community and instance.community.supports > 0:
         instance.community.supports -= 1
         instance.community.save()
 

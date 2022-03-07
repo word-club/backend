@@ -57,17 +57,13 @@ class CommunityDetail(APIView):
     def get(self, request, pk=None):
         community = get_object_or_404(Community, pk=pk)
         self.check_object_permissions(request, community)
-        serializer = RetrieveSerializer(
-            community, context={"depth": 2, "user": request.user}
-        )
+        serializer = RetrieveSerializer(community, context={"depth": 2, "user": request.user})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def patch(self, request, pk):
         community = get_object_or_404(Community, pk=pk)
         self.check_object_permissions(request, community)
-        serializer = CommunitySerializer(
-            data=request.data, instance=community, partial=True
-        )
+        serializer = CommunitySerializer(data=request.data, instance=community, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)

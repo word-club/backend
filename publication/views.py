@@ -177,9 +177,7 @@ class GetTwitterEmbed(APIView):
         if not source:
             return Response(status=status.HTTP_400_BAD_REQUEST)
         serializer = TwitterEmbedSerializer(
-            TwitterOEmbedData(
-                source=source, oembed=helper.get_twitter_embed_data(source)
-            )
+            TwitterOEmbedData(source=source, oembed=helper.get_twitter_embed_data(source))
         )
         return Response(serializer.data, status=status.HTTP_200_OK)
 

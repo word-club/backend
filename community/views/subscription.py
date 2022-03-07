@@ -33,9 +33,7 @@ class SubscriptionDetail(APIView):
     permission_classes = [IsAuthenticated, IsSubscriber]
 
     def delete(self, request, pk):
-        subscription = get_object_or_404(
-            Subscription, community=pk, subscriber=request.user
-        )
+        subscription = get_object_or_404(Subscription, community=pk, subscriber=request.user)
         self.check_object_permissions(request, subscription.community)
 
         subscription.delete()
@@ -50,9 +48,7 @@ class SubscribeToACommunity(APIView):
         community = get_object_or_404(Community, pk=pk)
         self.check_object_permissions(request, community)
         context = {"community": community, "request": request}
-        subscription = Subscription.objects.create(
-            community=community, subscriber=request.user
-        )
+        subscription = Subscription.objects.create(community=community, subscriber=request.user)
         if community.type == "public":
             subscription.is_approved = True
             subscription.approved_at = timezone.now()
@@ -76,7 +72,7 @@ class DisableNotifications(APIView):
         return Response(status=status.HTTP_201_CREATED)
 
 
-class AcceptRejectACommunitySubscriber(APIView):
+class AcceptRejectASubscriber(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated, IsCommunityModerator]
 
@@ -104,7 +100,7 @@ class AcceptRejectACommunitySubscriber(APIView):
         return Response(status=status.HTTP_200_OK)
 
 
-class BanUnBanACommunitySubscriber(APIView):
+class BanUnBanASubscriber(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsCommunityModerator]
 

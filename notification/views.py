@@ -16,9 +16,7 @@ class NotificationListView(APIView):
     @staticmethod
     def get(request):
         notifications = Notification.objects.all()
-        serializer = NotificationSerializer(
-            instance=notifications, many=True, read_only=True
-        )
+        serializer = NotificationSerializer(instance=notifications, many=True, read_only=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
