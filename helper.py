@@ -211,7 +211,7 @@ def get_viewset_filterset(request, filterset_fields, default_field):
         sort_string = "{}{}".format("-" if not asc else "", sort_by)
     # for fresh item sort, only show items with popularity less than administration limit
     if sort_by in ["{}".format(default_field)]:
-        filterset["popularity__lt"] = 1  # TODO: replace with pt here
+        filterset["popularity__gt"] = 1  # TODO: replace with pt here
 
     search = request.query_params.get("search")
     search_by = request.query_params.get("search_by")

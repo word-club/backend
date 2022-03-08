@@ -48,6 +48,8 @@ class PublicationListView(mixins.ListModelMixin, viewsets.GenericViewSet):
         )
         user = get_user_from_auth_header(self.request)
 
+        print(filterset)
+
         queryset = Publication.objects.filter(**filterset).order_by(sort_string)
         hidden_publications = []
         if user:
@@ -57,7 +59,7 @@ class PublicationListView(mixins.ListModelMixin, viewsets.GenericViewSet):
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
-        context["depth"] = self.request.query_params.get("depth", 0)
+        context["depth"] = int(self.request.query_params.get("depth", 0))
         return context
 
 

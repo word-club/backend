@@ -26,6 +26,10 @@ class PublicationSerializer(serializers.ModelSerializer):
     tags = HashtagSerializer(read_only=True, many=True)
     created_by = UserGlobalSerializer(read_only=True)
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.Meta.depth = self.context.get("depth", 0)
+
     class Meta:
         model = Publication
         fields = "__all__"
