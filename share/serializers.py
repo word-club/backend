@@ -1,7 +1,11 @@
 from rest_framework import serializers
 
-from globals import UserGlobalSerializer, CommunityGlobalSerializer, PublicationGlobalSerializer, \
-    CommentGlobalSerializer
+from globals import (
+    UserGlobalSerializer,
+    CommunityGlobalSerializer,
+    PublicationGlobalSerializer,
+    CommentGlobalSerializer,
+)
 from share.models import Share
 
 

@@ -1,12 +1,15 @@
+from django.utils import timezone
+
 from rest_framework import serializers
 
-from avatar.serializers import CommunityAvatarSerializer
+from avatar.serializers import CommunityAvatarSerializer, Avatar
+from comment.serializers import CommentSerializer, Comment
 from community.models import Community
 from community.serializers.moderator import ModeratorSerializer
 from community.serializers.rule import RuleSerializer
 from community.serializers.subscription import SubscriptionCommunitySerializer
 from community.serializers.theme import ThemeSerializer
-from cover.serializers import CommunityCoverSerializer
+from cover.serializers import CommunityCoverSerializer, Cover
 from hashtag.serializers import HashtagSerializer
 from report.serializers import ReportSerializer
 
@@ -15,6 +18,36 @@ class MyCommunitySerializer(serializers.ModelSerializer):
     class Meta:
         model = Community
         exclude = ["created_by"]
+
+
+class TrendingSerializer(serializers.ModelSerializer):
+    avatar = serializers.SerializerMethodField()
+    cover = serializers.SerializerMethodField()
+    theme = ThemeSerializer(read_only=True)
+
+    discussions_today = serializers.SerializerMethodField()
+
+    def get_discussions_today(self, obj):
+        # TODO: check if publication is not banned
+        return Comment.objects.filter(publication__community=obj, created_at__day=timezone.now().day).count()
+
+    def get_avatar(self, obj):
+        try:
+            avatar = Avatar.objects.get(community=obj, is_active=True)
+            return CommunityAvatarSerializer(avatar).data
+        except Avatar.DoesNotExist:
+            return None
+
+    def get_cover(self, obj):
+        try:
+            cover = Cover.objects.get(community=obj, is_active=True)
+            return CommunityCoverSerializer(cover).data
+        except Cover.DoesNotExist:
+            return None
+
+    class Meta:
+        model = Community
+        fields = ["id", "name", "avatar", "unique_id", "cover", "theme", "discussions_today"]
 
 
 class CommunitySerializer(serializers.ModelSerializer):

@@ -9,7 +9,6 @@ import helper
 from account.permissions import IsOwner
 from community.helper import check_community_law
 from community.permissions import IsCommunityModerator
-from helpers.twitter_oembed import TwitterEmbedSerializer, TwitterOEmbedData
 from hide.models import Hide
 from publication.helper import check_publication_update_date_limit
 from publication.serializers import *
@@ -151,21 +150,6 @@ class PublishPublicationView(APIView):
         publication.published_at = None
         publication.save()
         return Response(status=status.HTTP_201_CREATED)
-
-
-class GetTwitterEmbed(APIView):
-    authentication_classes = []
-    permission_classes = []
-
-    @staticmethod
-    def get(request):
-        source = request.query_params.get("source", None)
-        if not source:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
-        serializer = TwitterEmbedSerializer(
-            TwitterOEmbedData(source=source, oembed=helper.get_twitter_embed_data(source))
-        )
-        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class PublicationPinView(APIView):

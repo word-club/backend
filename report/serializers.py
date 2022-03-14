@@ -1,8 +1,13 @@
 from rest_framework import serializers
 
 from choices import RESOLVE_REPORT_STATES
-from globals import UserGlobalSerializer, PublicationGlobalSerializer, CommentGlobalSerializer, \
-    CommunityGlobalSerializer, ShareGlobalSerializer
+from globals import (
+    UserGlobalSerializer,
+    PublicationGlobalSerializer,
+    CommentGlobalSerializer,
+    CommunityGlobalSerializer,
+    ShareGlobalSerializer,
+)
 from report.models import Report
 
 

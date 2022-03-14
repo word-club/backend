@@ -5,6 +5,7 @@ from community.filters import (
     CommunitySubscribersFilter,
     SubscribedCommunityFilter,
     TopCommunitiesList,
+    TrendingCommunityList,
 )
 from community.views.community import CommunityDetail, CommunityViewSet, ViewACommunity
 from community.views.hashtag import UpdateCommunityHashtag
@@ -29,6 +30,7 @@ app_name = "community"
 urlpatterns += [
     path("community/<int:pk>/", CommunityDetail.as_view()),
     path("community/top/", TopCommunitiesList.as_view()),
+    path("community/trending/", TrendingCommunityList.as_view()),
     path("community/<str:unique_id>/view/", ViewACommunity.as_view()),
     path("community/<int:pk>/subscriber/filter/", CommunitySubscribersFilter.as_view()),
     path("community/<int:pk>/subscribe/", SubscribeToACommunity.as_view()),

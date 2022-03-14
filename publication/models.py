@@ -47,6 +47,15 @@ class Publication(models.Model):
     supports = models.PositiveBigIntegerField(default=0, editable=False)
     discussions = models.PositiveBigIntegerField(default=0, editable=False)
 
+    # TODO: implement ban one to one relation
+    # is_banned = models.BooleanField(default=False, editable=False)
+    # banned_at = models.DateTimeField(null=True, editable=False)
+    # banned_by = models.ForeignKey(
+    #     get_user_model(), null=True, editable=False, on_delete=models.SET_NULL
+    # )
+    # ban_reason_title = models.CharField(max_length=128, null=True, editable=False)
+    # ban_reason_content = models.TextField(null=True, blank=True, editable=False)
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

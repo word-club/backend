@@ -13,20 +13,18 @@ from community.serializers.community import RetrieveSerializer
 
 
 class AdministrationViewSet(
-    mixins.ListModelMixin,
-    mixins.CreateModelMixin,
-    viewsets.GenericViewSet
+    mixins.ListModelMixin, mixins.CreateModelMixin, viewsets.GenericViewSet
 ):
     serializer_class = AdministrationSerializer
     queryset = Administration.objects.all()
 
     def get_authenticators(self):
-        if self.request.method == 'GET':
+        if self.request.method == "GET":
             return ()
         return [TokenAuthentication()]
 
     def get_permissions(self):
-        if self.request.method == 'GET':
+        if self.request.method == "GET":
             return ()
         return [IsSuperUser()]
 
@@ -113,9 +111,9 @@ class TopView(APIView):
         users = []
         [users.append(profile.user) for profile in profiles]
 
-        profiles = Profile.objects.filter(discussions__gte=limit,).order_by(
-            "-discussions"
-        )
+        profiles = Profile.objects.filter(
+            discussions__gte=limit,
+        ).order_by("-discussions")
         if profiles.count() > limit:
             profiles = profiles[:limit]
         commentators = []

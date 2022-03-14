@@ -5,8 +5,9 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from administration.models import Administration
 from community.models import Community, Subscription
-from community.serializers.community import CommunitySerializer
+from community.serializers.community import CommunitySerializer, TrendingSerializer
 from globals import UserGlobalSerializer, CommunityGlobalSerializer
 
 
@@ -15,9 +16,34 @@ class TopCommunitiesList(APIView):
     permission_classes = []
 
     def get(self, request):
-        communities = []
+        limit, _ = Administration.objects.get_or_create(id=1)
+        limit = limit.top_count
+        communities = Community.objects.filter(type="public", view_globally=True).order_by(
+            "-popularity"
+        )
+        if communities.count() > limit:
+            communities = communities[:limit]
         serializer = CommunitySerializer(communities, many=True, read_only=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class TrendingCommunityList(APIView):
+    authentication_classes = []
+    permission_classes = []
+
+    def get(self, request):
+        limit, _ = Administration.objects.get_or_create(id=1)
+        limit = limit.top_count
+        communities = Community.objects.filter(type="public", view_globally=True).order_by(
+            "-discussions"
+        )
+        if communities.count() > limit:
+            communities = communities[:limit]
+        serializer = TrendingSerializer(communities, many=True, read_only=True)
+        sorted_communities = sorted(
+            serializer.data, key=lambda k: k["discussions_today"], reverse=True
+        )
+        return Response(sorted_communities, status=status.HTTP_200_OK)
 
 
 class SubscribedCommunityFilter(APIView):

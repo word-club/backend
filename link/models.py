@@ -37,7 +37,7 @@ class Link(models.Model):
     def save(self, *args, **kwargs):
         check = 0
         if self.publication:
-            if self.publication.type != 'link':
+            if self.publication.type != "link":
                 raise ValidationError({"detail": "Publication is not a link"})
             check += 1
         if self.comment:

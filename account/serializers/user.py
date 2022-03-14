@@ -14,7 +14,7 @@ from community.serializers.subscription import MySubscriptionSerializer
 from cover.serializers import ProfileCoverSerializer
 from hide.serializers import MyHideSerializer
 from notification.serializers import MyNotificationSerializer
-from publication.serializers import MyPublicationSerializer
+from publication.serializers import MyPublicationSerializer, Publication
 from report.serializers import MyReportSerializer
 from share.serializers import MyShareSerializer
 from vote.serializers import MyVoteSerializer
@@ -85,6 +85,16 @@ class UserSerializer(serializers.ModelSerializer):
 
 class UserRetrieveSerializer(serializers.ModelSerializer):
     profile = ProfileSerializer(read_only=True)
+    followers = FollowerSerializer(many=True, read_only=True)
+    following = FollowingSerializer(many=True, read_only=True)
+    my_comments = MyCommentSerializer(many=True, read_only=True)
+    my_publications = serializers.SerializerMethodField()
+    my_subscriptions = MySubscriptionSerializer(many=True, read_only=True)
+
+    @staticmethod
+    def get_my_publications(obj):
+        publications = Publication.objects.filter(created_by=obj, is_published=True)
+        return MyPublicationSerializer(publications, many=True).data
 
     class Meta:
         model = get_user_model()

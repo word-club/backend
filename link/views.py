@@ -31,13 +31,14 @@ class AddPublicationLinkView(APIView):
             try:
                 serializer.save()
             except IntegrityError:
-                return Response({
-                    "link": ["Publication already has a link."]
-                }, status=status.HTTP_400_BAD_REQUEST)
+                return Response(
+                    {"link": ["Publication already has a link."]},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
             except NotParsableFetchError:
-                return Response({
-                    "link": ["Link is not parsable."]
-                }, status=status.HTTP_400_BAD_REQUEST)
+                return Response(
+                    {"link": ["Link is not parsable."]}, status=status.HTTP_400_BAD_REQUEST
+                )
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -59,13 +60,13 @@ class AddCommentLinkView(APIView):
             try:
                 serializer.save()
             except IntegrityError:
-                return Response({
-                    "link": ["Link already exists."]
-                }, status=status.HTTP_400_BAD_REQUEST)
+                return Response(
+                    {"link": ["Link already exists."]}, status=status.HTTP_400_BAD_REQUEST
+                )
             except NotParsableFetchError:
-                return Response({
-                    "link": ["Link is not parsable."]
-                }, status=status.HTTP_400_BAD_REQUEST)
+                return Response(
+                    {"link": ["Link is not parsable."]}, status=status.HTTP_400_BAD_REQUEST
+                )
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
