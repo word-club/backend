@@ -11,6 +11,7 @@ from rest_framework.generics import get_object_or_404
 from account.permissions import IsSuperUser
 from account.serializers.auth import LoginSerializer
 from account.serializers.user import UserInfoSerializer
+from administration.serializers import AdministrationSerializer, Administration
 
 
 class AdminInspect(APIView):
@@ -38,10 +39,10 @@ class LoginView(APIView):
         Login a user instance
         Provides a brand new token for a member user
         """
-        serializer = LoginSerializer(data=request.data)
-        if serializer.is_valid():
-            username = serializer.data["username"]
-            password = serializer.data["password"]
+        user_serializer = LoginSerializer(data=request.data)
+        if user_serializer.is_valid():
+            username = user_serializer.data["username"]
+            password = user_serializer.data["password"]
             try:
                 get_user_model().objects.get(username=username)
             except get_user_model().DoesNotExist:
@@ -55,17 +56,22 @@ class LoginView(APIView):
                 if not user.is_active:
                     user.is_active = True
                 user.save()
-                serializer = UserInfoSerializer(user, context={"request": request})
+                user_serializer = UserInfoSerializer(user, context={"request": request})
+                administration_serializer = AdministrationSerializer(Administration.objects.get(pk=1))
                 token, created = Token.objects.get_or_create(user=user)
                 return Response(
-                    {"token": token.key, "data": serializer.data},
+                    {
+                        "token": token.key,
+                        "user": user_serializer.data,
+                        "administration": administration_serializer.data,
+                    },
                     status=status.HTTP_202_ACCEPTED,
                 )
             return Response(
                 {"detail": "Login failed! Provide valid authentication credentials."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(user_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class LogoutView(APIView):

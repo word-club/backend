@@ -1,9 +1,11 @@
+from metadata_parser import NotParsableFetchError
 from rest_framework import status
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from django.db.utils import IntegrityError
 
 from account.permissions import IsOwner
 from comment.models import Comment
@@ -26,7 +28,16 @@ class AddPublicationLinkView(APIView):
         }
         serializer = LinkPostSerializer(data=request.data, context=context)
         if serializer.is_valid():
-            serializer.save()
+            try:
+                serializer.save()
+            except IntegrityError:
+                return Response({
+                    "link": ["Publication already has a link."]
+                }, status=status.HTTP_400_BAD_REQUEST)
+            except NotParsableFetchError:
+                return Response({
+                    "link": ["Link is not parsable."]
+                }, status=status.HTTP_400_BAD_REQUEST)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -45,7 +56,16 @@ class AddCommentLinkView(APIView):
         }
         serializer = LinkPostSerializer(data=request.data, context=context)
         if serializer.is_valid():
-            serializer.save()
+            try:
+                serializer.save()
+            except IntegrityError:
+                return Response({
+                    "link": ["Link already exists."]
+                }, status=status.HTTP_400_BAD_REQUEST)
+            except NotParsableFetchError:
+                return Response({
+                    "link": ["Link is not parsable."]
+                }, status=status.HTTP_400_BAD_REQUEST)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

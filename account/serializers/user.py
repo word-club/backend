@@ -9,7 +9,7 @@ from avatar.serializers import ProfileAvatarSerializer
 from bookmark.serializers import MyBookmarkSerializer
 from comment.serializers import MyCommentSerializer
 from community.serializers.community import MyCommunitySerializer
-from community.serializers.moderator import MyModeratorSerializer
+from community.serializers.moderator import MyModerationSerializer
 from community.serializers.subscription import MySubscriptionSerializer
 from cover.serializers import ProfileCoverSerializer
 from hide.serializers import MyHideSerializer
@@ -105,7 +105,7 @@ class UserInfoSerializer(serializers.ModelSerializer):
     my_hides = MyHideSerializer(many=True, read_only=True)
     my_communities = MyCommunitySerializer(many=True, read_only=True)
     my_subscriptions = MySubscriptionSerializer(many=True, read_only=True)
-    managed_communities = MyModeratorSerializer(many=True, read_only=True)
+    managed_communities = MyModerationSerializer(many=True, read_only=True)
 
     received_notifications = MyNotificationSerializer(many=True, read_only=True)
 

@@ -1,12 +1,12 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 
+from community.serializers.theme import ThemeSerializer
 from cover.models import Cover
 from avatar.models import Avatar
 from comment.models import Comment
 from community.models import (
     Community,
-    Theme,
     Subscription,
 )
 from hashtag.serializers import HashtagSerializer
@@ -21,7 +21,7 @@ class CommunityGlobalSerializer(serializers.ModelSerializer):
     tags = HashtagSerializer(many=True)
     avatar = serializers.SerializerMethodField(allow_null=True)
     cover = serializers.SerializerMethodField(allow_null=True)
-    theme = serializers.SerializerMethodField()
+    theme = ThemeSerializer()
     rating = serializers.SerializerMethodField()
     subscribers_count = serializers.SerializerMethodField()
 
@@ -40,18 +40,6 @@ class CommunityGlobalSerializer(serializers.ModelSerializer):
             return cover.image.url
         except Cover.DoesNotExist:
             return None
-
-    @staticmethod
-    def get_theme(obj):
-        try:
-            theme = Theme.objects.get(community=obj)
-            return {
-                "color": theme.color,
-                "to_call_subscriber": theme.subscriber_nickname,
-                "state_after_subscription": theme.state_after_subscription,
-            }
-        except Theme.DoesNotExist:
-            return "primary"
 
     @staticmethod
     def get_rating(obj):
@@ -147,10 +135,26 @@ class UserGlobalSerializer(serializers.ModelSerializer):
         ]
 
 
-class PublicationForUserCommentSerializer(serializers.ModelSerializer):
+class PublicationGlobalSerializer(serializers.ModelSerializer):
     community = CommunityGlobalSerializer()
     created_by = UserGlobalSerializer()
 
     class Meta:
         model = Publication
+        fields = "__all__"
+
+
+class CommentGlobalSerializer(serializers.ModelSerializer):
+    publication = PublicationGlobalSerializer()
+
+    class Meta:
+        model = Comment
+        fields = "__all__"
+
+
+class ShareGlobalSerializer(serializers.ModelSerializer):
+    publication = PublicationGlobalSerializer()
+
+    class Meta:
+        model = Share
         fields = "__all__"

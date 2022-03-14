@@ -29,7 +29,7 @@ app_name = "community"
 urlpatterns += [
     path("community/<int:pk>/", CommunityDetail.as_view()),
     path("community/top/", TopCommunitiesList.as_view()),
-    path("community/<int:pk>/view/", ViewACommunity.as_view()),
+    path("community/<str:unique_id>/view/", ViewACommunity.as_view()),
     path("community/<int:pk>/subscriber/filter/", CommunitySubscribersFilter.as_view()),
     path("community/<int:pk>/subscribe/", SubscribeToACommunity.as_view()),
     path("subscriber/<int:pk>/approve/", AcceptRejectASubscriber.as_view()),

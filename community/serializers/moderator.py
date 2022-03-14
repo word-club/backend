@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from community.sub_models.moderator import Moderator
+from globals import CommunityGlobalSerializer
 
 
 class ModeratorSerializer(serializers.ModelSerializer):
@@ -15,7 +16,9 @@ class ModeratorSerializer(serializers.ModelSerializer):
         return super().create(validated_data)
 
 
-class MyModeratorSerializer(serializers.ModelSerializer):
+class MyModerationSerializer(serializers.ModelSerializer):
+    community = CommunityGlobalSerializer()
+
     class Meta:
         model = Moderator
-        exclude = ["created_by"]
+        exclude = ["user"]

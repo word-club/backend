@@ -4,7 +4,7 @@ from avatar.serializers import CommunityAvatarSerializer
 from community.models import Community
 from community.serializers.moderator import ModeratorSerializer
 from community.serializers.rule import RuleSerializer
-from community.serializers.subscription import SubscriptionSerializer
+from community.serializers.subscription import SubscriptionCommunitySerializer
 from community.serializers.theme import ThemeSerializer
 from cover.serializers import CommunityCoverSerializer
 from hashtag.serializers import HashtagSerializer
@@ -49,7 +49,7 @@ class RetrieveSerializer(serializers.ModelSerializer):
     avatars = CommunityAvatarSerializer(many=True, read_only=True)
     tags = HashtagSerializer(many=True, read_only=True)
     moderators = ModeratorSerializer(many=True, read_only=True)
-    subscriptions = SubscriptionSerializer(many=True, read_only=True)
+    subscriptions = SubscriptionCommunitySerializer(many=True, read_only=True)
     reports = ReportSerializer(many=True, read_only=True)
 
     def __init__(self, *args, **kwargs):

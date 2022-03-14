@@ -3,12 +3,21 @@ from django.utils import timezone
 from rest_framework import serializers
 
 from community.sub_models.subscription import Subscription
+from globals import CommunityGlobalSerializer
 
 
 class MySubscriptionSerializer(serializers.ModelSerializer):
+    community = CommunityGlobalSerializer(read_only=True)
+
     class Meta:
         model = Subscription
         exclude = ("subscriber",)
+
+
+class SubscriptionCommunitySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Subscription
+        exclude = ("community",)
 
 
 class SubscriptionSerializer(serializers.ModelSerializer):

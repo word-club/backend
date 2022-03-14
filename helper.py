@@ -1,14 +1,14 @@
 import datetime
 import os
-import uuid
 from collections import OrderedDict
 
 import requests
 from django.utils import timezone
 from django.utils.timezone import utc
 from rest_framework import serializers
+from rest_framework.authtoken.models import Token
 
-# from administration.models import Administration
+from administration.models import Administration
 from backend.settings.base import ALLOWED_IMAGES_EXTENSIONS, MAX_UPLOAD_IMAGE_SIZE
 from publication.validators import check_bool_query, validate_date_string
 
@@ -182,12 +182,28 @@ def get_filter_range(params):
     return timestamp_range, None
 
 
-def get_viewset_filterset(request, filterset_fields, default_field):
-    # TODO: fix this
-    # pt = Administration.objects.first().popularity_threshold
-    # AttributeError: 'NoneType' object has no attribute 'popularity_threshold'
+def get_user_from_auth_header(request):
+    auth_header = request.headers.get("Authorization", False)
+    if auth_header:
+        token = auth_header.split(" ")[1]
+        try:
+            token_instance = Token.objects.get(key=token)
+            return token_instance.user
+        except Token.DoesNotExist:
+            return None
+    else:
+        return None
 
-    # pt = Administration.objects.first().popularity_threshold
+
+def get_viewset_filterset(request, filterset_fields, default_field):
+    if Administration.objects.count() == 0:
+        Administration.objects.create()
+    pt = Administration.objects.first().popularity_threshold
+
+    # for public users set popularity threshold for every filterset
+    requestor = get_user_from_auth_header(request)
+    threshold = 0 if requestor else pt
+
     sort_by = request.query_params.get("sort_by")
     asc = request.query_params.get("asc")
     asc = check_bool_query(asc)
@@ -199,19 +215,15 @@ def get_viewset_filterset(request, filterset_fields, default_field):
                 value = True
             if value == "false":
                 value = False
-            if item in ["publication", "created_by", "community"]:
+            if item in ["publication", "created_by", "community", "reply"]:
                 value = int(value)
-            if item in ["reply"]:
-                value = uuid.UUID(value)
             filterset[item] = value
     sort_string = "-{}".format(default_field)
     if sort_by in ["popularity", "supports", "discussions", "views"]:
-        # only view items with reactions more than administration limit
-        filterset["{}__gte".format(sort_by)] = 0  # TODO: replace with pt here
+        filterset["{}__gte".format(sort_by)] = threshold
         sort_string = "{}{}".format("-" if not asc else "", sort_by)
-    # for fresh item sort, only show items with popularity less than administration limit
     if sort_by in ["{}".format(default_field)]:
-        filterset["popularity__gt"] = 1  # TODO: replace with pt here
+        filterset["popularity__gte"] = threshold
 
     search = request.query_params.get("search")
     search_by = request.query_params.get("search_by")

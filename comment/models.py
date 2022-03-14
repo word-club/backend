@@ -1,7 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.db import models
 
-from administration.models import Administration
 from publication.models import Publication
 
 

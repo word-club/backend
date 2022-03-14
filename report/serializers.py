@@ -1,6 +1,8 @@
 from rest_framework import serializers
 
 from choices import RESOLVE_REPORT_STATES
+from globals import UserGlobalSerializer, PublicationGlobalSerializer, CommentGlobalSerializer, \
+    CommunityGlobalSerializer, ShareGlobalSerializer
 from report.models import Report
 
 
@@ -31,6 +33,12 @@ class ResolveReportSerializer(serializers.Serializer):
 
 
 class MyReportSerializer(serializers.ModelSerializer):
+    user = UserGlobalSerializer(allow_null=True)
+    publication = PublicationGlobalSerializer(allow_null=True)
+    comment = CommentGlobalSerializer(allow_null=True)
+    community = CommunityGlobalSerializer(allow_null=True)
+    share = ShareGlobalSerializer(allow_null=True)
+
     class Meta:
         model = Report
         exclude = ("created_by",)

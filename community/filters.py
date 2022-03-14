@@ -7,7 +7,7 @@ from rest_framework.views import APIView
 
 from community.models import Community, Subscription
 from community.serializers.community import CommunitySerializer
-from globals import UserGlobalSerializer
+from globals import UserGlobalSerializer, CommunityGlobalSerializer
 
 
 class TopCommunitiesList(APIView):
@@ -28,22 +28,22 @@ class SubscribedCommunityFilter(APIView):
     def get(request):
         search = request.GET.get("search")
         if search:
-            items = Subscription.objects.filter(
+            subscriptions = Subscription.objects.filter(
                 is_approved=True,
                 is_banned=False,
                 subscriber=request.user,
                 community__name__contains=search,
             )
         else:
-            items = Subscription.objects.filter(
+            subscriptions = Subscription.objects.filter(
                 is_approved=True, is_banned=False, subscriber=request.user
             )
         communities = []
-        [communities.append(subscription.community) for subscription in items]
+        [communities.append(subscription.community) for subscription in subscriptions]
         return Response(
             {
-                "count": items.count(),
-                "results": CommunitySerializer(communities, many=True).data,
+                "count": subscriptions.count(),
+                "results": CommunityGlobalSerializer(communities, many=True).data,
             },
             status=status.HTTP_200_OK,
         )

@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from comment.models import Comment
-from globals import PublicationForUserCommentSerializer, UserGlobalSerializer
+from globals import PublicationGlobalSerializer, UserGlobalSerializer
 from image.serializers import CommentImageSerializer
 
 
@@ -38,7 +38,7 @@ class ReplySerializer(serializers.ModelSerializer):
 
 
 class CommentForProfileSerializer(serializers.ModelSerializer):
-    publication = PublicationForUserCommentSerializer()
+    publication = PublicationGlobalSerializer()
     images = CommentImageSerializer(many=True, read_only=True)
 
     class Meta:
@@ -47,6 +47,8 @@ class CommentForProfileSerializer(serializers.ModelSerializer):
 
 
 class MyCommentSerializer(serializers.ModelSerializer):
+    publication = PublicationGlobalSerializer()
+
     class Meta:
         model = Comment
         exclude = ["created_by"]

@@ -13,24 +13,29 @@ from community.serializers.community import RetrieveSerializer
 
 
 class AdministrationViewSet(
-    mixins.ListModelMixin, mixins.CreateModelMixin, viewsets.GenericViewSet
+    mixins.ListModelMixin,
+    mixins.CreateModelMixin,
+    viewsets.GenericViewSet
 ):
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsSuperUser]
     serializer_class = AdministrationSerializer
     queryset = Administration.objects.all()
 
+    def get_authenticators(self):
+        if self.request.method == 'GET':
+            return ()
+        return [TokenAuthentication()]
+
+    def get_permissions(self):
+        if self.request.method == 'GET':
+            return ()
+        return [IsSuperUser()]
+
     def list(self, request, *args, **kwargs):
-        instance = Administration.objects.first()
-        if not instance:
-            instance = Administration.objects.create()
+        instance, _ = Administration.objects.get_or_create(id=1)
         return Response(AdministrationSerializer(instance).data, status=status.HTTP_200_OK)
 
     def create(self, request, *args, **kwargs):
-        instance = Administration.objects.first()
-        if not instance:
-            instance = Administration.objects.create()
-
+        instance, _ = Administration.objects.get_or_create(id=1)
         serializer = AdministrationSerializer(instance, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
@@ -47,16 +52,11 @@ class PageViewViewSet(mixins.ListModelMixin, mixins.UpdateModelMixin, viewsets.G
 
     def list(self, request, *args, **kwargs):
         page_view = PageView.objects.first()
-        if not page_view:
-            page_view = PageView.objects.create()
         return Response(PageViewSerializer(page_view).data, status=status.HTTP_200_OK)
 
     @staticmethod
     def create(request, *args, **kwargs):
-        # instance check
-        page_view = PageView.objects.first()
-        if not page_view:
-            page_view = PageView.objects.create()
+        page_view, _ = PageView.objects.get_or_create(id=1)
 
         # validate query param count
         if len(request.query_params) > 1:
@@ -97,21 +97,27 @@ class PageViewViewSet(mixins.ListModelMixin, mixins.UpdateModelMixin, viewsets.G
 class TopView(APIView):
     @staticmethod
     def get(request):
-        administration, created = Administration.objects.get_or_create(id=1)
+        administration, _ = Administration.objects.get_or_create(id=1)
         count = administration.top_count
         limit = administration.popularity_threshold
         communities = Community.objects.filter(
             type__in=["public", "restricted"],
             popularity__gte=limit,
-        ).order_by("-popularity")[:count]
+        ).order_by("-popularity")
+        if communities.count() > limit:
+            communities = communities[:limit]
 
-        profiles = Profile.objects.filter(popularity__gte=limit).order_by("-popularity")[:count]
+        profiles = Profile.objects.filter(popularity__gte=limit).order_by("-popularity")
+        if profiles.count() > limit:
+            profiles = profiles[:limit]
         users = []
         [users.append(profile.user) for profile in profiles]
 
         profiles = Profile.objects.filter(discussions__gte=limit,).order_by(
             "-discussions"
-        )[:count]
+        )
+        if profiles.count() > limit:
+            profiles = profiles[:limit]
         commentators = []
         [commentators.append(profile.user) for profile in profiles]
 

@@ -1,4 +1,5 @@
 import metadata_parser
+from django.core.validators import URLValidator
 from rest_framework import serializers
 
 from link.models import Link
@@ -22,6 +23,8 @@ class LinkInfoSerializer(serializers.ModelSerializer):
 
 
 class LinkPostSerializer(serializers.ModelSerializer):
+    link = serializers.URLField(required=True)
+
     class Meta:
         model = Link
         exclude = ["publication", "comment"]

@@ -1,5 +1,6 @@
 from rest_framework import serializers
 
+from comment.models import Comment
 from comment.serializers import CommentSerializer
 from globals import CommunityGlobalSerializer, UserGlobalSerializer
 from hashtag.serializers import HashtagSerializer
@@ -20,7 +21,7 @@ class PublicationFormSerializer(serializers.ModelSerializer):
 
 class PublicationSerializer(serializers.ModelSerializer):
     community = CommunityGlobalSerializer()
-    comments = CommentSerializer(many=True, read_only=True)
+    comments = serializers.SerializerMethodField()
     links = LinkInfoSerializer(read_only=True)
     images = PublicationImageSerializer(read_only=True, many=True)
     tags = HashtagSerializer(read_only=True, many=True)
@@ -29,6 +30,13 @@ class PublicationSerializer(serializers.ModelSerializer):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.Meta.depth = self.context.get("depth", 0)
+
+    @staticmethod
+    def get_comments(obj):
+        # only include comment items that are not replies
+        # replies are included in the parent comment
+        comments = Comment.objects.filter(publication=obj, reply=None)
+        return CommentSerializer(comments, many=True).data
 
     class Meta:
         model = Publication

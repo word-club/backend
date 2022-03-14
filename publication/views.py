@@ -1,7 +1,6 @@
 from django.utils import timezone
 from rest_framework import mixins, status, viewsets
 from rest_framework.authentication import TokenAuthentication
-from rest_framework.authtoken.models import Token
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -14,19 +13,6 @@ from helpers.twitter_oembed import TwitterEmbedSerializer, TwitterOEmbedData
 from hide.models import Hide
 from publication.helper import check_publication_update_date_limit
 from publication.serializers import *
-
-
-def get_user_from_auth_header(request):
-    auth_header = request.headers.get("Authorization", False)
-    if auth_header:
-        token = auth_header.split(" ")[1]
-        try:
-            token_instance = Token.objects.get(key=token)
-            return token_instance.user
-        except Token.DoesNotExist:
-            return None
-    else:
-        return None
 
 
 class PublicationListView(mixins.ListModelMixin, viewsets.GenericViewSet):
@@ -46,9 +32,7 @@ class PublicationListView(mixins.ListModelMixin, viewsets.GenericViewSet):
         filterset, sort_string = helper.get_viewset_filterset(
             self.request, self.filterset_fields, "published_at"
         )
-        user = get_user_from_auth_header(self.request)
-
-        print(filterset)
+        user = helper.get_user_from_auth_header(self.request)
 
         queryset = Publication.objects.filter(**filterset).order_by(sort_string)
         hidden_publications = []
@@ -219,7 +203,7 @@ class ViewAPublication(APIView):
     permission_classes = []
 
     @staticmethod
-    def post(request, pk=None):
+    def get(request, pk=None):
         publication = get_object_or_404(Publication, pk=pk)
         publication.views += 1
         publication.save()
