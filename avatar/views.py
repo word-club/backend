@@ -79,7 +79,9 @@ class ToggleActiveStatus(APIView):
             return Response(status=status.HTTP_204_NO_CONTENT)
 
         # set every avatar's active status to false first
-        Avatar.objects.filter(is_active=True, community=avatar.community, profile=avatar.profile).update(is_active=False)
+        Avatar.objects.filter(
+            is_active=True, community=avatar.community, profile=avatar.profile
+        ).update(is_active=False)
 
         # toggle active status
         avatar.is_active = True

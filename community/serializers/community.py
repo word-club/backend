@@ -29,7 +29,9 @@ class TrendingSerializer(serializers.ModelSerializer):
 
     def get_discussions_today(self, obj):
         # TODO: check if publication is not banned
-        return Comment.objects.filter(publication__community=obj, created_at__day=timezone.now().day).count()
+        return Comment.objects.filter(
+            publication__community=obj, created_at__day=timezone.now().day
+        ).count()
 
     def get_avatar(self, obj):
         try:

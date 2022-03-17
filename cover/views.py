@@ -75,7 +75,9 @@ class ToggleActiveStatus(APIView):
         cover = get_object_or_404(Cover, pk=pk)
         self.check_object_permissions(request, cover)
 
-        Cover.objects.filter(is_active=True, community=cover.community, profile=cover.profile).update(is_active=False)
+        Cover.objects.filter(
+            is_active=True, community=cover.community, profile=cover.profile
+        ).update(is_active=False)
 
         cover.is_active = True
         cover.save()
