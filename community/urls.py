@@ -19,7 +19,7 @@ from community.views.subscription import (
     SubscribeToACommunity,
     SubscriptionDetail,
 )
-from community.views.theme import AddCommunityTheme, UpdateCommunityTheme
+from community.views.theme import UpdateCommunityTheme
 
 router = DefaultRouter()
 router.register(r"wc-community", CommunityViewSet, basename="community")
@@ -46,6 +46,5 @@ urlpatterns += [
     path("community/<int:pk>/sub-mod/", AddSubModerator.as_view()),
     path("community/rule/<int:pk>/", PatchDeleteCommunityRule.as_view()),
     path("community/moderator/<int:pk>/", ModeratorDetail.as_view()),
-    path("community/<int:pk>/theme/", AddCommunityTheme.as_view()),
     path("community/theme/<int:pk>/", UpdateCommunityTheme.as_view()),
 ]

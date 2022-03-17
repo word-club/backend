@@ -41,18 +41,6 @@ class Cover(models.Model):
 
     class Meta:
         ordering = ["-created_at"]
-        constraints = [
-            UniqueConstraint(
-                fields=["community", "is_active"],
-                condition=models.Q(community__isnull=False),
-                name="unique_community_active_cover",
-            ),
-            UniqueConstraint(
-                fields=["profile", "is_active"],
-                condition=models.Q(profile__isnull=False),
-                name="unique_profile_active_cover",
-            ),
-        ]
 
     def save(self, *args, **kwargs):
         check = 0
@@ -64,6 +52,7 @@ class Cover(models.Model):
             raise ValidationError({"detail": "One of the key field must be specified"})
         if check > 1:
             raise ValidationError({"detail": "Only one key field can be submitted"})
+
         return super().save(*args, **kwargs)
 
     def delete(self, using=None, keep_parents=False):

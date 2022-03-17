@@ -1,7 +1,6 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.authentication import TokenAuthentication
-from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -49,7 +48,7 @@ class AddCommunityCoverView(APIView):
 
 class CoverDetail(APIView):
     authentication_classes = [TokenAuthentication]
-    permission_classes = [IsOwner, IsAdminUser]
+    permission_classes = [IsOwner]
 
     def get(self, request, pk):
         cover = get_object_or_404(Cover, pk=pk)
@@ -57,18 +56,36 @@ class CoverDetail(APIView):
         serializer = CoverSerializer(cover)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    def patch(self, request, pk):
+    def delete(self, request, pk):
+        cover = get_object_or_404(Cover, pk=pk)
+        self.check_object_permissions(request, cover)
+        cover.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class ToggleActiveStatus(APIView):
+
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsOwner]
+
+    def post(self, request, pk):
         """
         toggle active status
         """
         cover = get_object_or_404(Cover, pk=pk)
         self.check_object_permissions(request, cover)
-        cover.is_active = not cover.is_active
+
+        Cover.objects.filter(is_active=True, community=cover.community, profile=cover.profile).update(is_active=False)
+
+        cover.is_active = True
         cover.save()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     def delete(self, request, pk):
         cover = get_object_or_404(Cover, pk=pk)
         self.check_object_permissions(request, cover)
-        cover.delete()
+        if not cover.is_active:
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        cover.is_active = False
+        cover.save()
         return Response(status=status.HTTP_204_NO_CONTENT)

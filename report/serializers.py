@@ -12,6 +12,9 @@ from report.models import Report
 
 
 class ReportSerializer(serializers.ModelSerializer):
+    created_by = UserGlobalSerializer(read_only=True)
+    resolved_by = UserGlobalSerializer(read_only=True)
+
     class Meta:
         model = Report
         fields = "__all__"

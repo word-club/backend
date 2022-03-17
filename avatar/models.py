@@ -45,18 +45,6 @@ class Avatar(models.Model):
 
     class Meta:
         ordering = ["-created_at"]
-        constraints = [
-            UniqueConstraint(
-                fields=["community", "is_active"],
-                condition=models.Q(community__isnull=False),
-                name="unique_community_active_avatar",
-            ),
-            UniqueConstraint(
-                fields=["profile", "is_active"],
-                condition=models.Q(profile__isnull=False),
-                name="unique_profile_active_avatar",
-            ),
-        ]
 
     def save(self, *args, **kwargs):
         check = 0

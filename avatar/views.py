@@ -49,7 +49,7 @@ class AddCommunityAvatarView(APIView):
 
 class AvatarDetail(APIView):
     authentication_classes = [TokenAuthentication]
-    permission_classes = [IsOwner, IsAdminUser]
+    permission_classes = [IsOwner]
 
     def get(self, request, pk):
         avatar = get_object_or_404(Avatar, pk=pk)
@@ -57,18 +57,40 @@ class AvatarDetail(APIView):
         serializer = AvatarSerializer(avatar)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    def patch(self, request, pk):
+    def delete(self, request, pk):
+        avatar = get_object_or_404(Avatar, pk=pk)
+        self.check_object_permissions(request, avatar)
+        avatar.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class ToggleActiveStatus(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsOwner]
+
+    def post(self, request, pk):
         """
-        toggle active status
+        set active status
         """
-        cover = get_object_or_404(Avatar, pk=pk)
-        self.check_object_permissions(request, cover)
-        cover.is_active = not cover.is_active
-        cover.save()
+        avatar = get_object_or_404(Avatar, pk=pk)
+        self.check_object_permissions(request, avatar)
+
+        if avatar.is_active:
+            return Response(status=status.HTTP_204_NO_CONTENT)
+
+        # set every avatar's active status to false first
+        Avatar.objects.filter(is_active=True, community=avatar.community, profile=avatar.profile).update(is_active=False)
+
+        # toggle active status
+        avatar.is_active = True
+        avatar.save()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     def delete(self, request, pk):
         avatar = get_object_or_404(Avatar, pk=pk)
         self.check_object_permissions(request, avatar)
-        avatar.delete()
+        if not avatar.is_active:
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        avatar.is_active = False
+        avatar.save()
         return Response(status=status.HTTP_204_NO_CONTENT)

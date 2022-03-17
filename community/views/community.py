@@ -81,7 +81,7 @@ class ViewACommunity(APIView):
     permission_classes = [IsNotBannedSubscriber]
 
     def get(self, request, unique_id=None):
-        community = get_object_or_404(Community, unique_id=unique_id)
+        community = get_object_or_404(Community, unique_id=unique_id, view_globally=True, type="public")
         self.check_object_permissions(request, community)
         community.views += 1
         community.save()
