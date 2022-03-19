@@ -39,3 +39,11 @@ MOD_CHOICES = (
     ("mod", "Moderator"),
     ("sub", "Sub Moderator"),
 )
+
+GENDER_CHOICES = (
+    ("M", "Male"),
+    ("F", "Female"),
+    ("NB", "Non-Binary"),
+    ("C", "I Refer To Myself As..."),
+    ("XY", "I Prefer Not To Say"),
+)

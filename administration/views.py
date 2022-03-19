@@ -1,7 +1,9 @@
 from rest_framework import mixins, status, viewsets
 from rest_framework.authentication import TokenAuthentication
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from django_countries import countries
 
 from account.models import Profile
 from account.permissions import IsSuperUser
@@ -132,4 +134,18 @@ class TopView(APIView):
                 "commentators": UserGlobalSerializer(commentators, many=True, context=context).data,
             },
             status=status.HTTP_200_OK,
+        )
+
+
+class CountriesList(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    @staticmethod
+    def get(request):
+        country_list = []
+        for (code, name) in countries:
+            country_list.append({"code": code, "name": name})
+        return Response(
+            {"count": len(country_list), "results": country_list}, status=status.HTTP_200_OK
         )

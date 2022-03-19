@@ -139,3 +139,6 @@ backend.iml
 core*
 tmp/
 db.sqlite3
+
+# script file
+playground.py

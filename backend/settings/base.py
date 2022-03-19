@@ -36,6 +36,7 @@ EXTERNAL_APPS = [
     "phonenumber_field",
     "django_filters",
     "corsheaders",
+    "django_countries",
 ]
 
 LOCAL_APPS = [

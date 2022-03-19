@@ -1,6 +1,10 @@
 from django.contrib.auth import get_user_model
 from django.db import models
 
+from django_countries.fields import CountryField
+
+from choices import GENDER_CHOICES
+
 
 class Profile(models.Model):
     user = models.OneToOneField(get_user_model(), on_delete=models.CASCADE, editable=False)
@@ -21,6 +25,8 @@ class Profile(models.Model):
     dislikes = models.PositiveIntegerField(default=0, editable=False)
     discussions = models.PositiveIntegerField(default=0, editable=False)
     supports = models.PositiveBigIntegerField(default=0, editable=False)
+
+    country = CountryField(null=True, blank=False)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -48,3 +54,9 @@ class FollowUser(models.Model):
     class Meta:
         ordering = ["-created_at"]
         unique_together = [["created_by", "user"]]
+
+
+class Gender(models.Model):
+    custom = models.CharField(max_length=16, null=True)
+    type = models.CharField(max_length=2, choices=GENDER_CHOICES, null=True)
+    user = models.OneToOneField(get_user_model(), on_delete=models.CASCADE, editable=False)

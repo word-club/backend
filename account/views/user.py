@@ -21,10 +21,12 @@ class UserViewSet(
     permission_classes = [IsAdminUser]
 
     def get_serializer_class(self):
-        if self.action in ["list", "delete"]:
-            return UserSerializer
-        else:
+        if self.action in ["create"]:
             return UserPostSerializer
+        elif self.action in ["update"]:
+            return UserUpdateSerializer
+        else:
+            return UserSerializer
 
 
 class ProfileListView(mixins.ListModelMixin, viewsets.GenericViewSet):
@@ -67,3 +69,17 @@ class RetrieveUserByUsername(APIView):
         user = get_object_or_404(get_user_model(), username=username)
         serializer = UserRetrieveSerializer(user, context={"user": request.user}, read_only=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class UpdateAccount(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    @staticmethod
+    def patch(request):
+        user = request.user
+        serializer = UserUpdateSerializer(user, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

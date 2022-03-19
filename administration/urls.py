@@ -1,7 +1,7 @@
 from django.urls import path
 from rest_framework.routers import DefaultRouter
 
-from administration.views import AdministrationViewSet, PageViewViewSet, TopView
+from administration.views import AdministrationViewSet, PageViewViewSet, TopView, CountriesList
 
 router = DefaultRouter()
 router.register(r"administration", AdministrationViewSet, basename="administration")
@@ -12,4 +12,5 @@ app_name = "administration"
 
 urlpatterns += [
     path("top/", TopView.as_view()),
+    path("countries/", CountriesList.as_view()),
 ]
