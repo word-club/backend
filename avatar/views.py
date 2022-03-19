@@ -8,6 +8,7 @@ from rest_framework.views import APIView
 from account.models import Profile
 from account.permissions import IsOwner
 from avatar.models import Avatar
+from avatar.permissions import IsAvatarManager
 from avatar.serializers import (
     AvatarSerializer,
     CommunityAvatarSerializer,
@@ -49,7 +50,7 @@ class AddCommunityAvatarView(APIView):
 
 class AvatarDetail(APIView):
     authentication_classes = [TokenAuthentication]
-    permission_classes = [IsOwner]
+    permission_classes = [IsAvatarManager]
 
     def get(self, request, pk):
         avatar = get_object_or_404(Avatar, pk=pk)
@@ -66,7 +67,7 @@ class AvatarDetail(APIView):
 
 class ToggleActiveStatus(APIView):
     authentication_classes = [TokenAuthentication]
-    permission_classes = [IsOwner]
+    permission_classes = [IsAvatarManager]
 
     def post(self, request, pk):
         """

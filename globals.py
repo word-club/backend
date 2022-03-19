@@ -64,6 +64,7 @@ class CommunityGlobalSerializer(serializers.ModelSerializer):
             "theme",
             "rating",
             "tags",
+            "views",
             "subscribers_count",
         ]
 
@@ -75,6 +76,26 @@ class UserGlobalSerializer(serializers.ModelSerializer):
     avatar = serializers.SerializerMethodField()
     cover = serializers.SerializerMethodField()
     reactions = serializers.SerializerMethodField()
+    popularity = serializers.SerializerMethodField()
+    dislikes = serializers.SerializerMethodField()
+    discussions = serializers.SerializerMethodField()
+    supports = serializers.SerializerMethodField()
+
+    @staticmethod
+    def get_popularity(obj):
+        return obj.profile.popularity
+
+    @staticmethod
+    def get_discussions(obj):
+        return obj.profile.discussions
+
+    @staticmethod
+    def get_supports(obj):
+        return obj.profile.supports
+
+    @staticmethod
+    def get_dislikes(obj):
+        return obj.profile.dislikes
 
     @staticmethod
     def get_name(obj):
@@ -132,6 +153,10 @@ class UserGlobalSerializer(serializers.ModelSerializer):
             "avatar",
             "cover",
             "reactions",
+            "popularity",
+            "discussions",
+            "supports",
+            "dislikes",
         ]
 
 

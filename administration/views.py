@@ -5,11 +5,13 @@ from rest_framework.views import APIView
 
 from account.models import Profile
 from account.permissions import IsSuperUser
-from account.serializers.user import UserRetrieveSerializer
-from administration.models import Administration, PageView
-from administration.serializers import AdministrationSerializer, PageViewSerializer
-from community.models import Community
-from community.serializers.community import RetrieveSerializer
+from administration.serializers import (
+    AdministrationSerializer,
+    PageViewSerializer,
+    Administration,
+    PageView,
+)
+from globals import CommunityGlobalSerializer, UserGlobalSerializer, Community
 
 
 class AdministrationViewSet(
@@ -102,20 +104,20 @@ class TopView(APIView):
             type__in=["public", "restricted"],
             popularity__gte=limit,
         ).order_by("-popularity")
-        if communities.count() > limit:
-            communities = communities[:limit]
+        if communities.count() > count:
+            communities = communities[:count]
 
         profiles = Profile.objects.filter(popularity__gte=limit).order_by("-popularity")
-        if profiles.count() > limit:
-            profiles = profiles[:limit]
+        if profiles.count() > count:
+            profiles = profiles[:count]
         users = []
         [users.append(profile.user) for profile in profiles]
 
         profiles = Profile.objects.filter(
             discussions__gte=limit,
         ).order_by("-discussions")
-        if profiles.count() > limit:
-            profiles = profiles[:limit]
+        if profiles.count() > count:
+            profiles = profiles[:count]
         commentators = []
         [commentators.append(profile.user) for profile in profiles]
 
@@ -123,11 +125,11 @@ class TopView(APIView):
 
         return Response(
             {
-                "communities": RetrieveSerializer(communities, many=True, context=context).data,
-                "users": UserRetrieveSerializer(users, many=True, context=context).data,
-                "commentators": UserRetrieveSerializer(
-                    commentators, many=True, context=context
+                "communities": CommunityGlobalSerializer(
+                    communities, many=True, context=context
                 ).data,
+                "users": UserGlobalSerializer(users, many=True, context=context).data,
+                "commentators": UserGlobalSerializer(commentators, many=True, context=context).data,
             },
             status=status.HTTP_200_OK,
         )
