@@ -1,3 +1,5 @@
+from django.utils import timezone
+
 from rest_framework import status, viewsets, mixins
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.generics import get_object_or_404
@@ -83,3 +85,34 @@ class UpdateAccount(APIView):
             serializer.save()
             return Response(status=status.HTTP_204_NO_CONTENT)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class DeactivateAccount(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        profile = request.user.profile
+        if profile.is_deactivated:
+            return Response(status=status.HTTP_403_FORBIDDEN)
+        serializer = DeactivateAccountSerializer(profile, data=request.data)
+        if serializer.is_valid():
+            profile.deactivated_at = timezone.now()
+            profile.is_deactivated = True
+            profile.save()
+            serializer.save()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ActivateAccount(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        user = request.user
+        user.profile.is_deactivated = False
+        user.profile.deactivated_at = None
+        user.profile.deactivation_reason = None
+        user.profile.save()
+        return Response(status=status.HTTP_200_OK)

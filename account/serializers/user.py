@@ -161,3 +161,11 @@ class UserInfoSerializer(serializers.ModelSerializer):
     class Meta:
         model = get_user_model()
         fields = "__all__"
+
+
+class DeactivateAccountSerializer(serializers.ModelSerializer):
+    deactivation_reason = serializers.CharField(max_length=255, required=True)
+
+    class Meta:
+        model = Profile
+        fields = ["deactivation_reason"]

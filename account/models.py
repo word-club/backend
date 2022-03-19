@@ -31,6 +31,10 @@ class Profile(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    is_deactivated = models.BooleanField(default=False, editable=False)
+    deactivated_at = models.DateTimeField(null=True, editable=False)
+    deactivation_reason = models.CharField(max_length=255, null=True, editable=False)
+
     class Meta:
         ordering = ["-created_at"]
 

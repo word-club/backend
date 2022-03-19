@@ -12,6 +12,8 @@ from account.views.user import (
     RetrieveUserByUsername,
     UserViewSet,
     UpdateAccount,
+    DeactivateAccount,
+    ActivateAccount,
 )
 
 router = DefaultRouter()
@@ -22,6 +24,8 @@ urlpatterns = router.urls
 urlpatterns += [
     path("me/", GetMeView.as_view()),
     path("me/update/", UpdateAccount.as_view()),
+    path("me/deactivate/", DeactivateAccount.as_view()),
+    path("me/activate/", ActivateAccount.as_view()),
     path("wc-register/", RegisterUserView.as_view()),
     path("wc-signin/", LoginView.as_view(), name="user-login"),
     path("wc-signout/", LogoutView.as_view(), name="user-logout"),
