@@ -3,7 +3,7 @@ from django.utils import timezone
 from rest_framework import serializers
 
 from avatar.serializers import CommunityAvatarSerializer, Avatar
-from comment.serializers import CommentSerializer, Comment
+from comment.serializers import Comment
 from community.models import Community
 from community.serializers.moderator import ModeratorSerializer
 from community.serializers.rule import RuleSerializer

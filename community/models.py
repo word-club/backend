@@ -52,6 +52,7 @@ class Community(models.Model):
 
     @property
     def moderators(self):
+        print("here")
         return Moderator.objects.filter(community=self.id, role="mod").distinct()
 
     @property

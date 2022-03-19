@@ -9,6 +9,7 @@ from account.permissions import IsOwner
 from community.models import Community
 from community.permissions import IsCommunityModerator
 from cover.models import Cover
+from cover.permissions import IsCoverManager
 from cover.serializers import (
     CommunityCoverSerializer,
     CoverSerializer,
@@ -17,8 +18,8 @@ from cover.serializers import (
 
 
 class AddProfileCoverView(APIView):
-    permission_classes = [IsOwner]
     authentication_classes = [TokenAuthentication]
+    permission_classes = [IsOwner]
 
     def post(self, request):
         profile = get_object_or_404(Profile, user=request.user)
@@ -48,7 +49,7 @@ class AddCommunityCoverView(APIView):
 
 class CoverDetail(APIView):
     authentication_classes = [TokenAuthentication]
-    permission_classes = [IsOwner]
+    permission_classes = [IsCoverManager]
 
     def get(self, request, pk):
         cover = get_object_or_404(Cover, pk=pk)
@@ -64,9 +65,8 @@ class CoverDetail(APIView):
 
 
 class ToggleActiveStatus(APIView):
-
     authentication_classes = [TokenAuthentication]
-    permission_classes = [IsOwner]
+    permission_classes = [IsCoverManager]
 
     def post(self, request, pk):
         """

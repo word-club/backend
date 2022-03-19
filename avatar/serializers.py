@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from avatar.models import Avatar
+from globals import UserGlobalSerializer
 
 
 class AvatarSerializer(serializers.ModelSerializer):
@@ -21,6 +22,8 @@ class ProfileAvatarSerializer(serializers.ModelSerializer):
 
 
 class CommunityAvatarSerializer(serializers.ModelSerializer):
+    created_by = UserGlobalSerializer(read_only=True)
+
     class Meta:
         model = Avatar
         exclude = ("profile", "community")
