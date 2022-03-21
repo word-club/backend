@@ -12,9 +12,9 @@ def get_upload_path(instance, filename, mode):
         elif instance.comment:
             upload_to = f"publications/{instance.comment.id}/"
     elif instance.profile:
-        upload_to += f"profile/${instance.profile.user.username}/"
+        upload_to += f"profile/{instance.profile.created_by.username}/"
     elif instance.community:
-        upload_to += f"community/${instance.community.id}/"
+        upload_to += f"community/{instance.community.id}/"
     upload_to += f"{mode}/{filename}"
     return upload_to
 

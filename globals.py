@@ -65,12 +65,14 @@ class CommunityGlobalSerializer(serializers.ModelSerializer):
             "rating",
             "tags",
             "views",
+            "type",
+            "is_authorized",
             "subscribers_count",
         ]
 
 
 class UserGlobalSerializer(serializers.ModelSerializer):
-    name = serializers.SerializerMethodField()
+    display_name = serializers.SerializerMethodField()
     bio = serializers.SerializerMethodField()
     birth_date = serializers.SerializerMethodField()
     avatar = serializers.SerializerMethodField()
@@ -98,11 +100,8 @@ class UserGlobalSerializer(serializers.ModelSerializer):
         return obj.profile.dislikes
 
     @staticmethod
-    def get_name(obj):
-        if obj.first_name and obj.last_name:
-            return "{} {}".format(obj.first_name, obj.last_name)
-        else:
-            return obj.username
+    def get_display_name(obj):
+        return obj.profile.display_name
 
     @staticmethod
     def get_bio(obj):
@@ -134,7 +133,6 @@ class UserGlobalSerializer(serializers.ModelSerializer):
         publications = Publication.objects.filter(created_by=obj)
         for pub in publications:
             comments = Comment.objects.filter(publication=pub).count()
-
             up_votes = Vote.objects.filter(publication=pub, up=True).count()
             down_votes = Vote.objects.filter(publication=pub, up=False).count()
             shares = Share.objects.filter(publication=pub).count()
@@ -148,7 +146,7 @@ class UserGlobalSerializer(serializers.ModelSerializer):
             "username",
             "bio",
             "date_joined",
-            "name",
+            "display_name",
             "birth_date",
             "avatar",
             "cover",

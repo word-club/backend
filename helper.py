@@ -113,21 +113,24 @@ def get_twitter_embed_data(source):
 
 
 def fetch_query(request):
-    publication = request.query_params.get("publication")  # expects pk
-    all_time = check_bool_query(request.query_params.get("all_time"))  # expects 0|1
-    q_today = check_bool_query(request.query_params.get("today"))  # expects 0|1
-    this_week = check_bool_query(request.query_params.get("this_week"))  # expects 0|1
+    publication = request.query_params.get("publication", None)  # expects pk
+    community = request.query_params.get("community", None)  # expects pk
 
-    from_query = request.query_params.get("from")  # expects date string
-    to_query = request.query_params.get("to")  # expects date string
-    year = request.query_params.get("year")  # expects year
-    month = request.query_params.get("month")  # expects month number
-    day = request.query_params.get("day")  # expects day number
+    all_time = check_bool_query(request.query_params.get("all_time", None))  # expects 0|1
+    q_today = check_bool_query(request.query_params.get("today", None))  # expects 0|1
+    this_week = check_bool_query(request.query_params.get("this_week", None))  # expects 0|1
 
-    search = request.query_params.get("search")  # expects plain string
+    from_query = request.query_params.get("from", None)  # expects date string
+    to_query = request.query_params.get("to", None)  # expects date string
+    year = request.query_params.get("year", None)  # expects year
+    month = request.query_params.get("month", None)  # expects month number
+    day = request.query_params.get("day", None)  # expects day number
+
+    search = request.query_params.get("search", None)  # expects plain string
 
     return {
         "publication": publication,
+        "community": community,
         "all_time": all_time,
         "today": q_today,
         "this_week": this_week,

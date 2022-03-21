@@ -113,7 +113,7 @@ class TopView(APIView):
         if profiles.count() > count:
             profiles = profiles[:count]
         users = []
-        [users.append(profile.user) for profile in profiles]
+        [users.append(profile.created_by) for profile in profiles]
 
         profiles = Profile.objects.filter(
             discussions__gte=limit,
@@ -121,7 +121,7 @@ class TopView(APIView):
         if profiles.count() > count:
             profiles = profiles[:count]
         commentators = []
-        [commentators.append(profile.user) for profile in profiles]
+        [commentators.append(profile.created_by) for profile in profiles]
 
         context = {"user": request.user}
 
