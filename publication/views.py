@@ -1,6 +1,7 @@
 from django.utils import timezone
 from rest_framework import mixins, status, viewsets
 from rest_framework.authentication import TokenAuthentication
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -182,14 +183,37 @@ class PublicationPinView(APIView):
         return Response(status=status.HTTP_200_OK)
 
 
-class ViewAPublication(APIView):
+class GetAPublication(APIView):
     authentication_classes = []
     permission_classes = []
 
     @staticmethod
     def get(request, pk=None):
         publication = get_object_or_404(Publication, pk=pk)
-        publication.views += 1
-        publication.save()
         serializer = PublicationSerializer(publication)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class RecentPublicationView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, pk):
+        publication = get_object_or_404(Publication, pk=pk)
+        if publication.is_published:
+            RecentPublication.objects.get_or_create(
+                created_by=request.user, publication=publication
+            )
+            return Response(status=status.HTTP_201_CREATED)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, pk):
+        publication = get_object_or_404(Publication, pk=pk)
+        try:
+            recent_publication = RecentPublication.objects.get(
+                created_by=request.user, publication=publication
+            )
+            recent_publication.delete()
+            return Response(status=status.HTTP_200_OK)
+        except RecentPublication.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)

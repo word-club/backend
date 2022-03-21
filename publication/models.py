@@ -64,3 +64,17 @@ class Publication(models.Model):
 
     def is_draft(self):
         return not self.is_published
+
+
+class RecentPublication(models.Model):
+    publication = models.ForeignKey(
+        Publication, on_delete=models.CASCADE, related_name="recent_viewers"
+    )
+    created_by = models.ForeignKey(
+        get_user_model(), on_delete=models.CASCADE, related_name="recent_publications"
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+        unique_together = [["publication", "created_by"]]

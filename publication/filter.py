@@ -35,15 +35,18 @@ def get_publication_wrt_query(request):
     if query_params["all_time"]:
         return Publication.objects.filter(is_published=True), None
 
+    filterset = OrderedDict()
     filter_range, err = get_filter_range(query_params)
     if err:
         return None, err
+    if query_params["community"]:
+        filterset["community"] = query_params["community"]
+    filterset["published_at__range"] = filter_range
+    filterset["is_published"] = True
+    if query_params["search"]:
+        filterset["title__contains"] = query_params["search"]
     return (
-        Publication.objects.filter(
-            title__contains=query_params["search"],
-            is_published=True,
-            published_at__range=filter_range,
-        ),
+        Publication.objects.filter(**filterset),
         None,
     )
 

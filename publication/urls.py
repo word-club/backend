@@ -8,7 +8,8 @@ from publication.views import (
     PublicationPinView,
     PublishPublicationView,
     RetrieveUpdatePublicationView,
-    ViewAPublication,
+    GetAPublication,
+    RecentPublicationView,
 )
 
 router = DefaultRouter()
@@ -22,5 +23,6 @@ urlpatterns += [
     path("publication/<int:pk>/publish/", PublishPublicationView.as_view()),
     path("publication/<int:pk>/pin/", PublicationPinView.as_view()),
     path("publication/filter/", PublicationFilter.as_view()),
-    path("publication/<int:pk>/view/", ViewAPublication.as_view()),
+    path("publication/<int:pk>/view/", GetAPublication.as_view()),
+    path("publication/<int:pk>/recent/", RecentPublicationView.as_view()),
 ]
