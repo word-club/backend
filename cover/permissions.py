@@ -10,4 +10,4 @@ class IsCoverManager(permissions.BasePermission):
             return Moderator.objects.filter(community=obj.community, user=request.user).exists()
         # otherwise, the avatar should be for the user profile
         else:
-            return obj.profile.user.id == request.user.id
+            return obj.profile.created_by.id == request.user.id

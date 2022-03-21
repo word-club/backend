@@ -1,11 +1,11 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.authentication import TokenAuthentication
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from account.models import Profile
-from account.permissions import IsOwner
 from community.models import Community
 from community.permissions import IsCommunityModerator
 from cover.models import Cover
@@ -17,9 +17,17 @@ from cover.serializers import (
 )
 
 
+def update_active_status_of(cover):
+    Cover.objects.filter(is_active=True, community=cover.community, profile=cover.profile).update(
+        is_active=False
+    )
+    cover.is_active = True
+    cover.save()
+
+
 class AddProfileCoverView(APIView):
     authentication_classes = [TokenAuthentication]
-    permission_classes = [IsOwner]
+    permission_classes = [IsAuthenticated]
 
     def post(self, request):
         profile = get_object_or_404(Profile, user=request.user)
@@ -27,7 +35,11 @@ class AddProfileCoverView(APIView):
         context = {"profile": profile, "request": request}
         serializer = ProfileCoverSerializer(data=request.data, context=context)
         if serializer.is_valid():
-            serializer.save()
+            cv = serializer.save()
+            # if request queryset has active param, then set avatar as active
+            status_to_set = request.query_params.get("active", False)
+            if status_to_set and status_to_set.lower() == "true":
+                update_active_status_of(cv)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -42,7 +54,11 @@ class AddCommunityCoverView(APIView):
         context = {"community": community, "request": request}
         serializer = CommunityCoverSerializer(data=request.data, context=context)
         if serializer.is_valid():
-            serializer.save()
+            cv = serializer.save()
+            # if request queryset has active param, then set avatar as active
+            status_to_set = request.query_params.get("active", False)
+            if status_to_set and status_to_set.lower() == "true":
+                update_active_status_of(cv)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -75,12 +91,7 @@ class ToggleActiveStatus(APIView):
         cover = get_object_or_404(Cover, pk=pk)
         self.check_object_permissions(request, cover)
 
-        Cover.objects.filter(
-            is_active=True, community=cover.community, profile=cover.profile
-        ).update(is_active=False)
-
-        cover.is_active = True
-        cover.save()
+        update_active_status_of(cover)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     def delete(self, request, pk):
