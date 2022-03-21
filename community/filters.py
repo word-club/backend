@@ -57,12 +57,12 @@ class SubscribedCommunityFilter(APIView):
             subscriptions = Subscription.objects.filter(
                 is_approved=True,
                 is_banned=False,
-                subscriber=request.user,
+                created_by=request.user,
                 community__name__contains=search,
             )
         else:
             subscriptions = Subscription.objects.filter(
-                is_approved=True, is_banned=False, subscriber=request.user
+                is_approved=True, is_banned=False, created_by=request.user
             )
         communities = []
         [communities.append(subscription.community) for subscription in subscriptions]
@@ -92,8 +92,8 @@ class CommunitySubscribersFilter(APIView):
                 community=community,
                 is_approved=True,
                 is_banned=False,
-                subscriber__username__contains=search,
+                created_by__username__contains=search,
             )
         users = []
-        [users.append(subscription.subscriber) for subscription in valid_subscriptions]
+        [users.append(subscription.created_by) for subscription in valid_subscriptions]
         return Response(UserGlobalSerializer(users, many=True).data, status=status.HTTP_200_OK)

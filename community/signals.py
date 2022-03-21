@@ -19,7 +19,7 @@ def set_writer_as_mod(instance, writer):
 
 def init_writer_subscription(instance, writer):
     Subscription.objects.create(
-        subscriber=writer,
+        created_by=writer,
         community=instance,
         is_approved=True,
         approved_at=timezone.now(),

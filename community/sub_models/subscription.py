@@ -3,12 +3,6 @@ from django.db import models
 
 
 class Subscription(models.Model):
-    subscriber = models.ForeignKey(
-        get_user_model(),
-        on_delete=models.CASCADE,
-        related_name="my_subscriptions",
-        editable=False,
-    )
     community = models.ForeignKey(
         "Community",
         on_delete=models.CASCADE,
@@ -25,9 +19,16 @@ class Subscription(models.Model):
     ban_reason = models.TextField(null=True, editable=False)
     banned_at = models.DateTimeField(null=True, editable=False)
 
+    created_by = models.ForeignKey(
+        get_user_model(),
+        on_delete=models.CASCADE,
+        related_name="my_subscriptions",
+        editable=False,
+    )
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         ordering = ["-created_at"]
-        unique_together = [["subscriber", "community"]]
+        unique_together = [["created_by", "community"]]

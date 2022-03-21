@@ -14,7 +14,38 @@ from hashtag.serializers import HashtagSerializer
 from report.serializers import ReportSerializer
 
 
+def get_active_community_avatar(community):
+    try:
+        avatar = Avatar.objects.get(community=community, is_active=True)
+        return CommunityAvatarSerializer(avatar).data
+    except Avatar.DoesNotExist:
+        return None
+
+
+def get_active_community_cover(community):
+    try:
+        cover = Cover.objects.get(community=community, is_active=True)
+        return CommunityCoverSerializer(cover).data
+    except Cover.DoesNotExist:
+        return None
+
+
 class MyCommunitySerializer(serializers.ModelSerializer):
+    theme = ThemeSerializer(read_only=True)
+    rules = RuleSerializer(many=True, read_only=True)
+    avatar = serializers.SerializerMethodField()
+    cover = serializers.SerializerMethodField()
+    tags = HashtagSerializer(many=True, read_only=True)
+    moderators = ModeratorSerializer(many=True, read_only=True)
+    subscriptions = SubscriptionCommunitySerializer(many=True, read_only=True)
+    reports = ReportSerializer(many=True, read_only=True)
+
+    def get_avatar(self, obj):
+        return get_active_community_avatar(obj)
+
+    def get_cover(self, obj):
+        return get_active_community_cover(obj)
+
     class Meta:
         model = Community
         exclude = ["created_by"]
@@ -34,18 +65,10 @@ class TrendingSerializer(serializers.ModelSerializer):
         ).count()
 
     def get_avatar(self, obj):
-        try:
-            avatar = Avatar.objects.get(community=obj, is_active=True)
-            return CommunityAvatarSerializer(avatar).data
-        except Avatar.DoesNotExist:
-            return None
+        return get_active_community_avatar(obj)
 
     def get_cover(self, obj):
-        try:
-            cover = Cover.objects.get(community=obj, is_active=True)
-            return CommunityCoverSerializer(cover).data
-        except Cover.DoesNotExist:
-            return None
+        return get_active_community_cover(obj)
 
     class Meta:
         model = Community

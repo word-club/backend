@@ -16,7 +16,11 @@ from community.serializers.subscription import MySubscriptionSerializer
 from cover.serializers import ProfileCoverSerializer
 from hide.serializers import MyHideSerializer
 from notification.serializers import MyNotificationSerializer
-from publication.serializers import MyPublicationSerializer, Publication
+from publication.serializers import (
+    MyPublicationSerializer,
+    RecentPublicationSerializer,
+    Publication,
+)
 from report.serializers import MyReportSerializer
 from share.serializers import MyShareSerializer
 from vote.serializers import MyVoteSerializer
@@ -76,7 +80,7 @@ class UserUpdateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = get_user_model()
-        exclude = ["is_active", "date_joined", "is_superuser", "is_staff", "password"]
+        fields = ["email", "profile", "gender"]
 
     def update(self, instance, validated_data):
         profile = instance.profile
@@ -117,7 +121,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = get_user_model()
-        exclude = ["password"]
+        exclude = ["password", "first_name", "last_name"]
 
 
 class UserRetrieveSerializer(serializers.ModelSerializer):
@@ -136,7 +140,7 @@ class UserRetrieveSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = get_user_model()
-        fields = "__all__"
+        exclude = ["password", "first_name", "last_name"]
 
 
 class UserInfoSerializer(serializers.ModelSerializer):
@@ -155,12 +159,13 @@ class UserInfoSerializer(serializers.ModelSerializer):
     my_communities = MyCommunitySerializer(many=True, read_only=True)
     my_subscriptions = MySubscriptionSerializer(many=True, read_only=True)
     managed_communities = MyModerationSerializer(many=True, read_only=True)
+    recent_publications = RecentPublicationSerializer(many=True, read_only=True)
 
     received_notifications = MyNotificationSerializer(many=True, read_only=True)
 
     class Meta:
         model = get_user_model()
-        fields = "__all__"
+        exclude = ["first_name", "last_name", "password"]
 
 
 class DeactivateAccountSerializer(serializers.ModelSerializer):

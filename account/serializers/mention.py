@@ -6,19 +6,17 @@ from avatar.models import Avatar
 
 
 class MentionUserSerializer(serializers.ModelSerializer):
-    name = serializers.SerializerMethodField()
-    avatar = serializers.SerializerMethodField()
+    display_name = serializers.SerializerMethodField()
     username = serializers.SerializerMethodField()
+    avatar = serializers.SerializerMethodField()
 
     @staticmethod
     def get_username(obj):
         return obj.username
 
     @staticmethod
-    def get_name(obj):
-        if obj.first_name and obj.last_name:
-            return "{} {}".format(obj.first_name, obj.last_name)
-        return obj.username
+    def get_display_name(obj):
+        return obj.profile.display_name
 
     @staticmethod
     def get_avatar(obj):
@@ -30,4 +28,4 @@ class MentionUserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = get_user_model()
-        fields = ["id", "name", "username", "avatar"]
+        fields = ["id", "display_name", "username", "avatar"]

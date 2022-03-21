@@ -7,14 +7,13 @@ from choices import GENDER_CHOICES
 
 
 class Profile(models.Model):
-    user = models.OneToOneField(get_user_model(), on_delete=models.CASCADE, editable=False)
     bio = models.TextField(null=True)
     birth_date = models.DateField(null=True)
 
     is_authorized = models.BooleanField(default=False, editable=False)
     authorized_at = models.DateTimeField(null=True, editable=False)
 
-    display_name = models.CharField(max_length=30, null=True)
+    display_name = models.CharField(max_length=32, null=True)
 
     allow_follow = models.BooleanField(default=True)
     adult_content = models.BooleanField(default=True)
@@ -34,6 +33,8 @@ class Profile(models.Model):
     is_deactivated = models.BooleanField(default=False, editable=False)
     deactivated_at = models.DateTimeField(null=True, editable=False)
     deactivation_reason = models.CharField(max_length=255, null=True, editable=False)
+
+    created_by = models.OneToOneField(get_user_model(), on_delete=models.CASCADE, editable=False)
 
     class Meta:
         ordering = ["-created_at"]
@@ -63,4 +64,5 @@ class FollowUser(models.Model):
 class Gender(models.Model):
     custom = models.CharField(max_length=16, null=True)
     type = models.CharField(max_length=2, choices=GENDER_CHOICES, null=True)
-    user = models.OneToOneField(get_user_model(), on_delete=models.CASCADE, editable=False)
+    created_by = models.OneToOneField(get_user_model(), on_delete=models.CASCADE, editable=False)
+    created_at = models.DateTimeField(auto_now_add=True)
