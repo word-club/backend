@@ -190,6 +190,11 @@ class GetAPublication(APIView):
     @staticmethod
     def get(request, pk=None):
         publication = get_object_or_404(Publication, pk=pk)
+        _, created = RecentPublication.objects.get_or_create(
+            created_by=request.user, publication=publication
+        )
+        if created:
+            publication.views += 1
         serializer = PublicationSerializer(publication)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -197,15 +202,6 @@ class GetAPublication(APIView):
 class RecentPublicationView(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
-
-    def post(self, request, pk):
-        publication = get_object_or_404(Publication, pk=pk)
-        if publication.is_published:
-            RecentPublication.objects.get_or_create(
-                created_by=request.user, publication=publication
-            )
-            return Response(status=status.HTTP_201_CREATED)
-        return Response(status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, pk):
         publication = get_object_or_404(Publication, pk=pk)

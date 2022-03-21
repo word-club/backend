@@ -58,10 +58,11 @@ class MyPublicationSerializer(serializers.ModelSerializer):
 class PublicationForRecentSerializer(serializers.ModelSerializer):
     tags = HashtagSerializer(read_only=True, many=True)
     community = CommunityGlobalSerializer(allow_null=True, read_only=True)
+    created_by = UserGlobalSerializer(read_only=True)
 
     class Meta:
         model = Publication
-        fields = ("id", "title", "created_at", "tags", "community", "type")
+        fields = ("id", "title", "created_at", "tags", "community", "type", "created_by")
 
 
 class RecentPublicationSerializer(serializers.ModelSerializer):
