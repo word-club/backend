@@ -16,5 +16,8 @@ class MentionList(APIView):
     @staticmethod
     def get(request):
         users = get_user_model().objects.all()
-        serializer = MentionUserSerializer(users, many=True, read_only=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        try:
+            serializer = MentionUserSerializer(users, many=True, read_only=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)

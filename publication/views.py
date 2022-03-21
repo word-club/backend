@@ -190,11 +190,15 @@ class GetAPublication(APIView):
     @staticmethod
     def get(request, pk=None):
         publication = get_object_or_404(Publication, pk=pk)
-        _, created = RecentPublication.objects.get_or_create(
-            created_by=request.user, publication=publication
-        )
-        if created:
-            publication.views += 1
+        if publication.is_published:
+            requestor = helper.get_user_from_auth_header(request)
+            if requestor:
+                _, created = RecentPublication.objects.get_or_create(
+                    created_by=requestor, publication=publication
+                )
+                if created:
+                    publication.views += 1
+                    publication.save()
         serializer = PublicationSerializer(publication)
         return Response(serializer.data, status=status.HTTP_200_OK)
 

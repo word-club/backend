@@ -11,7 +11,7 @@ class MySubscriptionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Subscription
-        exclude = ("subscriber",)
+        exclude = ("created_by",)
 
 
 class SubscriptionCommunitySerializer(serializers.ModelSerializer):
@@ -34,7 +34,7 @@ class SubscribeCommunitySerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         community = self.context["community"]
-        validated_data["subscriber"] = self.context["request"].user
+        validated_data["created_by"] = self.context["request"].user
         validated_data["community"] = community
         if community.type == "public":
             validated_data["is_approved"] = True

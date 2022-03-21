@@ -1,3 +1,5 @@
+from collections import OrderedDict
+
 from django.utils import timezone
 
 from rest_framework import serializers
@@ -11,23 +13,8 @@ from community.serializers.subscription import SubscriptionCommunitySerializer
 from community.serializers.theme import ThemeSerializer
 from cover.serializers import CommunityCoverSerializer, Cover
 from hashtag.serializers import HashtagSerializer
+from helpers.get_active import get_active_avatar_for, get_active_cover_for
 from report.serializers import ReportSerializer
-
-
-def get_active_community_avatar(community):
-    try:
-        avatar = Avatar.objects.get(community=community, is_active=True)
-        return CommunityAvatarSerializer(avatar).data
-    except Avatar.DoesNotExist:
-        return None
-
-
-def get_active_community_cover(community):
-    try:
-        cover = Cover.objects.get(community=community, is_active=True)
-        return CommunityCoverSerializer(cover).data
-    except Cover.DoesNotExist:
-        return None
 
 
 class MyCommunitySerializer(serializers.ModelSerializer):
@@ -40,11 +27,17 @@ class MyCommunitySerializer(serializers.ModelSerializer):
     subscriptions = SubscriptionCommunitySerializer(many=True, read_only=True)
     reports = ReportSerializer(many=True, read_only=True)
 
-    def get_avatar(self, obj):
-        return get_active_community_avatar(obj)
+    @staticmethod
+    def get_avatar(obj):
+        filterset = OrderedDict()
+        filterset["community"] = obj.id
+        return get_active_avatar_for(filterset)
 
-    def get_cover(self, obj):
-        return get_active_community_cover(obj)
+    @staticmethod
+    def get_cover(obj):
+        filterset = OrderedDict()
+        filterset["community"] = obj.id
+        return get_active_cover_for(filterset)
 
     class Meta:
         model = Community
@@ -58,17 +51,26 @@ class TrendingSerializer(serializers.ModelSerializer):
 
     discussions_today = serializers.SerializerMethodField()
 
-    def get_discussions_today(self, obj):
-        # TODO: check if publication is not banned
+    @staticmethod
+    def get_discussions_today(obj):
         return Comment.objects.filter(
-            publication__community=obj, created_at__day=timezone.now().day
+            publication__is_published=True,
+            publication__community=obj,
+            created_at__day=timezone.now().day,
+            # publication__is_banned=False
         ).count()
 
-    def get_avatar(self, obj):
-        return get_active_community_avatar(obj)
+    @staticmethod
+    def get_avatar(obj):
+        filterset = OrderedDict()
+        filterset["community"] = obj.id
+        return get_active_avatar_for(filterset)
 
-    def get_cover(self, obj):
-        return get_active_community_cover(obj)
+    @staticmethod
+    def get_cover(obj):
+        filterset = OrderedDict()
+        filterset["community"] = obj.id
+        return get_active_cover_for(filterset)
 
     class Meta:
         model = Community
@@ -100,7 +102,8 @@ class RetrieveSerializer(serializers.ModelSerializer):
     """
     Serializer for retrieving a community
     """
-
+    avatar = serializers.SerializerMethodField(allow_null=True)
+    cover = serializers.SerializerMethodField(allow_null=True)
     theme = ThemeSerializer(read_only=True)
     rules = RuleSerializer(many=True, read_only=True)
     covers = CommunityCoverSerializer(many=True, read_only=True)
@@ -109,6 +112,18 @@ class RetrieveSerializer(serializers.ModelSerializer):
     moderators = ModeratorSerializer(many=True, read_only=True)
     subscriptions = SubscriptionCommunitySerializer(many=True, read_only=True)
     reports = ReportSerializer(many=True, read_only=True)
+
+    @staticmethod
+    def get_avatar(obj):
+        filterset = OrderedDict()
+        filterset["community"] = obj.id
+        return get_active_avatar_for(filterset)
+
+    @staticmethod
+    def get_cover(obj):
+        filterset = OrderedDict()
+        filterset["community"] = obj.id
+        return get_active_cover_for(filterset)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

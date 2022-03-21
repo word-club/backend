@@ -2,7 +2,7 @@ from rest_framework import serializers
 
 from comment.models import Comment
 from comment.serializers import CommentSerializer
-from globals import CommunityGlobalSerializer, UserGlobalSerializer
+from globals import CommunityGlobalSerializer, UserGlobalSerializer, PublicationGlobalSerializer
 from hashtag.serializers import HashtagSerializer
 from image.serializers import PublicationImageSerializer
 from link.serializers import LinkInfoSerializer
@@ -55,18 +55,8 @@ class MyPublicationSerializer(serializers.ModelSerializer):
         exclude = ("created_by",)
 
 
-class PublicationForRecentSerializer(serializers.ModelSerializer):
-    tags = HashtagSerializer(read_only=True, many=True)
-    community = CommunityGlobalSerializer(allow_null=True, read_only=True)
-    created_by = UserGlobalSerializer(read_only=True)
-
-    class Meta:
-        model = Publication
-        fields = ("id", "title", "created_at", "tags", "community", "type", "created_by")
-
-
 class RecentPublicationSerializer(serializers.ModelSerializer):
-    publication = PublicationForRecentSerializer()
+    publication = PublicationGlobalSerializer()
 
     class Meta:
         model = RecentPublication

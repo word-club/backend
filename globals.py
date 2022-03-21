@@ -1,3 +1,5 @@
+from collections import OrderedDict
+
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 
@@ -10,6 +12,8 @@ from community.models import (
     Subscription,
 )
 from hashtag.serializers import HashtagSerializer
+from helpers.get_active import get_active_cover_for, get_active_avatar_for
+from publication.helper import get_thumbnail_for
 from publication.models import (
     Publication,
 )
@@ -27,19 +31,15 @@ class CommunityGlobalSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def get_avatar(obj):
-        try:
-            avatar = Avatar.objects.get(community=obj, is_active=True)
-            return avatar.image.url
-        except Avatar.DoesNotExist:
-            return None
+        filterset = OrderedDict()
+        filterset["community"] = obj.id
+        return get_active_avatar_for(filterset)
 
     @staticmethod
     def get_cover(obj):
-        try:
-            cover = Cover.objects.get(community=obj, is_active=True)
-            return cover.image.url
-        except Cover.DoesNotExist:
-            return None
+        filterset = OrderedDict()
+        filterset["community"] = obj.id
+        return get_active_cover_for(filterset)
 
     @staticmethod
     def get_rating(obj):
@@ -113,19 +113,15 @@ class UserGlobalSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def get_avatar(obj):
-        try:
-            cover = Avatar.objects.get(profile=obj.profile, is_active=True)
-            return cover.image.url
-        except Avatar.DoesNotExist:
-            return None
+        filterset = OrderedDict()
+        filterset["profile"] = obj.profile
+        return get_active_avatar_for(filterset)
 
     @staticmethod
     def get_cover(obj):
-        try:
-            cover = Cover.objects.get(profile=obj.profile, is_active=True)
-            return cover.image.url
-        except Cover.DoesNotExist:
-            return None
+        filterset = OrderedDict()
+        filterset["profile"] = obj.profile
+        return get_active_cover_for(filterset)
 
     @staticmethod
     def get_reactions(obj):
@@ -161,10 +157,15 @@ class UserGlobalSerializer(serializers.ModelSerializer):
 class PublicationGlobalSerializer(serializers.ModelSerializer):
     community = CommunityGlobalSerializer()
     created_by = UserGlobalSerializer()
+    thumbnail = serializers.SerializerMethodField()
+
+    @staticmethod
+    def get_thumbnail(obj):
+        return get_thumbnail_for(obj)
 
     class Meta:
         model = Publication
-        fields = "__all__"
+        exclude = ["content"]
 
 
 class CommentGlobalSerializer(serializers.ModelSerializer):

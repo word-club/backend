@@ -8,8 +8,8 @@ from account.models import FollowUser, Profile, Gender
 @receiver(post_save, sender=get_user_model())
 def create_user_profile(sender, instance, created, **kwargs):
     if created:
-        Profile.objects.create(user=instance)
-        Gender.objects.create(user=instance)
+        Profile.objects.create(created_by=instance)
+        Gender.objects.create(created_by=instance)
 
 
 @receiver(post_save, sender=FollowUser)

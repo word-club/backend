@@ -1,18 +1,15 @@
+from collections import OrderedDict
+
 from django.contrib.auth import get_user_model
 
 from rest_framework import serializers
 
-from avatar.models import Avatar
+from helpers.get_active import get_active_avatar_for
 
 
 class MentionUserSerializer(serializers.ModelSerializer):
     display_name = serializers.SerializerMethodField()
-    username = serializers.SerializerMethodField()
     avatar = serializers.SerializerMethodField()
-
-    @staticmethod
-    def get_username(obj):
-        return obj.username
 
     @staticmethod
     def get_display_name(obj):
@@ -20,11 +17,9 @@ class MentionUserSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def get_avatar(obj):
-        try:
-            avatar = Avatar.objects.get(profile__user=obj, is_active=True)
-            return avatar.image.url
-        except Avatar.DoesNotExist:
-            return None
+        filterset = OrderedDict()
+        filterset["profile"] = obj.profile
+        return get_active_avatar_for(filterset)
 
     class Meta:
         model = get_user_model()

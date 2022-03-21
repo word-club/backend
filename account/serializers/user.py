@@ -1,3 +1,5 @@
+from collections import OrderedDict
+
 from django.contrib.auth.password_validation import validate_password
 from django.contrib.auth import get_user_model
 
@@ -14,6 +16,7 @@ from community.serializers.community import MyCommunitySerializer
 from community.serializers.moderator import MyModerationSerializer
 from community.serializers.subscription import MySubscriptionSerializer
 from cover.serializers import ProfileCoverSerializer
+from helpers.get_active import get_active_avatar_for, get_active_cover_for
 from hide.serializers import MyHideSerializer
 from notification.serializers import MyNotificationSerializer
 from publication.serializers import (
@@ -34,7 +37,7 @@ class GenderSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Gender
-        exclude = ["user", "id"]
+        exclude = ["created_by", "id"]
 
 
 class ProfilePostSerializer(serializers.ModelSerializer):
@@ -112,7 +115,7 @@ class ProfileSerializer(CountryFieldMixin, serializers.ModelSerializer):
 
     class Meta:
         model = Profile
-        exclude = ["user"]
+        exclude = ["created_by"]
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -125,6 +128,8 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class UserRetrieveSerializer(serializers.ModelSerializer):
+    avatar = serializers.SerializerMethodField(allow_null=True)
+    cover = serializers.SerializerMethodField(allow_null=True)
     profile = ProfileSerializer(read_only=True)
     gender = GenderSerializer(read_only=True)
     followers = FollowerSerializer(many=True, read_only=True)
@@ -134,8 +139,24 @@ class UserRetrieveSerializer(serializers.ModelSerializer):
     my_subscriptions = MySubscriptionSerializer(many=True, read_only=True)
 
     @staticmethod
+    def get_avatar(obj):
+        filterset = OrderedDict()
+        filterset["profile"] = obj.profile
+        return get_active_avatar_for(filterset)
+
+    @staticmethod
+    def get_cover(obj):
+        filterset = OrderedDict()
+        filterset["profile"] = obj.profile
+        return get_active_cover_for(filterset)
+
+    @staticmethod
     def get_my_publications(obj):
-        publications = Publication.objects.filter(created_by=obj, is_published=True)
+        publications = Publication.objects.filter(
+            created_by=obj,
+            is_published=True,
+            # is_banned=False
+        )
         return MyPublicationSerializer(publications, many=True).data
 
     class Meta:
@@ -144,6 +165,8 @@ class UserRetrieveSerializer(serializers.ModelSerializer):
 
 
 class UserInfoSerializer(serializers.ModelSerializer):
+    avatar = serializers.SerializerMethodField(allow_null=True)
+    cover = serializers.SerializerMethodField(allow_null=True)
     profile = ProfileSerializer(read_only=True)
     gender = GenderSerializer(read_only=True)
     followers = FollowerSerializer(many=True, read_only=True)
@@ -162,6 +185,18 @@ class UserInfoSerializer(serializers.ModelSerializer):
     recent_publications = RecentPublicationSerializer(many=True, read_only=True)
 
     received_notifications = MyNotificationSerializer(many=True, read_only=True)
+
+    @staticmethod
+    def get_avatar(obj):
+        filterset = OrderedDict()
+        filterset["profile"] = obj.profile
+        return get_active_avatar_for(filterset)
+
+    @staticmethod
+    def get_cover(obj):
+        filterset = OrderedDict()
+        filterset["profile"] = obj.profile
+        return get_active_cover_for(filterset)
 
     class Meta:
         model = get_user_model()
