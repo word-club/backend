@@ -10,6 +10,7 @@ import helper
 from account.permissions import IsOwner
 from community.helper import check_community_law
 from community.permissions import IsCommunityModerator
+from helpers.update_reactions import notify_author, add_popularity
 from hide.models import Hide
 from publication.helper import check_publication_update_date_limit
 from publication.serializers import *
@@ -135,7 +136,24 @@ class PublishPublicationView(APIView):
             if do_break:
                 return Response(detail, status=status.HTTP_403_FORBIDDEN)
         publication.is_published = True
-        publication.published_at = timezone.now()
+        # recorded only at the first time of publishing
+        # to notice first time of publishing
+        if not publication.published_at:
+            if publication.community:
+                add_popularity(publication)
+                published_by = publication.created_by
+                description = (
+                    f"{published_by.profile.display_name or published_by.created_by.username}"
+                    f" published a new publication in the community "
+                    f'"{publication.community.name}".'
+                )
+                notify_author(
+                    target=publication.community,
+                    instance=publication,
+                    key="publication",
+                    description=description,
+                )
+            publication.published_at = timezone.now()
         publication.save()
         return Response(
             PublicationSerializer(publication, context={"user": request.user}).data,
@@ -148,7 +166,6 @@ class PublishPublicationView(APIView):
         if publication.is_draft():
             return Response(status=status.HTTP_200_OK)
         publication.is_published = False
-        publication.published_at = None
         publication.save()
         return Response(status=status.HTTP_201_CREATED)
 
@@ -207,7 +224,8 @@ class RecentPublicationView(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
 
-    def delete(self, request, pk):
+    @staticmethod
+    def delete(request, pk):
         publication = get_object_or_404(Publication, pk=pk)
         try:
             recent_publication = RecentPublication.objects.get(

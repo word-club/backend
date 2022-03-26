@@ -1,5 +1,3 @@
-import collections
-
 from django.db.models.signals import post_delete, post_save
 from django.dispatch import receiver
 
@@ -17,17 +15,9 @@ from vote.models import Vote
 def post_save_vote(sender, instance, created, **kwargs):
     add_popularity(instance)
     add_supports(instance)
-    fieldset = collections.OrderedDict()
     voted_instance = instance.publication or instance.comment
-    fieldset["vote"] = instance
-    fieldset["subject"] = "Vote"
-    fieldset["description"] = (
-        f"{instance.created_by.username} has "
-        f"{'up' if instance.up else 'down'}-voted"
-        f" your {voted_instance.__class__.__name__.lower()}"
-        f' "{voted_instance.title}".'
-    )
-    notify_author(fieldset, voted_instance.created_by)
+    verb = f"{'up' if instance.up else 'down'}-voted"
+    notify_author(voted_instance, instance, "vote", verb)
 
 
 @receiver(post_delete, sender=Vote)

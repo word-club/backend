@@ -62,6 +62,9 @@ class Publication(models.Model):
     class Meta:
         ordering = ["-created_at"]
 
+    def __str__(self):
+        return self.title
+
     def is_draft(self):
         return not self.is_published
 

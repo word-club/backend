@@ -12,6 +12,7 @@ from community.models import Community
 from community.permissions import IsSubscriber, IsNotASubscriber, IsCommunityModerator
 from community.serializers.subscription import SubscriptionSerializer
 from community.sub_models.subscription import Subscription
+from helpers.update_reactions import notify_author
 
 
 class RemoveDisableNotification(APIView):
@@ -86,6 +87,17 @@ class AcceptRejectASubscriber(APIView):
             )
         else:
             if subscription.is_approved:
+                description = (
+                    f"Your subscription request for the community"
+                    f' "{subscription.community.name}" has been accepted.'
+                )
+                notify_author(
+                    target=subscription,
+                    instance=subscription,
+                    key="subscription",
+                    subject="Accept",
+                    description=description,
+                )
                 return Response({"detail": "Subscriber already accepted."})
             else:
                 subscription.is_approved = True
@@ -116,6 +128,17 @@ class BanUnBanASubscriber(APIView):
             subscription.is_banned = True
             subscription.banned_at = timezone.now()
             subscription.save()
+            description = (
+                f"Sorry, Your subscription has been banned for the community"
+                f' "{subscription.community.name}".'
+            )
+            notify_author(
+                target=subscription,
+                instance=subscription,
+                key="subscription",
+                subject="Ban",
+                description=description,
+            )
             return Response(status=status.HTTP_200_OK)
 
     def delete(self, request, pk):

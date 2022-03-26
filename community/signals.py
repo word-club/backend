@@ -4,6 +4,7 @@ from django.utils import timezone
 
 from community.helper import notify_community
 from community.models import Community, Moderator, Subscription, Theme
+from helpers.update_reactions import notify_author
 
 
 def set_writer_as_mod(instance, writer):
@@ -41,4 +42,7 @@ def setup_post_community_actions(sender, instance, created, **kwargs):
 
 @receiver(post_save, sender=Subscription)
 def post_save_subscription(sender, instance, created, **kwargs):
-    notify_community(instance, created)
+    if created:
+        notify_author(
+            instance.community, instance, "subscription", "requested for subscription for"
+        )

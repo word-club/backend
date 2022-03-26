@@ -16,7 +16,10 @@ def post_save_pub_share(sender, instance, created, **kwargs):
     if created:
         add_popularity(instance)
         add_supports(instance)
-        notify_author(instance)
+        shared_instance = (
+            instance.user or instance.community or instance.publication or instance.comment
+        )
+        notify_author(shared_instance, instance, "share", "shared")
 
 
 @receiver(post_delete, sender=Share)
