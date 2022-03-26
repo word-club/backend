@@ -1,10 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.db import models
 
-from comment.models import Comment
-from community.models import Community, Subscription
-from publication.models import Publication
-
 
 class Notification(models.Model):
     is_global = models.BooleanField(default=False)
@@ -13,36 +9,55 @@ class Notification(models.Model):
     description = models.CharField(max_length=255, blank=True, null=True)
 
     publication = models.ForeignKey(
-        Publication,
-        blank=True,
+        "publication.Publication",
         null=True,
         on_delete=models.CASCADE,
         related_name="notifications",
     )
     community = models.ForeignKey(
-        Community,
-        blank=True,
+        "community.Community",
         null=True,
         on_delete=models.CASCADE,
         related_name="notifications",
     )
     comment = models.ForeignKey(
-        Comment,
-        blank=True,
+        "comment.Comment",
         null=True,
         on_delete=models.CASCADE,
         related_name="notifications",
     )
-    # upvote
-    # down vote
-    # share
-    # bookmark
-    # follow
-    # report
-
+    vote = models.ForeignKey(
+        "vote.Vote",
+        null=True,
+        on_delete=models.CASCADE,
+        related_name="notifications",
+    )
+    share = models.ForeignKey(
+        "share.Share",
+        null=True,
+        on_delete=models.CASCADE,
+        related_name="notifications",
+    )
     subscription = models.ForeignKey(
-        Subscription,
-        blank=True,
+        "community.Subscription",
+        null=True,
+        on_delete=models.CASCADE,
+        related_name="notifications",
+    )
+    bookmark = models.ForeignKey(
+        "bookmark.Bookmark",
+        null=True,
+        on_delete=models.CASCADE,
+        related_name="notifications",
+    )
+    follow = models.ForeignKey(
+        "account.FollowUser",
+        null=True,
+        on_delete=models.CASCADE,
+        related_name="notifications",
+    )
+    report = models.ForeignKey(
+        "report.Report",
         null=True,
         on_delete=models.CASCADE,
         related_name="notifications",
@@ -67,7 +82,6 @@ class NotificationTo(models.Model):
         related_name="receivers",
         editable=False,
     )
-
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

@@ -102,6 +102,7 @@ class RetrieveSerializer(serializers.ModelSerializer):
     """
     Serializer for retrieving a community
     """
+
     avatar = serializers.SerializerMethodField(allow_null=True)
     cover = serializers.SerializerMethodField(allow_null=True)
     theme = ThemeSerializer(read_only=True)

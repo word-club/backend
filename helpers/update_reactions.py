@@ -1,3 +1,6 @@
+from notification.models import Notification, NotificationTo
+
+
 def add_popularity(trigger):
     instance = trigger.publication or trigger.comment
     instance.popularity += 1
@@ -70,6 +73,6 @@ def decrease_supports(vote):
         instance.community.save()
 
 
-def notify_author(instance):
-    # TODO
-    pass
+def notify_author(fieldset, send_to):
+    notification = Notification.objects.create(**fieldset)
+    NotificationTo.objects.create(notification=notification, user=send_to)

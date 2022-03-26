@@ -17,7 +17,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 SECRET_KEY = os.getenv("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv("DEBUG")
+DEBUG = os.getenv("DEBUG") or False
 
 # Application definition
 INTERNAL_APPS = [
@@ -30,7 +30,7 @@ INTERNAL_APPS = [
 ]
 
 EXTERNAL_APPS = [
-    # "channels",
+    "channels",
     "rest_framework",
     "rest_framework.authtoken",
     "phonenumber_field",
@@ -138,7 +138,7 @@ REST_FRAMEWORK = {
 
 LANGUAGE_CODE = "en-us"
 
-TIME_ZONE = os.getenv("TIME_ZONE")
+TIME_ZONE = os.getenv("TIME_ZONE") or "UTC"
 
 USE_I18N = True
 
@@ -169,11 +169,14 @@ ASGI_APPLICATION = "backend.asgi.application"
 # Channels Configuration
 # https://channels.readthedocs.io/en/stable/
 
-# CHANNEL_LAYERS = {
-#     "default": {
-#         "BACKEND": "channels_redis.core.RedisChannelLayer",
-#         "CONFIG": {
-#             "hosts": [("127.0.0.1", 6379)],
-#         },
-#     },
-# }
+
+REDIS_HOST = os.getenv("REDIS_HOST") or "localhost"
+REDIS_PORT = os.getenv("REDIS_PORT") or 6379
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [(REDIS_HOST, REDIS_PORT)],
+        },
+    },
+}
