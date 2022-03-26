@@ -7,7 +7,7 @@ from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-import helper
+from helpers import filter
 from account.serializers.user import *
 
 
@@ -36,7 +36,7 @@ class ProfileListView(mixins.ListModelMixin, viewsets.GenericViewSet):
     serializer_class = UserSerializer
 
     def get_queryset(self):
-        filterset, sort_string = helper.get_viewset_filterset(
+        filterset, sort_string = filter.get_viewset_filterset(
             self.request, self.filterset_fields, "created_at"
         )
         return Profile.objects.filter(**filterset).order_by(sort_string)

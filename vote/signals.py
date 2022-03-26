@@ -6,8 +6,8 @@ from helpers.update_reactions import (
     add_supports,
     decrease_popularity,
     decrease_supports,
-    notify_author,
 )
+from helpers.notify import notify_author
 from vote.models import Vote
 
 
@@ -17,7 +17,7 @@ def post_save_vote(sender, instance, created, **kwargs):
     add_supports(instance)
     voted_instance = instance.publication or instance.comment
     verb = f"{'up' if instance.up else 'down'}-voted"
-    notify_author(voted_instance, instance, "vote", verb)
+    notify_author(voted_instance, instance, verb)
 
 
 @receiver(post_delete, sender=Vote)

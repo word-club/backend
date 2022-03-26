@@ -13,7 +13,7 @@ from community.models import (
 )
 from hashtag.serializers import HashtagSerializer
 from helpers.get_active import get_active_cover_for, get_active_avatar_for
-from publication.helper import get_thumbnail_for
+from helpers.publication import get_thumbnail_for
 from publication.models import (
     Publication,
 )

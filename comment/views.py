@@ -6,7 +6,7 @@ from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-import helper
+from helpers import helper
 from account.permissions import IsOwner
 from comment.helper import check_comment_update_date_limit
 from comment.serializers import *

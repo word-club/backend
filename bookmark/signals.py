@@ -1,23 +1,25 @@
-from django.db.models.signals import post_delete, post_save
+from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 
-from bookmark.helper import (
+from helpers.update_reactions import (
     add_popularity,
     add_supports,
     decrease_popularity,
     decrease_supports,
 )
 from bookmark.models import Bookmark
-from helpers.update_reactions import notify_author
+from helpers.notify import notify_author
 
 
 @receiver(post_save, sender=Bookmark)
-def post_save_bookmark(sender, instance, created, **kwargs):
+def post_save_bookmark(instance, created, **kwargs):
     if created:
         add_popularity(instance)
         add_supports(instance)
-        target = instance.community or instance.comment or instance.publication
-        notify_author(target=target, instance=instance, key="bookmark", verb="bookmarked")
+        # exclude community notification for bookmark creation
+        target = instance.profile or instance.publication or instance.comment
+        if target:
+            notify_author(target=target, instance=instance, verb="bookmarked")
 
 
 @receiver(post_delete, sender=Bookmark)

@@ -9,11 +9,10 @@ from publication.models import Publication
 class HideTest(TestCase):
     def setUp(self):
         self.actor = get_user_model().objects.create(username="actor", password="actor")
-        self.comment = Comment.objects.create(
-            comment="comment",
-            created_by=self.actor,
-        )
         self.publication = Publication.objects.create(title="Test", created_by=self.actor)
+        self.comment = Comment.objects.create(
+            comment="comment", created_by=self.actor, publication=self.publication
+        )
 
     def test_no_key_field_provided(self):
         try:

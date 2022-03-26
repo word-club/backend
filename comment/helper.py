@@ -2,6 +2,7 @@ from django.utils import timezone
 from rest_framework import status
 from rest_framework.response import Response
 
+from administration.models import Administration
 from bookmark.models import Bookmark
 from bookmark.serializers import BookmarkSerializer
 from comment.models import *
@@ -97,22 +98,3 @@ def check_comment_update_date_limit(obj):
             },
             status=status.HTTP_403_FORBIDDEN,
         )
-
-
-def add_pub_discussions(instance, created):
-    if created and instance.publication:
-        instance.publication.discussions += 1
-        instance.publication.save()
-        if instance.reply:
-            instance.reply.discussions += 1
-            instance.reply.save()
-
-
-def decrease_pub_discussions(instance):
-    if instance.publication:
-        if instance.publication.discussions > 0:
-            instance.publication.discussions -= 1
-            instance.publication.save()
-        if instance.reply and instance.reply.discussions > 0:
-            instance.reply.discussions -= 1
-            instance.reply.save()

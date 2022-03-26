@@ -1,123 +1,83 @@
-import collections
-from notification.models import Notification, NotificationTo
+from comment.models import Comment
 
 
-def prepare_fieldset(target, instance, key, verb=None, description=None, subject=None):
-    fieldset = collections.OrderedDict()
-    fieldset[key] = instance
-    fieldset["subject"] = subject or key.capitalize()
-    if description:
-        fieldset["description"] = description
-    else:
-        creator = instance.created_by
-        fieldset["description"] = (
-            f"{creator.profile.display_name or creator.username} has "
-            f"{verb}"
-            f" your {target.__class__.__name__.lower()}"
-            f' "{target.__str__()}".'
-        )
-    return fieldset
-
-
-def update_reaction(trigger, key, add=True):
-    instance = None
-    if hasattr(trigger, "publication") and trigger.publication:
-        instance = trigger.publication
-    elif hasattr(trigger, "comment") and trigger.comment:
-        instance = trigger.comment
-    elif hasattr(trigger, "community") and trigger.community:
-        instance = trigger.community
-    if instance:
-        if add:
-            setattr(instance, key, getattr(instance, key) + 1)
-        else:
-            if getattr(instance, key) > 0:
-                setattr(instance, key, getattr(instance, key) - 1)
-        instance.save()
-        # except for community instances update the authors profile
-        if not instance.__class__.__name__ == "Community":
-            profile_to_update = instance.created_by.profile
-            if add:
-                setattr(profile_to_update, key, getattr(profile_to_update, key) + 1)
-            else:
-                if getattr(profile_to_update, key) > 0:
-                    setattr(profile_to_update, key, getattr(profile_to_update, key) - 1)
-            profile_to_update.save()
-        if hasattr(instance, "community") and instance.community:
-            community_to_update = instance.community
-            if add:
-                setattr(community_to_update, key, getattr(community_to_update, key) + 1)
-            else:
-                if getattr(community_to_update, key) > 0:
-                    setattr(community_to_update, key, getattr(community_to_update, key) - 1)
-            community_to_update.save()
+def _get_target(trigger, search_for=None):
+    target = None
+    if not search_for:
+        search_for = ["publication", "comment", "community", "profile"]
+    for key in search_for:
+        if hasattr(trigger, key) and getattr(trigger, key):
+            target = getattr(trigger, key)
+            break
+    return target
 
 
 def add_popularity(trigger):
-    """
-    Add popularity to the trigger's base models
-
-    searches for
-
-    :param trigger: can be positive vote, share, bookmark or comment instance
-    :return: void
-    """
-    # update_reaction(trigger, "popularity")
-    # if the target is a publication
-    target = None
-    if hasattr(trigger, "publication") and trigger.publication:
-        target = trigger.publication
-    elif hasattr(trigger, "comment") and trigger.comment:
-        target = trigger.comment
-    elif hasattr(trigger, "community") and trigger.community:
-        target = trigger.community
-    elif hasattr(trigger, "profile") and trigger.profile:
-        target = trigger.profile
+    target = _get_target(trigger)
     target.popularity += 1
     target.save()
-    # if the target is a comment
 
 
 def add_supports(trigger):
-    update_reaction(trigger, "supports")
+    target = _get_target(trigger)
+    target.supports += 1
+    target.save()
 
 
 def add_dislikes(trigger):
-    update_reaction(trigger, "dislikes", False)
+    target = _get_target(trigger)
+    target.dislikes += 1
+    target.save()
 
 
 def decrease_popularity(trigger):
-    update_reaction(trigger, "popularity", False)
+    target = _get_target(trigger)
+    if target.popularity > 0:
+        target.popularity -= 1
+        target.save()
 
 
 def decrease_dislikes(trigger):
-    update_reaction(trigger, "dislikes", False)
+    target = _get_target(trigger)
+    if target.dislikes > 0:
+        target.dislikes -= 1
+        target.save()
 
 
 def decrease_supports(trigger):
-    update_reaction(trigger, "supports", False)
+    target = _get_target(trigger)
+    if target.supports > 0:
+        target.supports -= 1
+        target.save()
 
 
-def notify_author(target, instance, key=None, verb=None, description=None, subject=None):
-    fieldset = prepare_fieldset(target, instance, key, verb, description, subject)
-    notification = Notification.objects.create(**fieldset)
-    if target.__class__.__name__ == "Community":
-        # notify to all community subscribers on a published post
-        if instance.__class__.__name__ == "Publication":
-            from community.sub_models.subscription import Subscription
+def add_discussions(trigger: Comment):
+    publication = trigger.publication
+    publication.discussions += 1
+    publication.save()
+    trigger.created_by.profile.discussions += 1
+    trigger.created_by.profile.save()
+    if trigger.reply:
+        trigger.reply.discussions += 1
+        trigger.reply.save()
+    community = trigger.publication.community
+    if community:
+        community.discussions += 1
+        community.save()
 
-            subscriptions = Subscription.objects.filter(
-                community=target, disable_notification=False, is_approved=True, is_banned=False
-            )
-            # moderators will be included in the subscription list
-            for subscription in subscriptions:
-                NotificationTo.objects.create(notification=notification, user=subscription)
-        else:
-            # notify community moderators if the target is a community instance
-            from community.sub_models.moderator import Moderator
 
-            moderators = Moderator.objects.filter(community=target, is_accepted=True, role="MOD")
-            for mod in moderators:
-                NotificationTo.objects.create(notification=notification, user=mod.user)
-    else:
-        NotificationTo.objects.create(notification=notification, user=target.created_by)
+def decrease_discussions(trigger: Comment):
+    publication = trigger.publication
+    if publication.discussions > 0:
+        publication.discussions -= 1
+        publication.save()
+    if trigger.created_by.profile.discussions > 0:
+        trigger.created_by.profile.discussions -= 1
+        trigger.created_by.profile.save()
+    if trigger.reply and trigger.reply.discussions > 0:
+        trigger.reply.discussions -= 1
+        trigger.reply.save()
+    community = trigger.publication.community
+    if community and community.discussions > 0:
+        community.discussions -= 1
+        community.save()

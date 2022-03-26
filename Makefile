@@ -122,4 +122,4 @@ fresh: clean-db-migration fresh-migrations new-admin
 
 .PHONY: test
 test:
-	$(PYTHON) manage.py test --settings=backend.settings.test $(TEST)
+	$(PYTHON) manage.py test --settings=backend.settings.test
