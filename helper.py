@@ -42,8 +42,9 @@ first_day_of_week = now.replace(
 
 def generate_url_for_media_resource(media_url):
     http = "https" if os.getenv("IS_SECURE") else "http"
-    base_url = os.getenv("BASE_URL")
-    return "{}://{}{}".format(http, base_url, media_url)
+    host = os.getenv("HOST")
+    port = os.getenv("PORT")
+    return f"{http}://{host}:{port}{media_url}"
 
 
 def get_time_diff_in_days(time_posted):

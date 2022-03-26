@@ -23,15 +23,15 @@ migrate:
 
 .PHONY: serve
 serve:
-	$(PYTHON) manage.py runserver $(BASE_URL) --settings=$(SETTINGS)
+	$(PYTHON) manage.py runserver $(HOST):$(PORT) --settings=$(SETTINGS)
 
 .PHONY: dev
 dev:
-	$(PYTHON) manage.py runserver $(BASE_URL) --settings=backend.settings.dev
+	$(PYTHON) manage.py runserver $(HOST):$(PORT) --settings=backend.settings.dev
 
 .PHONY: prod
 prod:
-	$(PYTHON) manage.py runserver $(BASE_URL) --settings=backend.settings.prod
+	$(PYTHON) manage.py runserver $(HOST):$(PORT) --settings=backend.settings.prod
 
 .PHONY: shell
 shell:
