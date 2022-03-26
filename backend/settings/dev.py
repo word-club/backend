@@ -33,4 +33,7 @@ EMAIL_PORT = 1025
 EMAIL_HOST_USER = "foo@bar.com"
 # -----------------------------------------------------
 
+# Channels Configuration
+# https://channels.readthedocs.io/en/stable/
+
 CHANNEL_LAYERS = {"default": {"BACKEND": "channels.layers.InMemoryChannelLayer"}}

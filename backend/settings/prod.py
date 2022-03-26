@@ -38,7 +38,6 @@ EMAIL_HOST_PASSWORD = os.getenv("HOST_PASSWORD")
 # Channels Configuration
 # https://channels.readthedocs.io/en/stable/
 
-
 REDIS_HOST = os.getenv("REDIS_HOST") or "localhost"
 REDIS_PORT = os.getenv("REDIS_PORT") or 6379
 CHANNEL_LAYERS = {
