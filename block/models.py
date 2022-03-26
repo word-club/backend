@@ -1,20 +1,23 @@
 from django.contrib.auth import get_user_model
-from django.core.exceptions import ValidationError
-from django.db import models
 from django.db.models import UniqueConstraint
 
-from community.models import Community
+from helpers.base_classes import Mains, check_assignment, models
 
 
-class Block(models.Model):
-    user = models.ForeignKey(
-        get_user_model(),
+class Block(Mains):
+    profile = models.ForeignKey(
+        "account.Profile",
+        null=True,
         on_delete=models.CASCADE,
         related_name="blocks",
         editable=False,
     )
     community = models.ForeignKey(
-        Community, related_name="blocks", on_delete=models.CASCADE, editable=False
+        "community.Community",
+        related_name="blocks",
+        on_delete=models.CASCADE,
+        null=True,
+        editable=False,
     )
     created_by = models.ForeignKey(
         get_user_model(),
@@ -25,24 +28,16 @@ class Block(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def save(self, *args, **kwargs):
-        check = 0
-        if self.user:
-            check += 1
-        if self.community:
-            check += 1
-        if check == 0:
-            raise ValidationError({"detail": "One of the key field must be specified"})
-        if check > 1:
-            raise ValidationError({"detail": "Only one key field can be submitted"})
+        check_assignment(self, ["profile", "community"])
         return super().save(*args, **kwargs)
 
     class Meta:
         ordering = ["-created_at"]
         constraints = [
             UniqueConstraint(
-                fields=["user", "created_by"],
-                condition=models.Q(user__isnull=False),
-                name="unique_user_block",
+                fields=["profile", "created_by"],
+                condition=models.Q(profile__isnull=False),
+                name="unique_profile_block",
             ),
             UniqueConstraint(
                 fields=["community", "created_by"],

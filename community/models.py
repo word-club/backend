@@ -8,9 +8,10 @@ from community.sub_models.subscription import Subscription
 from community.sub_models.theme import Theme
 from community.validators import validate_unique_id
 from hashtag.models import Hashtag
+from helpers.base_classes import Reactions
 
 
-class Community(models.Model):
+class Community(Reactions):
     unique_id = models.CharField(max_length=64, unique=True, validators=[validate_unique_id])
     name = models.CharField(max_length=64, unique=True)
     description = models.CharField(max_length=256, null=True)
@@ -37,12 +38,6 @@ class Community(models.Model):
         related_name="my_communities",
         editable=False,
     )
-
-    popularity = models.PositiveIntegerField(default=0, editable=False)
-    dislikes = models.PositiveIntegerField(default=0, editable=False)
-    discussions = models.PositiveIntegerField(default=0, editable=False)
-    supports = models.PositiveBigIntegerField(default=0, editable=False)
-    views = models.PositiveBigIntegerField(default=0, editable=False)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

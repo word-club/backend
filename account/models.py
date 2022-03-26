@@ -4,36 +4,29 @@ from django.db import models
 from django_countries.fields import CountryField
 
 from choices import GENDER_CHOICES
+from helpers.base_classes import Reactions
 
 
-class Profile(models.Model):
+class Profile(Reactions):
     bio = models.TextField(null=True)
     birth_date = models.DateField(null=True)
+    display_name = models.CharField(max_length=32, null=True)
+    country = CountryField(null=True, blank=False)
 
     is_authorized = models.BooleanField(default=False, editable=False)
     authorized_at = models.DateTimeField(null=True, editable=False)
-
-    display_name = models.CharField(max_length=32, null=True)
 
     allow_follow = models.BooleanField(default=True)
     adult_content = models.BooleanField(default=True)
     content_visibility = models.BooleanField(default=True)
     communities_visibility = models.BooleanField(default=True)
 
-    popularity = models.PositiveIntegerField(default=0, editable=False)
-    dislikes = models.PositiveIntegerField(default=0, editable=False)
-    discussions = models.PositiveIntegerField(default=0, editable=False)
-    supports = models.PositiveBigIntegerField(default=0, editable=False)
-
-    country = CountryField(null=True, blank=False)
-
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
     is_deactivated = models.BooleanField(default=False, editable=False)
     deactivated_at = models.DateTimeField(null=True, editable=False)
     deactivation_reason = models.CharField(max_length=255, null=True, editable=False)
 
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
     created_by = models.OneToOneField(get_user_model(), on_delete=models.CASCADE, editable=False)
 
     class Meta:
@@ -41,8 +34,8 @@ class Profile(models.Model):
 
 
 class FollowUser(models.Model):
-    user = models.ForeignKey(
-        get_user_model(),
+    profile = models.ForeignKey(
+        "Profile",
         on_delete=models.CASCADE,
         related_name="followers",
         editable=False,
@@ -58,11 +51,14 @@ class FollowUser(models.Model):
 
     class Meta:
         ordering = ["-created_at"]
-        unique_together = [["created_by", "user"]]
+        unique_together = [["created_by", "profile"]]
 
 
 class Gender(models.Model):
     custom = models.CharField(max_length=16, null=True)
     type = models.CharField(max_length=2, choices=GENDER_CHOICES, null=True)
-    created_by = models.OneToOneField(get_user_model(), on_delete=models.CASCADE, editable=False)
+    profile = models.OneToOneField("Profile", on_delete=models.CASCADE, editable=False)
     created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.custom or dict(self.type)[self.type]

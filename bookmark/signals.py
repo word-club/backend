@@ -16,12 +16,8 @@ def post_save_bookmark(sender, instance, created, **kwargs):
     if created:
         add_popularity(instance)
         add_supports(instance)
-        target = instance.community \
-            or instance.comment \
-            or instance.publication
-        notify_author(
-            target=target, instance=instance, key="bookmark", verb="bookmarked"
-        )
+        target = instance.community or instance.comment or instance.publication
+        notify_author(target=target, instance=instance, key="bookmark", verb="bookmarked")
 
 
 @receiver(post_delete, sender=Bookmark)

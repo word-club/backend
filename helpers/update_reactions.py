@@ -54,7 +54,28 @@ def update_reaction(trigger, key, add=True):
 
 
 def add_popularity(trigger):
-    update_reaction(trigger, "popularity")
+    """
+    Add popularity to the trigger's base models
+
+    searches for
+
+    :param trigger: can be positive vote, share, bookmark or comment instance
+    :return: void
+    """
+    # update_reaction(trigger, "popularity")
+    # if the target is a publication
+    target = None
+    if hasattr(trigger, "publication") and trigger.publication:
+        target = trigger.publication
+    elif hasattr(trigger, "comment") and trigger.comment:
+        target = trigger.comment
+    elif hasattr(trigger, "community") and trigger.community:
+        target = trigger.community
+    elif hasattr(trigger, "profile") and trigger.profile:
+        target = trigger.profile
+    target.popularity += 1
+    target.save()
+    # if the target is a comment
 
 
 def add_supports(trigger):

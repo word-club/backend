@@ -9,6 +9,14 @@ SETTINGS := backend.settings.dev
 start-app:
 	django-admin startapp $(APP)
 
+.PHONY: p-install
+p-install:
+	$(PIP) install $(PACKAGE)
+
+.PHONY: pip-freeze
+pip-freeze:
+	$(PIP) freeze > requirements.txt
+
 .PHONY: install
 install:
 	$(PIP) install -r requirements.txt
@@ -90,39 +98,22 @@ new-admin:
 fresh-migrations:
 	make clean-migrations
 	make make-migrations APP=account
-	make migrate
 	make make-migrations APP=hashtag
-	make migrate
 	make make-migrations APP=community
-	make migrate
 	make make-migrations APP=publication
-	make migrate
 	make make-migrations APP=comment
-	make migrate
 	make make-migrations APP=vote
-	make migrate
-	make make-migrations APP=share
-	make migrate
 	make make-migrations APP=bookmark
-	make migrate
+	make make-migrations APP=share
 	make make-migrations APP=hide
-	make migrate
-	make make-migrations APP=report
-	make migrate
-	make make-migrations APP=avatar
-	make migrate
-	make make-migrations APP=cover
-	make migrate
-	make make-migrations APP=image
-	make migrate
-	make make-migrations APP=link
-	make migrate
-	make make-migrations APP=auth_code
-	make migrate
 	make make-migrations APP=block
-	make migrate
+	make make-migrations APP=avatar
+	make make-migrations APP=cover
+	make make-migrations APP=image
+	make make-migrations APP=link
+	make make-migrations APP=auth_code
+	make make-migrations APP=report
 	make make-migrations APP=notification
-	make migrate
 	make make-migrations APP=administration
 	make migrate
 
