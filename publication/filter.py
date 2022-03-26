@@ -6,10 +6,10 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from comment.models import Comment
-from helper import fetch_query, get_filter_range
+from helpers.filter import fetch_query, get_filter_range
 from publication.models import Publication
 from publication.serializers import PublicationSerializer
-from publication.validators import check_bool_query, check_sort_by_query
+from helpers.validators import check_bool_query, check_sort_by_query
 from share.models import Share
 from vote.models import Vote
 

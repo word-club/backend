@@ -165,18 +165,3 @@ MAX_UPLOAD_IMAGE_SIZE = 70000
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 
 ASGI_APPLICATION = "backend.asgi.application"
-
-# Channels Configuration
-# https://channels.readthedocs.io/en/stable/
-
-
-REDIS_HOST = os.getenv("REDIS_HOST") or "localhost"
-REDIS_PORT = os.getenv("REDIS_PORT") or 6379
-CHANNEL_LAYERS = {
-    "default": {
-        "BACKEND": "channels_redis.core.RedisChannelLayer",
-        "CONFIG": {
-            "hosts": [(REDIS_HOST, REDIS_PORT)],
-        },
-    },
-}

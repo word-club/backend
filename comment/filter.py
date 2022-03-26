@@ -7,8 +7,8 @@ from rest_framework.views import APIView
 from comment.helper import get_comment_reactions
 from comment.models import Comment
 from comment.serializers import CommentSerializer
-from helper import fetch_query, get_filter_range
-from publication.validators import check_bool_query, check_sort_by_query
+from helpers.filter import fetch_query, get_filter_range
+from helpers.validators import check_bool_query, check_sort_by_query
 
 
 def get_comments_wrt_query(request):

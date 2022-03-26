@@ -2,9 +2,8 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils import timezone
 
-from community.helper import notify_community
 from community.models import Community, Moderator, Subscription, Theme
-from helpers.update_reactions import notify_author
+from helpers.notify import notify_author
 
 
 def set_writer_as_mod(instance, writer):

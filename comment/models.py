@@ -1,17 +1,15 @@
 from django.contrib.auth import get_user_model
 
 from helpers.base_classes import Reactions, models
-from publication.models import Publication
 
 
 class Comment(Reactions):
     comment = models.TextField()
     publication = models.ForeignKey(
-        Publication,
+        "publication.Publication",
         related_name="comments",
         on_delete=models.CASCADE,
         editable=False,
-        null=True,
     )
     created_by = models.ForeignKey(
         get_user_model(),

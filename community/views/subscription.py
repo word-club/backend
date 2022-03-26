@@ -12,7 +12,7 @@ from community.models import Community
 from community.permissions import IsSubscriber, IsNotASubscriber, IsCommunityModerator
 from community.serializers.subscription import SubscriptionSerializer
 from community.sub_models.subscription import Subscription
-from helpers.update_reactions import notify_author
+from helpers.notify import notify_author
 
 
 class RemoveDisableNotification(APIView):

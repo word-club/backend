@@ -6,13 +6,14 @@ from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-import helper
+from helpers import helper
 from account.permissions import IsOwner
 from community.helper import check_community_law
 from community.permissions import IsCommunityModerator
-from helpers.update_reactions import notify_author, add_popularity
+from helpers.update_reactions import add_popularity
+from helpers.notify import notify_author
 from hide.models import Hide
-from publication.helper import check_publication_update_date_limit
+from helpers.publication import check_publication_update_date_limit
 from publication.serializers import *
 
 
