@@ -13,7 +13,6 @@ def broadcast_notifications(sender, instance, created, **kwargs):
         channel_layer = get_channel_layer()
         serializer = NotificationSerializer(instance.notification, read_only=True)
         # Trigger message sent to group
-        print("fromSignal", instance.user.username)
         async_to_sync(channel_layer.group_send)(
             # name of the channels group
             str(instance.user.username),

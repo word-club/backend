@@ -1,10 +1,10 @@
 from django.contrib.auth import get_user_model
-from django.db import models
 
+from helpers.base_classes import Reactions, models
 from publication.models import Publication
 
 
-class Comment(models.Model):
+class Comment(Reactions):
     comment = models.TextField()
     publication = models.ForeignKey(
         Publication,
@@ -19,11 +19,6 @@ class Comment(models.Model):
         related_name="my_comments",
         editable=False,
     )
-
-    popularity = models.PositiveBigIntegerField(default=0, editable=False)
-    dislikes = models.PositiveBigIntegerField(default=0, editable=False)
-    supports = models.PositiveBigIntegerField(default=0, editable=False)
-    discussions = models.PositiveBigIntegerField(default=0, editable=False)
 
     is_pinned = models.BooleanField(default=False, editable=False)
     pinned_at = models.DateTimeField(null=True, editable=False)
@@ -42,3 +37,6 @@ class Comment(models.Model):
 
     class Meta:
         ordering = ["-created_at"]
+
+    def __str__(self):
+        return self.comment

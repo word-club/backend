@@ -1,12 +1,12 @@
 from django.contrib.auth import get_user_model
-from django.db import models
 
 from choices import PUBLICATION_TYPE_CHOICES
 from community.models import Community
 from hashtag.models import Hashtag
+from helpers.base_classes import Reactions, models
 
 
-class Publication(models.Model):
+class Publication(Reactions):
     title = models.CharField(max_length=128)
     content = models.TextField(null=True, blank=True)
 
@@ -18,8 +18,6 @@ class Publication(models.Model):
     pinned_by = models.ForeignKey(
         get_user_model(), null=True, editable=False, on_delete=models.SET_NULL
     )
-
-    views = models.PositiveBigIntegerField(default=0, editable=False)
 
     type = models.CharField(max_length=32, choices=PUBLICATION_TYPE_CHOICES, default="editor")
 
@@ -42,12 +40,7 @@ class Publication(models.Model):
         editable=False,
     )
 
-    popularity = models.PositiveBigIntegerField(default=0, editable=False)
-    dislikes = models.PositiveBigIntegerField(default=0, editable=False)
-    supports = models.PositiveBigIntegerField(default=0, editable=False)
-    discussions = models.PositiveBigIntegerField(default=0, editable=False)
-
-    # TODO: implement ban one to one relation
+    # TODO: implement ban from different app
     # is_banned = models.BooleanField(default=False, editable=False)
     # banned_at = models.DateTimeField(null=True, editable=False)
     # banned_by = models.ForeignKey(
@@ -61,6 +54,9 @@ class Publication(models.Model):
 
     class Meta:
         ordering = ["-created_at"]
+
+    def __str__(self):
+        return self.title
 
     def is_draft(self):
         return not self.is_published

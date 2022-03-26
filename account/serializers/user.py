@@ -42,6 +42,7 @@ class GenderSerializer(serializers.ModelSerializer):
 
 class ProfilePostSerializer(serializers.ModelSerializer):
     country = CountryField(required=False, country_dict=True)
+    gender = GenderSerializer(write_only=True, required=True)
 
     class Meta:
         model = Profile
@@ -50,7 +51,6 @@ class ProfilePostSerializer(serializers.ModelSerializer):
 
 class UserPostSerializer(serializers.ModelSerializer):
     profile = ProfilePostSerializer(write_only=True, required=True)
-    gender = GenderSerializer(write_only=True, required=True)
 
     @staticmethod
     def validate_password(password):
@@ -65,39 +65,38 @@ class UserPostSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         profile_data = validated_data.pop("profile")
-        gender_data = validated_data.pop("gender")
+        gender_data = profile_data.pop("gender")
         password = validated_data.pop("password")
         user = get_user_model().objects.create(**validated_data)
         user.set_password(password)
         user.save()
         user.profile.birth_date = profile_data.get("birth_date")
         user.profile.save()
-        user.gender.update(**gender_data)
-        user.gender.save()
+        user.profile.gender.update(**gender_data)
+        user.profile.gender.save()
         return user
 
 
 class UserUpdateSerializer(serializers.ModelSerializer):
     profile = ProfilePostSerializer(write_only=True, required=False)
-    gender = GenderSerializer(write_only=True, required=False)
 
     class Meta:
         model = get_user_model()
-        fields = ["email", "profile", "gender"]
+        fields = ["email", "profile"]
 
     def update(self, instance, validated_data):
         profile = instance.profile
-        gender = instance.gender
+        gender = profile.gender
         if "profile" in validated_data:
             profile_data = validated_data.pop("profile")
             for attr, value in profile_data.items():
                 setattr(profile, attr, value)
                 profile.save()
-        if "gender" in validated_data:
-            gender_data = validated_data.pop("gender")
-            for attr, value in gender_data.items():
-                setattr(gender, attr, value)
-                gender.save()
+            if "gender" in profile_data:
+                gender_data = profile_data.pop("gender")
+                for attr, value in gender_data.items():
+                    setattr(gender, attr, value)
+                    gender.save()
         if "email" in validated_data:
             profile.is_authorized = False
             profile.authorized_at = None
@@ -131,7 +130,6 @@ class UserRetrieveSerializer(serializers.ModelSerializer):
     avatar = serializers.SerializerMethodField(allow_null=True)
     cover = serializers.SerializerMethodField(allow_null=True)
     profile = ProfileSerializer(read_only=True)
-    gender = GenderSerializer(read_only=True)
     followers = FollowerSerializer(many=True, read_only=True)
     following = FollowingSerializer(many=True, read_only=True)
     my_comments = MyCommentSerializer(many=True, read_only=True)
@@ -168,7 +166,6 @@ class UserInfoSerializer(serializers.ModelSerializer):
     avatar = serializers.SerializerMethodField(allow_null=True)
     cover = serializers.SerializerMethodField(allow_null=True)
     profile = ProfileSerializer(read_only=True)
-    gender = GenderSerializer(read_only=True)
     followers = FollowerSerializer(many=True, read_only=True)
     following = FollowingSerializer(many=True, read_only=True)
 
