@@ -37,12 +37,12 @@ class GenderSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Gender
-        exclude = ["created_by", "id"]
+        exclude = ["profile", "id"]
 
 
 class ProfilePostSerializer(serializers.ModelSerializer):
     country = CountryField(required=False, country_dict=True)
-    gender = GenderSerializer(write_only=True, required=True)
+    gender = GenderSerializer(write_only=True, required=False)
 
     class Meta:
         model = Profile
@@ -65,15 +65,12 @@ class UserPostSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         profile_data = validated_data.pop("profile")
-        gender_data = profile_data.pop("gender")
         password = validated_data.pop("password")
         user = get_user_model().objects.create(**validated_data)
         user.set_password(password)
         user.save()
         user.profile.birth_date = profile_data.get("birth_date")
         user.profile.save()
-        user.profile.gender.update(**gender_data)
-        user.profile.gender.save()
         return user
 
 
@@ -119,7 +116,6 @@ class ProfileSerializer(CountryFieldMixin, serializers.ModelSerializer):
 
 class UserSerializer(serializers.ModelSerializer):
     profile = ProfileSerializer(read_only=True)
-    gender = GenderSerializer(read_only=True)
 
     class Meta:
         model = get_user_model()
@@ -181,7 +177,7 @@ class UserInfoSerializer(serializers.ModelSerializer):
     managed_communities = MyModerationSerializer(many=True, read_only=True)
     recent_publications = RecentPublicationSerializer(many=True, read_only=True)
 
-    received_notifications = MyNotificationSerializer(many=True, read_only=True)
+    my_notifications = MyNotificationSerializer(many=True, read_only=True)
 
     @staticmethod
     def get_avatar(obj):

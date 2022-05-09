@@ -1,6 +1,9 @@
 from channels.generic.websocket import JsonWebsocketConsumer
 from asgiref.sync import async_to_sync
 
+from notification.models import NotificationTo
+from notification.serializers import MyNotificationSerializer
+
 
 class NotificationConsumer(JsonWebsocketConsumer):
     def get_user_from_scope(self):
@@ -15,7 +18,16 @@ class NotificationConsumer(JsonWebsocketConsumer):
         else:
             async_to_sync(self.channel_layer.group_add)(f"{user.username}", self.channel_name)
             print(f"Added {self.channel_name} channel to the group '{user.username}'")
-            self.send_json({"message": f"{user.username} connected to his personal group"})
+            user_notifications = NotificationTo.objects.filter(user=user)
+            serializer = MyNotificationSerializer(user_notifications, many=True, allow_null=True)
+            self.send_json({
+                "message": f"{user.username} connected to his personal group",
+                "notifications": {
+                    "count": user_notifications.count(),
+                    "unseen_count": user_notifications.filter(seen=False).count(),
+                    "results": serializer.data
+                }
+            })
 
     def disconnect(self, code):
         user = self.get_user_from_scope()

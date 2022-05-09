@@ -2,6 +2,8 @@ from django.core.exceptions import ValidationError
 from django.contrib.auth import get_user_model
 from django.db import models
 
+from helpers.base_classes import check_assignment
+
 
 class Notification(models.Model):
     is_global = models.BooleanField(default=False)
@@ -67,29 +69,20 @@ class Notification(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def save(self, *args, **kwargs):
-        check = 0
-        if self.publication:
-            check += 1
-        if self.community:
-            check += 1
-        if self.comment:
-            check += 1
-        if self.vote:
-            check += 1
-        if self.share:
-            check += 1
-        if self.subscription:
-            check += 1
-        if self.bookmark:
-            check += 1
-        if self.follow:
-            check += 1
-        if self.report:
-            check += 1
-        if check == 0:
-            raise ValidationError({"detail": "One of the key field must be specified"})
-        if check > 1:
-            raise ValidationError({"detail": "Only one key field can be submitted"})
+        check_assignment(
+            self,
+            [
+                "publication",
+                "community",
+                "comment",
+                "vote",
+                "share",
+                "subscription",
+                "bookmark",
+                "follow",
+                "report",
+            ],
+        )
         return super().save(*args, **kwargs)
 
     class Meta:
@@ -101,7 +94,7 @@ class NotificationTo(models.Model):
     user = models.ForeignKey(
         get_user_model(),
         on_delete=models.CASCADE,
-        related_name="received_notifications",
+        related_name="my_notifications",
     )
     notification = models.ForeignKey(
         "Notification",

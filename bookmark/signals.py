@@ -18,8 +18,17 @@ def post_save_bookmark(instance, created, **kwargs):
         add_supports(instance)
         # exclude community notification for bookmark creation
         target = instance.profile or instance.publication or instance.comment
+        description = None
+        if instance.profile:
+            description = 'User {creator} has bookmarked your profile.'\
+                .format(creator=instance.profile.__str__())
         if target:
-            notify_author(target=target, instance=instance, verb="bookmarked")
+            notify_author(
+                target=target,
+                instance=instance,
+                verb="bookmarked",
+                description=description
+            )
 
 
 @receiver(post_delete, sender=Bookmark)

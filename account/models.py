@@ -32,6 +32,11 @@ class Profile(Reactions):
     class Meta:
         ordering = ["-created_at"]
 
+    def __str__(self):
+        if self.display_name:
+            return self.display_name
+        return self.created_by.username
+
 
 class FollowUser(models.Model):
     profile = models.ForeignKey(

@@ -2,11 +2,10 @@ from comment.models import Comment
 
 
 def _get_target(trigger, search_for=None):
-    target = None
     if not search_for:
         search_for = ["publication", "comment", "community", "profile"]
     for key in search_for:
-        if hasattr(trigger, key) and getattr(trigger, key):
+        if hasattr(trigger, key):
             target = getattr(trigger, key)
             break
     return target

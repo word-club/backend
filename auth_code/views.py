@@ -34,7 +34,6 @@ class ResetPasswordRequestCode(APIView):
             email = serializer.validated_data["email"]
             try:
                 user = get_user_model().objects.get(email=email)
-
                 current_site = get_current_site(request)
                 code_object, created = ResetPasswordCode.objects.get_or_create(user=user)
                 if not created:

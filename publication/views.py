@@ -6,10 +6,10 @@ from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from helpers import helper
 from account.permissions import IsOwner
 from community.helper import check_community_law
 from community.permissions import IsCommunityModerator
+from helpers.filter import get_viewset_filterset, get_user_from_auth_header
 from helpers.update_reactions import add_popularity
 from helpers.notify import notify_author
 from hide.models import Hide
@@ -31,10 +31,10 @@ class PublicationListView(mixins.ListModelMixin, viewsets.GenericViewSet):
     ]
 
     def get_queryset(self):
-        filterset, sort_string = helper.get_viewset_filterset(
+        filterset, sort_string = get_viewset_filterset(
             self.request, self.filterset_fields, "published_at"
         )
-        user = helper.get_user_from_auth_header(self.request)
+        user = get_user_from_auth_header(self.request)
 
         queryset = Publication.objects.filter(**filterset).order_by(sort_string)
         hidden_publications = []
@@ -151,7 +151,6 @@ class PublishPublicationView(APIView):
                 notify_author(
                     target=publication.community,
                     instance=publication,
-                    key="publication",
                     description=description,
                 )
             publication.published_at = timezone.now()
@@ -209,7 +208,7 @@ class GetAPublication(APIView):
     def get(request, pk=None):
         publication = get_object_or_404(Publication, pk=pk)
         if publication.is_published:
-            requestor = helper.get_user_from_auth_header(request)
+            requestor = get_user_from_auth_header(request)
             if requestor:
                 _, created = RecentPublication.objects.get_or_create(
                     created_by=requestor, publication=publication

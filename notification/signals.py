@@ -4,20 +4,20 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 
 from notification.models import NotificationTo
-from notification.serializers import NotificationSerializer, NotificationToSerializer
+from notification.serializers import MyNotificationSerializer
 
 
 @receiver(post_save, sender=NotificationTo)
 def broadcast_notifications(sender, instance, created, **kwargs):
     if created:
         channel_layer = get_channel_layer()
-        serializer = NotificationSerializer(instance.notification, read_only=True)
+        serializer = MyNotificationSerializer(instance, read_only=True)
         # Trigger message sent to group
         async_to_sync(channel_layer.group_send)(
             # name of the channels group
             str(instance.user.username),
             {
                 "type": "notify",
-                "data": serializer.data,
+                "notification": serializer.data,
             },
         )

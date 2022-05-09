@@ -11,7 +11,7 @@ def prepare_fieldset(target, instance, verb=None, description=None, subject=None
     else:
         creator = instance.created_by
         fieldset["description"] = (
-            f"{creator.profile.display_name or creator.username} has "
+            f'User "{creator.profile.display_name or creator.username}" has '
             f"{verb}"
             f" your {target.__class__.__name__.lower()}"
             f' "{target.__str__()}".'

@@ -1,4 +1,4 @@
-from django.db.models.signals import post_delete, post_save
+from django.db.models.signals import pre_delete, post_save
 from django.dispatch import receiver
 
 from helpers.update_reactions import (
@@ -20,7 +20,7 @@ def post_save_vote(sender, instance, created, **kwargs):
     notify_author(voted_instance, instance, verb)
 
 
-@receiver(post_delete, sender=Vote)
+@receiver(pre_delete, sender=Vote)
 def post_delete_vote(sender, instance, **kwargs):
     decrease_popularity(instance)
     decrease_supports(instance)
