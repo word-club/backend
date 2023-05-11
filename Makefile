@@ -41,7 +41,7 @@ test:
 
 .PHONY: prod
 prod:
-	$(PYTHON) manage.py runserver $(HOST):$(PORT) --settings=backend.settings.prod
+	DJANGO_SETTINGS_MODULE=backend.settings.dev daphne -p $(PORT) backend.asgi:application
 
 .PHONY: shell
 shell:

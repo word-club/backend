@@ -7,18 +7,21 @@ For more information on this file, see
 https://docs.djangoproject.com/en/3.1/howto/deployment/asgi/
 """
 
-import os
+import os, django
 
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "backend.settings")
+django.setup()
+
+from django.urls import path
+from django.core.asgi import get_asgi_application
 from channels.routing import ProtocolTypeRouter, URLRouter
 from channels.security.websocket import AllowedHostsOriginValidator
-from django.urls import path
 
 from backend.SocketAuthMiddleware import UserAuthMiddleware
 
 from account.consumers import LoginConsumer
 from notification.consumers import NotificationConsumer
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "backend.settings")
 
 websockets = URLRouter(
     [
@@ -29,6 +32,7 @@ websockets = URLRouter(
 
 application = ProtocolTypeRouter(
     {
+         "http": get_asgi_application(),
         # websocket handler
         "websocket": AllowedHostsOriginValidator(UserAuthMiddleware(websockets)),
     }
