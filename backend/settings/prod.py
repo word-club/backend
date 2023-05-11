@@ -1,12 +1,12 @@
 from backend.settings.base import *
 
 ALLOWED_HOSTS = [
-    "wordclub.foodswipe.com.np",
+    "wc.kiranparajuli.com.np"
 ]
 
 # SECURITY WARNING: don't include unknown hosts
 CORS_ALLOWED_ORIGIN_REGEXES = [
-    r"https?:\/\/wc.foodswipe.com.np$",
+    r"https?:\/\/wordclub.kiranparajuli.com.np$",
 ]
 
 # Database
@@ -14,14 +14,21 @@ CORS_ALLOWED_ORIGIN_REGEXES = [
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.postgresql_psycopg2",
-        "NAME": os.getenv("DB_NAME") or "wordclub",
-        "USER": os.getenv("DB_USER") or "wordclub",
-        "PASSWORD": os.getenv("DB_PASSWORD") or "wordclub",
-        "HOST": os.getenv("DB_HOST") or "localhost",
-        "PORT": os.getenv("DB_PORT") or "5432",
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": BASE_DIR / "db.sqlite3",
     }
 }
+
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.db.backends.postgresql_psycopg2",
+#         "NAME": os.getenv("DB_NAME") or "wordclub",
+#         "USER": os.getenv("DB_USER") or "wordclub",
+#         "PASSWORD": os.getenv("DB_PASSWORD") or "wordclub",
+#         "HOST": os.getenv("DB_HOST") or "localhost",
+#         "PORT": os.getenv("DB_PORT") or "5432",
+#     }
+# }
 # -------------------------------------------------------------
 
 # Email Server Configuration
