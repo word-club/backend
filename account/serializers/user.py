@@ -37,7 +37,7 @@ class GenderSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Gender
-        exclude = ["created_by", "id"]
+        fields = "__all__"
 
 
 class ProfilePostSerializer(serializers.ModelSerializer):

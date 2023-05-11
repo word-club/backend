@@ -1,4 +1,8 @@
 from .time import *
+from collections import OrderedDict
+from helpers.validators import check_bool_query, validate_date_string
+from helpers.helper import get_user_from_auth_header
+from administration.models import Administration
 
 
 def fetch_query(request):
@@ -72,19 +76,6 @@ def get_filter_range(params):
     else:
         timestamp_range = [before_three_days, now]
     return timestamp_range, None
-
-
-def get_user_from_auth_header(request):
-    auth_header = request.headers.get("Authorization", False)
-    if auth_header:
-        token = auth_header.split(" ")[1]
-        try:
-            token_instance = Token.objects.get(key=token)
-            return token_instance.user
-        except Token.DoesNotExist:
-            return None
-    else:
-        return None
 
 
 def get_viewset_filterset(request, filterset_fields, default_field):

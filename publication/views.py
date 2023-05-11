@@ -6,7 +6,7 @@ from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from helpers import helper
+from helpers import filter, helper
 from account.permissions import IsOwner
 from community.helper import check_community_law
 from community.permissions import IsCommunityModerator
@@ -31,7 +31,7 @@ class PublicationListView(mixins.ListModelMixin, viewsets.GenericViewSet):
     ]
 
     def get_queryset(self):
-        filterset, sort_string = helper.get_viewset_filterset(
+        filterset, sort_string = filter.get_viewset_filterset(
             self.request, self.filterset_fields, "published_at"
         )
         user = helper.get_user_from_auth_header(self.request)

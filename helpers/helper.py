@@ -1,6 +1,19 @@
 import os
 import datetime
 from django.utils.timezone import utc
+from rest_framework.authtoken.models import Token
+
+def get_user_from_auth_header(request):
+    auth_header = request.headers.get("Authorization", False)
+    if auth_header:
+        token = auth_header.split(" ")[1]
+        try:
+            token_instance = Token.objects.get(key=token)
+            return token_instance.user
+        except Token.DoesNotExist:
+            return None
+    else:
+        return None
 
 
 def get_time_diff_in_days(time_posted):
