@@ -99,6 +99,7 @@ new-admin:
 fresh-migrations:
 	make clean-migrations
 	make mm APP=account
+	make migrate
 	make mm APP=hashtag
 	make mm APP=community
 	make mm APP=publication
