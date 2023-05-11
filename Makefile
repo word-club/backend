@@ -3,7 +3,6 @@ SHELL=/bin/bash
 ADMIN_EMAIL := admin@test.com
 ADMIN_USERNAME := admin
 ADMIN_PASSWORD := admin
-SETTINGS := backend.settings.dev
 HOST := localhost
 PORT := 8000
 
