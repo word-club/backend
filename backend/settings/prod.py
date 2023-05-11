@@ -14,21 +14,14 @@ CORS_ALLOWED_ORIGIN_REGEXES = [
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+        "ENGINE": "django.db.backends.postgresql_psycopg2",
+        "NAME": os.getenv("DB_NAME") or "wordclub",
+        "USER": os.getenv("DB_USER") or "wordclub",
+        "PASSWORD": os.getenv("DB_PASSWORD") or "wordclub",
+        "HOST": os.getenv("DB_HOST") or "localhost",
+        "PORT": os.getenv("DB_PORT") or "5432",
     }
 }
-
-# DATABASES = {
-#     "default": {
-#         "ENGINE": "django.db.backends.postgresql_psycopg2",
-#         "NAME": os.getenv("DB_NAME") or "wordclub",
-#         "USER": os.getenv("DB_USER") or "wordclub",
-#         "PASSWORD": os.getenv("DB_PASSWORD") or "wordclub",
-#         "HOST": os.getenv("DB_HOST") or "localhost",
-#         "PORT": os.getenv("DB_PORT") or "5432",
-#     }
-# }
 # -------------------------------------------------------------
 
 # Email Server Configuration
