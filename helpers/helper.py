@@ -3,13 +3,6 @@ import datetime
 from django.utils.timezone import utc
 
 
-def generate_url_for_media_resource(media_url):
-    http = "https" if os.getenv("IS_SECURE") else "http"
-    host = os.getenv("HOST")
-    port = os.getenv("PORT")
-    return f"{http}://{host}:{port}{media_url}"
-
-
 def get_time_diff_in_days(time_posted):
     if time_posted:
         current = datetime.datetime.utcnow().replace(tzinfo=utc)

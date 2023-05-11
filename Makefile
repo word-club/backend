@@ -4,14 +4,12 @@ ADMIN_EMAIL := admin@test.com
 ADMIN_USERNAME := admin
 ADMIN_PASSWORD := admin
 SETTINGS := backend.settings.dev
+HOST := localhost
+PORT := 8000
 
 .PHONY: start-app
 start-app:
 	django-admin startapp $(APP)
-
-.PHONY: p-install
-p-install:
-	$(PIP) install $(PACKAGE)
 
 .PHONY: pip-freeze
 pip-freeze:
@@ -21,8 +19,8 @@ pip-freeze:
 install:
 	$(PIP) install -r requirements.txt
 
-.PHONY: make-migrations
-make-migrations:
+.PHONY: mm
+mm:
 	$(PYTHON) manage.py makemigrations $(APP) --settings=$(SETTINGS)
 
 .PHONY: migrate
@@ -36,6 +34,10 @@ serve:
 .PHONY: dev
 dev:
 	$(PYTHON) manage.py runserver $(HOST):$(PORT) --settings=backend.settings.dev
+
+.PHONY: test
+test:
+	$(PYTHON) manage.py test --settings=backend.settings.test
 
 .PHONY: prod
 prod:
@@ -97,29 +99,25 @@ new-admin:
 .PHONY: fresh-migrations
 fresh-migrations:
 	make clean-migrations
-	make make-migrations APP=account
-	make make-migrations APP=hashtag
-	make make-migrations APP=community
-	make make-migrations APP=publication
-	make make-migrations APP=comment
-	make make-migrations APP=vote
-	make make-migrations APP=bookmark
-	make make-migrations APP=share
-	make make-migrations APP=hide
-	make make-migrations APP=block
-	make make-migrations APP=avatar
-	make make-migrations APP=cover
-	make make-migrations APP=image
-	make make-migrations APP=link
-	make make-migrations APP=auth_code
-	make make-migrations APP=report
-	make make-migrations APP=notification
-	make make-migrations APP=administration
+	make mm APP=account
+	make mm APP=hashtag
+	make mm APP=community
+	make mm APP=publication
+	make mm APP=comment
+	make mm APP=vote
+	make mm APP=bookmark
+	make mm APP=share
+	make mm APP=hide
+	make mm APP=block
+	make mm APP=avatar
+	make mm APP=cover
+	make mm APP=image
+	make mm APP=link
+	make mm APP=auth_code
+	make mm APP=report
+	make mm APP=notification
+	make mm APP=administration
 	make migrate
 
 .PHONY: fresh
 fresh: clean-db-migration fresh-migrations new-admin
-
-.PHONY: test
-test:
-	$(PYTHON) manage.py test --settings=backend.settings.test
