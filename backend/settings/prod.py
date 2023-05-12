@@ -9,6 +9,11 @@ CORS_ALLOWED_ORIGIN_REGEXES = [
     r"https?:\/\/wordclub.kiranparajuli.com.np$",
 ]
 
+# CSRF ALLOWED ORIGINS
+CSRF_TRUSTED_ORIGINS = [
+    "wc.kiranparajuli.com.np"
+]
+
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
