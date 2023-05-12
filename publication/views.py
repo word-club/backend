@@ -6,21 +6,23 @@ from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from ban.models import Ban
 from helpers import filter, helper
-from account.permissions import IsOwner
+from account.permissions import IsOwner, IsSuperUser
 from community.helper import check_community_law
 from community.permissions import IsCommunityModerator
 from helpers.update_reactions import add_popularity
 from helpers.notify import notify_author
 from hide.models import Hide
 from helpers.publication import check_publication_update_date_limit
+from publication.permissions import IsNotBanned
 from publication.serializers import *
 
 
 class PublicationListView(mixins.ListModelMixin, viewsets.GenericViewSet):
     serializer_class = PublicationSerializer
     authentication_classes = []
-    permission_classes = []
+    permission_classes = [IsNotBanned]
     filterset_fields = [
         "created_by",
         "is_published",
@@ -37,11 +39,20 @@ class PublicationListView(mixins.ListModelMixin, viewsets.GenericViewSet):
         user = helper.get_user_from_auth_header(self.request)
 
         queryset = Publication.objects.filter(**filterset).order_by(sort_string)
-        hidden_publications = []
+
+        # exclude banned publications and hidden publications (if user is authenticated)
+        ids_to_exclude = []
         if user:
             hides = Hide.objects.filter(publication__isnull=False)
-            [hidden_publications.append(hide.publication.id) for hide in hides]
-        return queryset.exclude(id__in=hidden_publications)
+            [ids_to_exclude.append(hide.publication.id) for hide in hides]
+        [ids_to_exclude.append(ban.ban_item_id) for ban in Ban.objects.filter(
+            ban_item_model="publication",
+            ban_item_app_label="publication",
+        )]
+
+        return queryset.exclude(
+            id__in=ids_to_exclude
+        )
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
@@ -69,11 +80,11 @@ class AddPublicationView(APIView):
 
 class RetrieveUpdatePublicationView(APIView):
     authentication_classes = [TokenAuthentication]
-    permission_classes = [IsOwner | IsCommunityModerator]
+    permission_classes = [IsOwner | IsCommunityModerator, IsNotBanned]
 
-    @staticmethod
-    def get(request, pk):
+    def get(self, request, pk):
         publication = get_object_or_404(Publication, pk=pk)
+        self.check_object_permissions(request, publication)
         if request.user != publication.created_by:
             publication.views += 1
             publication.save()
@@ -113,7 +124,7 @@ class RetrieveUpdatePublicationView(APIView):
 
 class PublishPublicationView(APIView):
     authentication_classes = [TokenAuthentication]
-    permission_classes = [IsOwner | IsCommunityModerator]
+    permission_classes = [IsOwner | IsCommunityModerator, IsNotBanned]
 
     def post(self, request, pk):
         publication = get_object_or_404(Publication, pk=pk)
@@ -144,14 +155,14 @@ class PublishPublicationView(APIView):
                 add_popularity(publication)
                 published_by = publication.created_by
                 description = (
-                    f"{published_by.profile.display_name or published_by.created_by.username}"
+                    f"{published_by.profile.display_name or published_by.username}"
                     f" published a new publication in the community "
                     f'"{publication.community.name}".'
                 )
                 notify_author(
                     target=publication.community,
                     instance=publication,
-                    key="publication",
+                    verb="published",
                     description=description,
                 )
             publication.published_at = timezone.now()
@@ -162,6 +173,9 @@ class PublishPublicationView(APIView):
         )
 
     def delete(self, request, pk=None):
+        """
+        Un publish a publication (only if it is published)
+        """
         publication = get_object_or_404(Publication, pk=pk)
         self.check_object_permissions(request, publication)
         if publication.is_draft():

@@ -1,7 +1,8 @@
 from django.contrib.auth import get_user_model
 from django.db import models
 
-from helpers.base_classes import Mains, check_for_mains_unique_model_assignment, get_constraints
+from helpers.base_classes import Mains, get_constraints
+from helpers.helper import check_for_mains_unique_model_assignment
 
 
 class Hide(Mains):

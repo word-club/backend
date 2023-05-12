@@ -1,7 +1,8 @@
 from django.contrib.auth import get_user_model
 from django.db.models import UniqueConstraint
 
-from helpers.base_classes import Mains, check_assignment, models
+from helpers.base_classes import Mains, models
+from helpers.helper import check_if_a_key_field_is_present
 
 
 class Block(Mains):
@@ -28,7 +29,7 @@ class Block(Mains):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def save(self, *args, **kwargs):
-        check_assignment(self, ["profile", "community"])
+        check_if_a_key_field_is_present(self, "profile", "community")
         return super().save(*args, **kwargs)
 
     class Meta:

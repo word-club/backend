@@ -5,10 +5,10 @@ from django.db import models
 from choices import REPORT_STATES
 from helpers.base_classes import (
     Mains,
-    check_for_mains_unique_model_assignment,
     get_constraints,
     UniqueConstraint,
 )
+from helpers.helper import check_for_mains_unique_model_assignment
 from share.models import Share
 
 

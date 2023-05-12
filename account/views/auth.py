@@ -57,8 +57,9 @@ class LoginView(APIView):
                     user.is_active = True
                 user.save()
                 user_serializer = UserInfoSerializer(user, context={"request": request})
+                admin, created = Administration.objects.get_or_create(pk=1)
                 administration_serializer = AdministrationSerializer(
-                    Administration.objects.get(pk=1)
+                   admin
                 )
                 token, created = Token.objects.get_or_create(user=user)
                 return Response(

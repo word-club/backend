@@ -14,10 +14,10 @@ from helpers.base_classes import Reactions
 class Community(Reactions):
     unique_id = models.CharField(max_length=64, unique=True, validators=[validate_unique_id])
     name = models.CharField(max_length=64, unique=True)
-    description = models.CharField(max_length=256, null=True)
+    description = models.CharField(max_length=512, null=True)
     email = models.EmailField(unique=True, null=True)
-    quote = models.TextField(null=True)
-    welcome_text = models.TextField(null=True)
+    quote = models.CharField(max_length=256, null=True)
+    welcome_text = models.CharField(max_length=128, null=True)
 
     view_globally = models.BooleanField(default=True)
     contains_adult_content = models.BooleanField(default=False)

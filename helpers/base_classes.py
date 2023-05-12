@@ -1,5 +1,4 @@
 from django.db import models
-from django.core.exceptions import ValidationError
 from django.db.models import UniqueConstraint
 
 
@@ -26,23 +25,6 @@ def get_constraints(model):
             name=f"unique_community_user_{model}",
         ),
     ]
-
-
-def check_assignment(self, keys: list):
-    check = 0
-    for key in keys:
-        if getattr(self, key, None):
-            check += 1
-    if check == 0:
-        raise ValidationError({"detail": "One of the key field must be specified"})
-    if check > 1:
-        raise ValidationError({"detail": "Only one key field can be submitted"})
-
-
-def check_for_mains_unique_model_assignment(self, extra_keys=None):
-    if extra_keys is None:
-        extra_keys = []
-    check_assignment(self, ["publication", "comment", "profile", "community"] + extra_keys)
 
 
 class Reactions(models.Model):

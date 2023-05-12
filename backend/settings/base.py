@@ -58,6 +58,7 @@ LOCAL_APPS = [
     "link",
     "auth_code",
     "notification",
+    "ban",
 ]
 
 INSTALLED_APPS = INTERNAL_APPS + EXTERNAL_APPS + LOCAL_APPS

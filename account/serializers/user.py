@@ -183,14 +183,12 @@ class UserInfoSerializer(serializers.ModelSerializer):
 
     received_notifications = MyNotificationSerializer(many=True, read_only=True)
 
-    @staticmethod
-    def get_avatar(obj):
+    def get_avatar(self, obj):
         filterset = OrderedDict()
         filterset["profile"] = obj.profile
-        return get_active_avatar_for(filterset)
+        return get_active_avatar_for(filterset, request=self.context.get("request"))
 
-    @staticmethod
-    def get_cover(obj):
+    def get_cover(self, obj):
         filterset = OrderedDict()
         filterset["profile"] = obj.profile
         return get_active_cover_for(filterset)

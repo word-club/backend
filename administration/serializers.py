@@ -10,8 +10,8 @@ def no_negative(v):
 
 
 class AdministrationSerializer(serializers.ModelSerializer):
-    popularity_threshold = serializers.IntegerField(validators=[no_negative])
     publication_update_limit = serializers.IntegerField(validators=[no_negative])
+    popularity_threshold = serializers.IntegerField(validators=[no_negative])
     comment_update_limit = serializers.IntegerField(validators=[no_negative])
     top_count = serializers.IntegerField(validators=[no_negative])
 

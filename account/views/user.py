@@ -49,7 +49,7 @@ class GetMeView(APIView):
     @staticmethod
     def get(request):
         me = request.user
-        return Response(UserInfoSerializer(me).data, status=status.HTTP_200_OK)
+        return Response(UserInfoSerializer(me, context={"request": request}).data, status=status.HTTP_200_OK)
 
 
 class RegisterUserView(APIView):

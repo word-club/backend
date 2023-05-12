@@ -1,12 +1,11 @@
 from django.contrib.auth import get_user_model
-from django.core.exceptions import ValidationError
 from django.core.validators import FileExtensionValidator
 from django.db import models
-from django.db.models import UniqueConstraint
 
 from account.models import Profile
 from backend.settings.base import ALLOWED_IMAGES_EXTENSIONS
 from community.models import Community
+from helpers.helper import check_if_a_key_field_is_present
 from helpers.upload_path import upload_avatar_to
 
 
@@ -15,7 +14,6 @@ class Avatar(models.Model):
         upload_to=upload_avatar_to,
         validators=[FileExtensionValidator(ALLOWED_IMAGES_EXTENSIONS)],
     )
-
     profile = models.ForeignKey(
         Profile,
         on_delete=models.CASCADE,
@@ -47,15 +45,7 @@ class Avatar(models.Model):
         ordering = ["-created_at"]
 
     def save(self, *args, **kwargs):
-        check = 0
-        if self.community:
-            check += 1
-        if self.profile:
-            check += 1
-        if check == 0:
-            raise ValidationError({"detail": "One of the key field must be specified"})
-        if check > 1:
-            raise ValidationError({"detail": "Only one key field can be submitted"})
+        check_if_a_key_field_is_present(self, "community", "profile")
         return super().save(*args, **kwargs)
 
     def delete(self, using=None, keep_parents=False):

@@ -2,6 +2,8 @@ from django.core.exceptions import ValidationError
 from django.contrib.auth import get_user_model
 from django.db import models
 
+from helpers.helper import check_if_a_key_field_is_present
+
 
 class Notification(models.Model):
     is_global = models.BooleanField(default=False)
@@ -9,87 +11,24 @@ class Notification(models.Model):
     subject = models.CharField(max_length=64)
     description = models.CharField(max_length=255, blank=True, null=True)
 
-    publication = models.ForeignKey(
-        "publication.Publication",
-        null=True,
-        on_delete=models.CASCADE,
-        related_name="notifications",
-    )
-    community = models.ForeignKey(
-        "community.Community",
-        null=True,
-        on_delete=models.CASCADE,
-        related_name="notifications",
-    )
-    comment = models.ForeignKey(
-        "comment.Comment",
-        null=True,
-        on_delete=models.CASCADE,
-        related_name="notifications",
-    )
-    vote = models.ForeignKey(
-        "vote.Vote",
-        null=True,
-        on_delete=models.CASCADE,
-        related_name="notifications",
-    )
-    share = models.ForeignKey(
-        "share.Share",
-        null=True,
-        on_delete=models.CASCADE,
-        related_name="notifications",
-    )
-    subscription = models.ForeignKey(
-        "community.Subscription",
-        null=True,
-        on_delete=models.CASCADE,
-        related_name="notifications",
-    )
-    bookmark = models.ForeignKey(
-        "bookmark.Bookmark",
-        null=True,
-        on_delete=models.CASCADE,
-        related_name="notifications",
-    )
-    follow = models.ForeignKey(
-        "account.FollowUser",
-        null=True,
-        on_delete=models.CASCADE,
-        related_name="notifications",
-    )
-    report = models.ForeignKey(
-        "report.Report",
-        null=True,
-        on_delete=models.CASCADE,
-        related_name="notifications",
-    )
+    publication = models.ForeignKey("publication.Publication", null=True, on_delete=models.CASCADE, related_name="notifications")
+    community = models.ForeignKey("community.Community", null=True, on_delete=models.CASCADE, related_name="notifications")
+    comment = models.ForeignKey("comment.Comment", null=True, on_delete=models.CASCADE, related_name="notifications")
+    vote = models.ForeignKey("vote.Vote", null=True, on_delete=models.CASCADE, related_name="notifications")
+    share = models.ForeignKey("share.Share", null=True, on_delete=models.CASCADE, related_name="notifications")
+    subscription = models.ForeignKey("community.Subscription", null=True, on_delete=models.CASCADE, related_name="notifications")
+    bookmark = models.ForeignKey("bookmark.Bookmark", null=True, on_delete=models.CASCADE, related_name="notifications")
+    follow = models.ForeignKey("account.FollowUser", null=True, on_delete=models.CASCADE, related_name="notifications")
+    report = models.ForeignKey("report.Report", null=True, on_delete=models.CASCADE, related_name="notifications")
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def save(self, *args, **kwargs):
-        check = 0
-        if self.publication:
-            check += 1
-        if self.community:
-            check += 1
-        if self.comment:
-            check += 1
-        if self.vote:
-            check += 1
-        if self.share:
-            check += 1
-        if self.subscription:
-            check += 1
-        if self.bookmark:
-            check += 1
-        if self.follow:
-            check += 1
-        if self.report:
-            check += 1
-        if check == 0:
-            raise ValidationError({"detail": "One of the key field must be specified"})
-        if check > 1:
-            raise ValidationError({"detail": "Only one key field can be submitted"})
+        check_if_a_key_field_is_present(
+            self, "publication", "community", "comment", "vote",
+            "share", "subscription", "bookmark", "follow", "report"
+        )
         return super().save(*args, **kwargs)
 
     class Meta:

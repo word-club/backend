@@ -117,6 +117,7 @@ fresh-migrations:
 	make mm APP=report
 	make mm APP=notification
 	make mm APP=administration
+	make mm APP=ban
 	make migrate
 
 .PHONY: fresh

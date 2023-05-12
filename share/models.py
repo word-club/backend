@@ -1,7 +1,8 @@
 from django.contrib.auth import get_user_model
 from django.db import models
 
-from helpers.base_classes import get_constraints, check_for_mains_unique_model_assignment, Mains
+from helpers.base_classes import get_constraints, Mains
+from helpers.helper import check_for_mains_unique_model_assignment
 
 
 class Share(Mains):

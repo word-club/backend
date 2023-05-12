@@ -5,6 +5,7 @@ from django.core.exceptions import ValidationError
 from django.db import models
 
 from community.models import Community
+from helpers.helper import check_if_a_key_field_is_present
 
 
 class AuthorizationCode(models.Model):
@@ -33,15 +34,7 @@ class AuthorizationCode(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def save(self, *args, **kwargs):
-        check = 0
-        if self.community:
-            check += 1
-        if self.user:
-            check += 1
-        if check == 0:
-            raise ValidationError({"detail": "One of the key field must be specified"})
-        if check > 1:
-            raise ValidationError({"detail": "Only one key field can be submitted"})
+        check_if_a_key_field_is_present(self, "community", "user")
         return super().save(*args, **kwargs)
 
     class Meta:

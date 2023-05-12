@@ -30,18 +30,17 @@ class AddProfileCoverView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        profile = get_object_or_404(Profile, user=request.user)
+        profile = get_object_or_404(Profile, created_by=request.user)
         self.check_object_permissions(request, profile)
         context = {"profile": profile, "request": request}
         serializer = ProfileCoverSerializer(data=request.data, context=context)
-        if serializer.is_valid():
-            cv = serializer.save()
-            # if request queryset has active param, then set avatar as active
-            status_to_set = request.query_params.get("active", False)
-            if status_to_set and status_to_set.lower() == "true":
-                update_active_status_of(cv)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        serializer.is_valid(raise_exception=True)
+        cv = serializer.save()
+        # if request queryset has active param, then set avatar as active
+        status_to_set = request.query_params.get("active", False)
+        if status_to_set and status_to_set.lower() == "true":
+            update_active_status_of(cv)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
 class AddCommunityCoverView(APIView):

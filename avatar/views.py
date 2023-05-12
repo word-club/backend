@@ -36,7 +36,7 @@ class AddProfileAvatarView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        profile = get_object_or_404(Profile, user=request.user)
+        profile = get_object_or_404(Profile, created_by=request.user)
         self.check_object_permissions(request, profile)
         context = {"profile": profile, "request": request}
         serializer = ProfileAvatarSerializer(data=request.data, context=context)

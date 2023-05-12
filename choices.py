@@ -47,3 +47,16 @@ GENDER_CHOICES = (
     ("C", "I Refer To Myself As..."),
     ("XY", "I Prefer Not To Say"),
 )
+
+BAN_ITEM_MODEL_CHOICES = (
+    ("publication", "publication"),
+    ("comment", "comment"),
+    ("profile", "profile"),
+    ("community", "community"),
+)
+BAN_ITEM_APP_LABEL_CHOICES = (
+    ("publication", "publication"),
+    ("comment", "comment"),
+    ("account", "account"),
+    ("community", "community"),
+)
