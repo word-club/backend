@@ -142,3 +142,6 @@ db.sqlite3
 
 # script file
 playground.py
+
+# migrations
+**/migrations
