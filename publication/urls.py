@@ -3,6 +3,7 @@ from rest_framework.routers import DefaultRouter
 
 from publication.filter import PublicationFilter
 from publication.views import (
+    ListPublicationView,
     AddPublicationView,
     PublicationListView,
     PublicationPinView,
@@ -18,6 +19,7 @@ router.register(r"wc-publication", PublicationListView, basename="publication-li
 urlpatterns = router.urls
 
 urlpatterns += [
+    path("publication-list/", ListPublicationView.as_view()),
     path("publication/", AddPublicationView.as_view()),
     path("publication/<int:pk>/", RetrieveUpdatePublicationView.as_view()),
     path("publication/<int:pk>/publish/", PublishPublicationView.as_view()),

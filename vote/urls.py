@@ -5,7 +5,7 @@ from vote.views import (
     AddCommentUpVote,
     AddPublicationDownVote,
     AddPublicationUpVote,
-    VoteDetail,
+    VoteDetail, VoteList
 )
 
 urlpatterns = [
@@ -14,4 +14,5 @@ urlpatterns = [
     path("comment/<int:pk>/up-vote/", AddCommentUpVote.as_view()),
     path("comment/<int:pk>/down-vote/", AddCommentDownVote.as_view()),
     path("vote/<int:pk>/", VoteDetail.as_view()),
+    path("vote/", VoteList.as_view()),
 ]

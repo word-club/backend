@@ -1,28 +1,31 @@
 from collections import OrderedDict
+from pprint import pprint
 
 from avatar.models import Avatar
 from cover.models import Cover
 
 
-def get_active_avatar_for(filterset=None, request=None):
-    if filterset is None and type(filterset) != dict:
+def get_active_item_for(model_class, filterset=None, request=None):
+    if filterset is None or not isinstance(filterset, dict):
         filterset = OrderedDict()
+
     filterset["is_active"] = True
     try:
+        item = model_class.objects.get(**filterset)
         if request is None:
-            return Avatar.objects.get(**filterset).image.url
-        return "{}{}".format(request.META.get("HTTP_ORIGIN"), Avatar.objects.get(**filterset).image.url)
-    except Avatar.DoesNotExist:
+            return item.image.url
+
+        return "{}://{}{}".format(
+            getattr(request, "_request").scope.get("scheme"),
+            request.META.get("HTTP_HOST"), item.image.url
+        )
+    except model_class.DoesNotExist:
         return None
+
+
+def get_active_avatar_for(filterset=None, request=None):
+    return get_active_item_for(Avatar, filterset, request)
 
 
 def get_active_cover_for(filterset=None, request=None):
-    if filterset is None and type(filterset) != dict:
-        filterset = OrderedDict()
-    filterset["is_active"] = True
-    try:
-        if request is None:
-            return Cover.objects.get(**filterset).image.url
-        return "{}{}".format(request.META.get("HTTP_ORIGIN"), Cover.objects.get(**filterset).image.url)
-    except Cover.DoesNotExist:
-        return None
+    return get_active_item_for(Cover, filterset, request)

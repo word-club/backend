@@ -6,6 +6,7 @@ from vote.models import Vote
 
 class VoteDetailSerializer(serializers.ModelSerializer):
     class Meta:
+        depth = 1
         model = Vote
         fields = "__all__"
 

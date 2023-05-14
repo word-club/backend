@@ -15,6 +15,7 @@ from cover.serializers import CommunityCoverSerializer, Cover
 from hashtag.serializers import HashtagSerializer
 from helpers.get_active import get_active_avatar_for, get_active_cover_for
 from report.serializers import ReportSerializer
+from globals import UserGlobalSerializer
 
 
 class MyCommunitySerializer(serializers.ModelSerializer):
@@ -84,6 +85,7 @@ class CommunitySerializer(serializers.ModelSerializer):
     covers = CommunityCoverSerializer(many=True, read_only=True)
     theme = ThemeSerializer(read_only=True)
     moderators = ModeratorSerializer(many=True, read_only=True)
+    created_by = UserGlobalSerializer(read_only=True)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

@@ -7,7 +7,7 @@ from community.filters import (
     TopCommunitiesList,
     TrendingCommunityList,
 )
-from community.views.community import CommunityDetail, CommunityViewSet, ViewACommunity
+from community.views.community import CommunityList, CommunityDetail, CommunityViewSet, ViewACommunity
 from community.views.hashtag import UpdateCommunityHashtag
 from community.views.moderator import AddModerator, AddSubModerator, ModeratorDetail
 from community.views.rule import AddCommunityRule, PatchDeleteCommunityRule
@@ -28,6 +28,7 @@ urlpatterns = router.urls
 app_name = "community"
 
 urlpatterns += [
+    path("community/", CommunityList.as_view()),
     path("community/<int:pk>/", CommunityDetail.as_view()),
     path("community/top/", TopCommunitiesList.as_view()),
     path("community/trending/", TrendingCommunityList.as_view()),

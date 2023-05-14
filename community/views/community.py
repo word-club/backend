@@ -17,6 +17,7 @@ from community.serializers.community import (
     CommunitySerializer,
     RetrieveSerializer,
 )
+from account.permissions import IsSuperUser
 
 
 class CommunityViewSet(
@@ -48,6 +49,17 @@ class CommunityViewSet(
         context = super().get_serializer_context()
         context["depth"] = self.request.query_params.get("depth", 0)
         return context
+
+
+class CommunityList(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsSuperUser]
+
+    def get(self, request):
+        self.check_object_permissions(request, request.user)
+        communities = Community.objects.all()
+        serializer = CommunitySerializer(communities, many=True, context={"request": request})
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class CommunityDetail(APIView):

@@ -10,14 +10,26 @@ from share.models import Share
 
 
 class MyShareSerializer(serializers.ModelSerializer):
-    user = UserGlobalSerializer()
-    community = CommunityGlobalSerializer()
-    publication = PublicationGlobalSerializer()
-    comment = CommentGlobalSerializer()
+    user = UserGlobalSerializer(allow_null=True)
+    community = CommunityGlobalSerializer(allow_null=True)
+    publication = PublicationGlobalSerializer(allow_null=True)
+    comment = CommentGlobalSerializer(allow_null=True)
 
     class Meta:
         model = Share
         exclude = ("created_by",)
+
+
+class ShareViewSerializer(serializers.ModelSerializer):
+    user = UserGlobalSerializer(allow_null=True)
+    community = CommunityGlobalSerializer(allow_null=True)
+    publication = PublicationGlobalSerializer(allow_null=True)
+    comment = CommentGlobalSerializer(allow_null=True)
+    created_by = UserGlobalSerializer(allow_null=True)
+
+    class Meta:
+        model = Share
+        fields = "__all__"
 
 
 class ShareSerializer(serializers.ModelSerializer):

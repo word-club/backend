@@ -5,9 +5,9 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from account.permissions import IsOwner
+from account.permissions import IsOwner, IsSuperUser
 from bookmark.models import Bookmark
-from bookmark.serializers import BookmarkSerializer
+from bookmark.serializers import BookmarkSerializer, BookmarkViewSerializer
 from comment.models import Comment
 from community.models import Community
 from publication.models import Publication
@@ -82,3 +82,15 @@ class BookmarkDetail(APIView):
         bookmark = get_object_or_404(Bookmark, pk=pk)
         bookmark.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class BookmarkList(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsSuperUser]
+
+    def get(self, request):
+        self.check_object_permissions(request, request.user)
+        bookmarks = Bookmark.objects.all()
+        serializer = BookmarkViewSerializer(bookmarks, many=True, context={"request": request})
+        return Response(serializer.data, status=status.HTTP_200_OK)
+

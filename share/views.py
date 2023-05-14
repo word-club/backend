@@ -6,12 +6,12 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from account.permissions import IsOwner
+from account.permissions import IsOwner, IsSuperUser
 from comment.models import Comment
 from publication.models import Publication
 from publication.permissions import IsPublished
 from share.models import Share
-from share.serializers import ShareSerializer
+from share.serializers import ShareSerializer, ShareViewSerializer
 
 
 class AddPublicationShare(APIView):
@@ -68,3 +68,14 @@ class ShareDetail(APIView):
         self.check_object_permissions(request, share)
         share.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class ShareList(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsSuperUser]
+
+    def get(self, request):
+        self.check_object_permissions(request, request.user)
+        shares = Share.objects.all()
+        serializer = ShareViewSerializer(shares, many=True, context={"request": request})
+        return Response(serializer.data, status=status.HTTP_200_OK)

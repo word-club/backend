@@ -3,13 +3,13 @@ from backend.settings.base import *
 # SECURITY WARNING: don't include unknown hosts
 ALLOWED_HOSTS = [
     "localhost",
+    "host.docker.internal",
     "127.0.0.1",
 ]
 
 # SECURITY WARNING: don't include unknown hosts
 CORS_ALLOWED_ORIGIN_REGEXES = [
-    r"^http:\/\/localhost\:8080$",
-    r"^http:\/\/127\.0\.0\.1\:8080$",
+    r"^http:\/\/(localhost|host\.docker\.internal|127\.0\.0\.1)\:8080$",
 ]
 
 # Database

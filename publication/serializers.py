@@ -1,5 +1,6 @@
 from rest_framework import serializers
 
+from ban.serializers import BanSerializer
 from comment.models import Comment
 from comment.serializers import CommentSerializer
 from globals import CommunityGlobalSerializer, UserGlobalSerializer, PublicationGlobalSerializer
@@ -31,12 +32,11 @@ class PublicationSerializer(serializers.ModelSerializer):
         super().__init__(*args, **kwargs)
         self.Meta.depth = self.context.get("depth", 0)
 
-    @staticmethod
-    def get_comments(obj):
+    def get_comments(self, obj):
         # only include comment items that are not replies
         # replies are included in the parent comment
         comments = Comment.objects.filter(publication=obj, reply=None)
-        return CommentSerializer(comments, many=True).data
+        return CommentSerializer(comments, many=True, context=self.context).data
 
     class Meta:
         model = Publication
@@ -49,6 +49,12 @@ class MyPublicationSerializer(serializers.ModelSerializer):
     links = LinkInfoSerializer(read_only=True)
     images = PublicationImageSerializer(read_only=True, many=True)
     tags = HashtagSerializer(read_only=True, many=True)
+
+    ban = serializers.SerializerMethodField()
+
+    @staticmethod
+    def get_ban(obj):
+        return BanSerializer(obj.is_banned).data if obj.is_banned else None
 
     class Meta:
         model = Publication

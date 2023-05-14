@@ -10,7 +10,7 @@ class Ban(models.Model):
     ban_item_app_label = models.CharField(choices=BAN_ITEM_APP_LABEL_CHOICES, max_length=32)
     ban_item_model = models.CharField(choices=BAN_ITEM_MODEL_CHOICES, max_length=32)
 
-    banned_at = models.DateTimeField(null=True, editable=False)
+    banned_at = models.DateTimeField(auto_now_add=True, editable=False)
     banned_by = models.ForeignKey(
         get_user_model(), null=True, editable=False, on_delete=models.SET_NULL
     )

@@ -72,7 +72,9 @@ class UserPostSerializer(serializers.ModelSerializer):
         user.save()
         user.profile.birth_date = profile_data.get("birth_date")
         user.profile.save()
-        user.profile.gender.update(**gender_data)
+        # user.profile.gender.update(**gender_data)
+        for attr, value in gender_data.items():
+            setattr(user.profile.gender, attr, value)
         user.profile.gender.save()
         return user
 
@@ -91,12 +93,12 @@ class UserUpdateSerializer(serializers.ModelSerializer):
             profile_data = validated_data.pop("profile")
             for attr, value in profile_data.items():
                 setattr(profile, attr, value)
-                profile.save()
+            profile.save()
             if "gender" in profile_data:
                 gender_data = profile_data.pop("gender")
                 for attr, value in gender_data.items():
                     setattr(gender, attr, value)
-                    gender.save()
+                gender.save()
         if "email" in validated_data:
             profile.is_authorized = False
             profile.authorized_at = None
@@ -191,7 +193,7 @@ class UserInfoSerializer(serializers.ModelSerializer):
     def get_cover(self, obj):
         filterset = OrderedDict()
         filterset["profile"] = obj.profile
-        return get_active_cover_for(filterset)
+        return get_active_cover_for(filterset, request=self.context.get("request"))
 
     class Meta:
         model = get_user_model()

@@ -43,12 +43,12 @@ class PublicationListView(mixins.ListModelMixin, viewsets.GenericViewSet):
         # exclude banned publications and hidden publications (if user is authenticated)
         ids_to_exclude = []
         if user:
-            hides = Hide.objects.filter(publication__isnull=False)
-            [ids_to_exclude.append(hide.publication.id) for hide in hides]
-        [ids_to_exclude.append(ban.ban_item_id) for ban in Ban.objects.filter(
+            hides = Hide.objects.filter(publication__isnull=False).values("publication")
+            [ids_to_exclude.append(hide.get("publication")) for hide in hides]
+        [ids_to_exclude.append(ban.get("ban_item_id")) for ban in Ban.objects.filter(
             ban_item_model="publication",
             ban_item_app_label="publication",
-        )]
+        ).values("ban_item_id")]
 
         return queryset.exclude(
             id__in=ids_to_exclude
@@ -58,6 +58,17 @@ class PublicationListView(mixins.ListModelMixin, viewsets.GenericViewSet):
         context = super().get_serializer_context()
         context["depth"] = int(self.request.query_params.get("depth", 0))
         return context
+
+
+class ListPublicationView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsSuperUser]
+
+    def get(self, request):
+        self.check_object_permissions(request, request.user)
+        publications = Publication.objects.all()
+        serializer = PublicationSerializer(publications, many=True, context={"request": request})
+        return Response(serializer.data)
 
 
 class AddPublicationView(APIView):

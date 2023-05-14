@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 
+from ban.models import Ban
 from choices import PUBLICATION_TYPE_CHOICES
 from community.models import Community
 from hashtag.models import Hashtag
@@ -12,6 +13,9 @@ class Publication(Reactions):
 
     is_published = models.BooleanField(default=False, editable=False)
     published_at = models.DateTimeField(null=True, editable=False)
+
+    # TODO: implement pub access type (public, private, community)
+    # TODO: implement eighteen plus (18+)
 
     # TODO: implement pin from different app
     is_pinned = models.BooleanField(default=False, editable=False)
@@ -52,6 +56,17 @@ class Publication(Reactions):
 
     def is_draft(self):
         return not self.is_published
+
+    @property
+    def is_banned(self):
+        try:
+            return Ban.objects.get(
+                ban_item_id=self.pk,
+                ban_item_app_label="publication",
+                ban_item_model="publication",
+            )
+        except Ban.DoesNotExist:
+            return False
 
 
 class RecentPublication(models.Model):

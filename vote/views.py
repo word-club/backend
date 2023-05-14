@@ -5,7 +5,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from account.permissions import IsOwner
+from account.permissions import IsOwner, IsSuperUser
 from comment.models import Comment
 from publication.models import Publication
 from vote.models import Vote
@@ -83,3 +83,14 @@ class VoteDetail(APIView):
         self.check_object_permissions(request, vote)
         vote.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class VoteList(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated, IsSuperUser]
+
+    def get(self, request):
+        self.check_object_permissions(request, request.user)
+        votes = Vote.objects.all()
+        serializer = VoteDetailSerializer(votes, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
