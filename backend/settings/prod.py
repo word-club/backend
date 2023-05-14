@@ -11,7 +11,8 @@ CORS_ALLOWED_ORIGIN_REGEXES = [
 
 # CSRF ALLOWED ORIGINS
 CSRF_TRUSTED_ORIGINS = [
-    "wc.kiranparajuli.com.np"
+    "http://wc.kiranparajuli.com.np",
+    "https://wc.kiranparajuli.com.np"
 ]
 
 # Database
